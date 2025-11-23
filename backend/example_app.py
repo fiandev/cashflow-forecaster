@@ -36,24 +36,63 @@ def login():
     )
 
 
+@app.route("/profile", methods=["GET"])
+@authenticate_request
+def get_profile():
+    """Get current user profile"""
+    return UserController().profile()
+
+
+@app.route("/profile", methods=["PUT"])
+@authenticate_request
+@validate_json()
+def update_profile():
+    """Update current user profile"""
+    return UserController().update_profile()
+
+
+@app.route("/profile/change-password", methods=["POST"])
+@authenticate_request
+@validate_json(["current_password", "new_password"])
+def change_password():
+    """Change current user password"""
+    return UserController().change_password()
+
+
+@app.route("/users/search", methods=["GET"])
+@authenticate_request
+@require_permission("users:read")
+def search_users():
+    """Search users"""
+    return UserController().search_users()
+
+
+@app.route("/users/role/<string:role>", methods=["GET"])
+@authenticate_request
+@require_permission("users:read")
+def get_users_by_role(role):
+    """Get users by role"""
+    return UserController().get_users_by_role(role)
+
+
 @app.route("/users", methods=["GET"])
 @authenticate_request
 @require_permission("users:read")
 def get_users():
-    return UserController.get_users()
+    return UserController().index()
 
 
 @app.route("/users", methods=["POST"])
 @validate_json(["email", "password_hash"])
 def create_user():
-    return UserController.create_user()
+    return UserController().store()
 
 
 @app.route("/users/<int:user_id>", methods=["GET"])
 @authenticate_request
 @self_or_admin_required
 def get_user(user_id):
-    return UserController.get_user(user_id)
+    return UserController().show(user_id)
 
 
 @app.route("/users/<int:user_id>", methods=["PUT"])
@@ -61,21 +100,21 @@ def get_user(user_id):
 @self_or_admin_required
 @validate_json()
 def update_user(user_id):
-    return UserController.update_user(user_id)
+    return UserController().update(user_id)
 
 
 @app.route("/users/<int:user_id>", methods=["DELETE"])
 @authenticate_request
 @require_role("admin")
 def delete_user(user_id):
-    return UserController.delete_user(user_id)
+    return UserController().destroy(user_id)
 
 
 @app.route("/businesses", methods=["GET"])
 @authenticate_request
 @require_permission("businesses:read")
 def get_businesses():
-    return BusinessController.get_businesses()
+    return BusinessController().index()
 
 
 @app.route("/businesses", methods=["POST"])
@@ -83,14 +122,14 @@ def get_businesses():
 @require_permission("businesses:write")
 @validate_json(["name", "currency", "owner_id"])
 def create_business():
-    return BusinessController.create_business()
+    return BusinessController().store()
 
 
 @app.route("/businesses/<int:business_id>", methods=["GET"])
 @authenticate_request
 @require_permission("businesses:read")
 def get_business(business_id):
-    return BusinessController.get_business(business_id)
+    return BusinessController().show(business_id)
 
 
 @app.route("/businesses/<int:business_id>", methods=["PUT"])
@@ -98,14 +137,71 @@ def get_business(business_id):
 @business_owner_required
 @validate_json()
 def update_business(business_id):
-    return BusinessController.update_business(business_id)
+    return BusinessController().update(business_id)
 
 
 @app.route("/businesses/<int:business_id>", methods=["DELETE"])
 @authenticate_request
 @business_owner_required
 def delete_business(business_id):
-    return BusinessController.delete_business(business_id)
+    return BusinessController().destroy(business_id)
+
+
+@app.route("/my-businesses", methods=["GET"])
+@authenticate_request
+@require_permission("businesses:read")
+def my_businesses():
+    """Get current user's businesses"""
+    return BusinessController().my_businesses()
+
+
+@app.route("/businesses/search", methods=["GET"])
+@authenticate_request
+@require_permission("businesses:read")
+def search_businesses():
+    """Search businesses"""
+    return BusinessController().search()
+
+
+@app.route("/businesses/country/<string:country>", methods=["GET"])
+@authenticate_request
+@require_permission("businesses:read")
+def businesses_by_country(country):
+    """Get businesses by country"""
+    return BusinessController().by_country(country)
+
+
+@app.route("/businesses/city/<string:city>", methods=["GET"])
+@authenticate_request
+@require_permission("businesses:read")
+def businesses_by_city(city):
+    """Get businesses by city"""
+    return BusinessController().by_city(city)
+
+
+@app.route("/businesses/currency/<string:currency>", methods=["GET"])
+@authenticate_request
+@require_permission("businesses:read")
+def businesses_by_currency(currency):
+    """Get businesses by currency"""
+    return BusinessController().by_currency(currency)
+
+
+@app.route("/businesses/<int:business_id>/details", methods=["GET"])
+@authenticate_request
+@require_permission("businesses:read")
+def business_details(business_id):
+    """Get business with all details"""
+    return BusinessController().with_details(business_id)
+
+
+@app.route("/businesses/<int:business_id>/settings", methods=["PUT"])
+@authenticate_request
+@business_owner_required
+@validate_json()
+def update_business_settings(business_id):
+    """Update business settings"""
+    return BusinessController().update_settings(business_id)
 
 
 @app.route("/businesses/<int:business_id>/categories", methods=["GET"])

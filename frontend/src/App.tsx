@@ -6,11 +6,17 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { Header } from "@/components/Header";
+import { AuthInitializer } from "@/components/AuthInitializer";
+import ProtectedRoute from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Transactions from "./pages/Transactions";
 import BusinessSetup from "./pages/BusinessSetup";
 import Forecast from "./pages/Forecast";
 import ForecastResults from "./pages/ForecastResults";
+import Profile from "./pages/Profile";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -22,15 +28,48 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <SidebarProvider>
+          <AuthInitializer />
           <AppSidebar />
           <SidebarInset>
             <Header />
             <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/transactions" element={<Transactions />} />
-              <Route path="/business-setup" element={<BusinessSetup />} />
-              <Route path="/forecast" element={<Forecast />} />
-              <Route path="/forecast/results" element={<ForecastResults />} />
+              {/* Auth Routes */}
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+              
+              {/* Protected Routes */}
+              <Route path="/" element={
+                <ProtectedRoute>
+                  <Index />
+                </ProtectedRoute>
+              } />
+              <Route path="/transactions" element={
+                <ProtectedRoute>
+                  <Transactions />
+                </ProtectedRoute>
+              } />
+              <Route path="/business-setup" element={
+                <ProtectedRoute>
+                  <BusinessSetup />
+                </ProtectedRoute>
+              } />
+              <Route path="/forecast" element={
+                <ProtectedRoute>
+                  <Forecast />
+                </ProtectedRoute>
+              } />
+              <Route path="/forecast/results" element={
+                <ProtectedRoute>
+                  <ForecastResults />
+                </ProtectedRoute>
+              } />
+              <Route path="/profile" element={
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              } />
+              
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
