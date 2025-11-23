@@ -1,0 +1,29 @@
+from flask import Blueprint, request, jsonify
+from controllers.user_controller import UserController
+
+user_bp = Blueprint("users", __name__)
+
+
+@user_bp.route("/", methods=["POST"])
+def create_user():
+    return UserController.create_user()
+
+
+@user_bp.route("/", methods=["GET"])
+def get_users():
+    return UserController.get_users()
+
+
+@user_bp.route("/<int:user_id>", methods=["GET"])
+def get_user(user_id):
+    return UserController.get_user(user_id)
+
+
+@user_bp.route("/<int:user_id>", methods=["PUT"])
+def update_user(user_id):
+    return UserController.update_user(user_id)
+
+
+@user_bp.route("/<int:user_id>", methods=["DELETE"])
+def delete_user(user_id):
+    return UserController.delete_user(user_id)
