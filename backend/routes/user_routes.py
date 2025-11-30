@@ -12,7 +12,8 @@ user_bp = Blueprint("users", __name__)
 
 
 @user_bp.route("/", methods=["POST"])
-@validate_json(["email", "password_hash"])
+@require_role("admin")
+# @validate_json(["email", "password"])
 def create_user():
     return UserController().store()
 

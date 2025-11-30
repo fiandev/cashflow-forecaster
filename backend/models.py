@@ -7,7 +7,7 @@ class User(db.Model):
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(255), unique=True, nullable=False)
-    password_hash = db.Column(db.String(255), nullable=False)
+    password = db.Column(db.String(255), nullable=False)
     name = db.Column(db.String(200))
     role = db.Column(db.String(50))
     created_at = db.Column(db.DateTime, server_default=db.func.now())
@@ -57,7 +57,7 @@ class Category(db.Model):
 
 class Transaction(db.Model):
     __tablename__ = "transactions"
-    id = db.Column(db.BigInteger, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     business_id = db.Column(db.Integer, db.ForeignKey("businesses.id"), nullable=False)
     date = db.Column(db.Date, nullable=False)
     datetime = db.Column(db.DateTime)
@@ -107,7 +107,7 @@ class Model(db.Model):
 
 class ModelRun(db.Model):
     __tablename__ = "model_runs"
-    id = db.Column(db.BigInteger, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     model_id = db.Column(db.Integer, db.ForeignKey("models.id"), nullable=False)
     run_at = db.Column(db.DateTime, server_default=db.func.now())
     input_summary = db.Column(db.JSON)
@@ -120,9 +120,9 @@ class ModelRun(db.Model):
 
 class Forecast(db.Model):
     __tablename__ = "forecasts"
-    id = db.Column(db.BigInteger, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     business_id = db.Column(db.Integer, db.ForeignKey("businesses.id"), nullable=False)
-    model_run_id = db.Column(db.BigInteger, db.ForeignKey("model_runs.id"))
+    model_run_id = db.Column(db.Integer, db.ForeignKey("model_runs.id"))
     model_id = db.Column(db.Integer, db.ForeignKey("models.id"))
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     granularity = db.Column(db.String(20), nullable=False)
@@ -139,26 +139,26 @@ class Forecast(db.Model):
 
 class RiskScore(db.Model):
     __tablename__ = "risk_scores"
-    id = db.Column(db.BigInteger, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     business_id = db.Column(db.Integer, db.ForeignKey("businesses.id"), nullable=False)
     assessed_at = db.Column(db.DateTime, server_default=db.func.now())
     liquidity_score = db.Column(db.Numeric(5, 2))
     cashflow_risk_score = db.Column(db.Numeric(5, 2))
     volatility_index = db.Column(db.Numeric(10, 4))
     drawdown_prob = db.Column(db.Numeric(10, 4))
-    source_forecast_id = db.Column(db.BigInteger, db.ForeignKey("forecasts.id"))
+    source_forecast_id = db.Column(db.Integer, db.ForeignKey("forecasts.id"))
     details = db.Column(db.JSON)
 
 
 class Alert(db.Model):
     __tablename__ = "alerts"
-    id = db.Column(db.BigInteger, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     business_id = db.Column(db.Integer, db.ForeignKey("businesses.id"), nullable=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     level = db.Column(db.String(20), nullable=False)
     message = db.Column(db.Text, nullable=False)
-    linked_transaction_id = db.Column(db.BigInteger, db.ForeignKey("transactions.id"))
-    linked_forecast_id = db.Column(db.BigInteger, db.ForeignKey("forecasts.id"))
+    linked_transaction_id = db.Column(db.Integer, db.ForeignKey("transactions.id"))
+    linked_forecast_id = db.Column(db.Integer, db.ForeignKey("forecasts.id"))
     resolved = db.Column(db.Boolean, default=False)
     resolved_at = db.Column(db.DateTime)
     forecast_metadata = db.Column(db.JSON)
@@ -166,7 +166,7 @@ class Alert(db.Model):
 
 class Scenario(db.Model):
     __tablename__ = "scenarios"
-    id = db.Column(db.BigInteger, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     business_id = db.Column(db.Integer, db.ForeignKey("businesses.id"), nullable=False)
     name = db.Column(db.String(200))
     created_at = db.Column(db.DateTime, server_default=db.func.now())

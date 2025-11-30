@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from models import User, APIKey
 import hashlib
 import hmac
-
+import os
 
 class AuthenticationMiddleware:
     @staticmethod
@@ -15,7 +15,9 @@ class AuthenticationMiddleware:
             "exp": datetime.utcnow() + timedelta(hours=expires_in_hours),
             "iat": datetime.utcnow(),
         }
-        return jwt.encode(payload, secret_key, algorithm="HS256")
+        token = jwt.encode(payload, secret_key, algorithm="HS256")
+        # Ensure token is returned as string (PyJWT 2.x returns string)
+        return token if isinstance(token, str) else token.decode("utf-8")
 
     @staticmethod
     def verify_token(token, secret_key):
@@ -49,7 +51,7 @@ def authenticate_request(f):
         if auth_header and auth_header.startswith("Bearer "):
             token = auth_header.split(" ")[1]
             payload = AuthenticationMiddleware.verify_token(
-                token, "your-secret-key-here"
+                token, os.getenv("SECRET_KEY")
             )
 
             if payload:
@@ -71,7 +73,9 @@ def authenticate_request(f):
                     g.scopes = api_key.scopes.split(",") if api_key.scopes else []
 
         if not user:
-            return jsonify({"error": "Authentication required"}), 401
+            return jsonify({
+                "error": "Authentication required", 
+            }), 401
 
         g.current_user = user
         g.auth_method = auth_method

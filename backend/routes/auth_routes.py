@@ -3,6 +3,8 @@ from controllers.user_controller import UserController
 from middleware import validate_json
 from models import User
 from middleware.auth import AuthenticationMiddleware
+from utils.crypto import hash_password
+import os
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -14,13 +16,12 @@ def login():
     data = request.get_json()
 
     user = User.query.filter_by(email=data["email"]).first()
+    hashed_password = hash_password(data["password"])
 
-    if not user or user.password_hash != data["password"]:
+    if not user or user.password != hashed_password:
         return jsonify({"error": "Invalid credentials"}), 401
 
-    from app import app
-
-    token = AuthenticationMiddleware.generate_token(user.id, app.config["SECRET_KEY"])
+    token = AuthenticationMiddleware.generate_token(user.id, os.getenv("SECRET_KEY"))
 
     return jsonify(
         {
@@ -36,7 +37,7 @@ def login():
 
 
 @auth_bp.route("/register", methods=["POST"])
-@validate_json(["email", "password_hash", "name"])
+@validate_json(["email", "password", "name"])
 def register():
     """Register new user"""
     return UserController().store()

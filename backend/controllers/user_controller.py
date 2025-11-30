@@ -25,8 +25,8 @@ class UserController:
         """Create new user"""
         data = request.get_json()
 
-        if not data or not data.get("email") or not data.get("password_hash"):
-            return jsonify({"error": "Email and password_hash are required"}), 400
+        if not data or not data.get("email") or not data.get("password"):
+            return jsonify({"error": "Email and password are required"}), 400
 
         if self.user_repository.exists(email=data["email"]):
             return jsonify({"error": "Email already exists"}), 400
@@ -147,7 +147,7 @@ class UserController:
         updated_user = self.user_repository.update(
             g.current_user.id,
             {
-                "password_hash": data["new_password"]  # In real app, hash this!
+                "password": data["new_password"]  # In real app, hash this!
             },
         )
 

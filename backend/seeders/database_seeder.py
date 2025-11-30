@@ -1,7 +1,8 @@
 from datetime import datetime, date, timedelta
 from decimal import Decimal
-import hashlib
-import random
+from utils.crypto import hash_password
+import random, hashlib
+
 from models import (
     db,
     User,
@@ -56,38 +57,43 @@ class DatabaseSeeder:
 
         users_data = [
             {
-                "email": "admin@cashflow.com",
-                "password_hash": "hashed_password_admin",
+                "email": "admin@gmail.com",
+                "password": "password",
                 "name": "System Administrator",
                 "role": "admin",
             },
             {
-                "email": "john.doe@techcorp.com",
-                "password_hash": "hashed_password_john",
+                "email": "john.doe@gmail.com",
+                "password": "password",
                 "name": "John Doe",
                 "role": "owner",
             },
             {
-                "email": "jane.smith@retailco.com",
-                "password_hash": "hashed_password_jane",
+                "email": "jane.smith@gmail.com",
+                "password": "password",
                 "name": "Jane Smith",
                 "role": "owner",
             },
             {
-                "email": "mike.wilson@techcorp.com",
-                "password_hash": "hashed_password_mike",
+                "email": "mike.wilson@gmail.com",
+                "password": "password",
                 "name": "Mike Wilson",
                 "role": "manager",
             },
             {
-                "email": "sarah.brown@retailco.com",
-                "password_hash": "hashed_password_sarah",
+                "email": "sarah.brown@gmail.com",
+                "password": "password",
                 "name": "Sarah Brown",
                 "role": "analyst",
             },
         ]
 
         for user_data in users_data:
+            # Hash password using SHA256 with 255 character limit
+            password = user_data["password"]
+            hashed_password = hash_password(password)
+            user_data["password"] = hashed_password
+
             user = User(**user_data)
             db.session.add(user)
             self.users.append(user)
@@ -803,9 +809,7 @@ class DatabaseSeeder:
 
 
 def run_seeder():
-    from app import create_app
-
-    app = create_app()
+    from app import app
 
     with app.app_context():
         seeder = DatabaseSeeder()

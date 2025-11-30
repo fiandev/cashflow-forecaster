@@ -1,7 +1,9 @@
-from models import User
+from models import User, db
 from repositories.base_repository import BaseRepository
 from typing import List, Optional, Dict, Any
-
+from sqlalchemy.orm import joinedload
+from datetime import datetime, date
+from decimal import Decimal
 
 class UserRepository(BaseRepository):
     def __init__(self):
@@ -18,7 +20,7 @@ class UserRepository(BaseRepository):
     def createWithPassword(self, data: Dict[str, Any], password: str) -> User:
         """Create user with password hash"""
         user_data = data.copy()
-        user_data["password_hash"] = password
+        user_data["password"] = password
         return self.create(user_data)
 
     def updateLastLogin(self, user_id: int) -> Optional[User]:
@@ -36,7 +38,7 @@ class UserRepository(BaseRepository):
     def getWithBusinesses(self, user_id: int) -> Optional[User]:
         """Get user with their businesses"""
         return (
-            self.model.query.options(db.joinedload(self.model.businesses))
+            self.model.query.options(joinedload(self.model.businesses))
             .filter_by(id=user_id)
             .first()
         )
@@ -44,7 +46,26 @@ class UserRepository(BaseRepository):
     def getWithScenarios(self, user_id: int) -> Optional[User]:
         """Get user with their scenarios"""
         return (
-            self.model.query.options(db.joinedload(self.model.scenarios))
+            self.model.query.options(joinedload(self.model.scenarios))
             .filter_by(id=user_id)
             .first()
         )
+
+    def to_dict(self, instance: User) -> Dict[str, Any]:
+        """Convert user model instance to dictionary without password field"""
+        result = {}
+        for column in instance.__table__.columns:
+            # Skip the password field
+            if column.name == 'password':
+                continue
+
+            value = getattr(instance, column.name)
+            if isinstance(value, datetime):
+                result[column.name] = value.isoformat()
+            elif isinstance(value, date):
+                result[column.name] = value.isoformat()
+            elif isinstance(value, Decimal):
+                result[column.name] = float(value)
+            else:
+                result[column.name] = value
+        return result
