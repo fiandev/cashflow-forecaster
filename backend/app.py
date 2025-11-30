@@ -13,9 +13,7 @@ app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv(
     "DATABASE_URL", "sqlite:///" + os.path.join(basedir, "database", "database.db")
 )
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.config["SECRET_KEY"] = os.getenv(
-    "SECRET_KEY", "your-secret-key-change-in-production"
-)
+app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 
 from models import (
     db,

@@ -12,14 +12,15 @@ user_bp = Blueprint("users", __name__)
 
 
 @user_bp.route("/", methods=["POST"])
-@require_role("admin")
-# @validate_json(["email", "password"])
+@authenticate_request
+@require_role("admin")  
 def create_user():
     return UserController().store()
 
 
 @user_bp.route("/", methods=["GET"])
 @authenticate_request
+@require_role("admin")
 @require_permission("users:read")
 def get_users():
     return UserController().index()
@@ -42,7 +43,7 @@ def update_user(user_id):
 
 @user_bp.route("/<int:user_id>", methods=["DELETE"])
 @authenticate_request
-@require_role("admin")
+@self_or_admin_required
 def delete_user(user_id):
     return UserController().destroy(user_id)
 
