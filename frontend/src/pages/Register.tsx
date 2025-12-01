@@ -22,7 +22,7 @@ const Register: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  
+
   const navigate = useNavigate();
   const { register, isLoading, error, isAuthenticated } = useAuthStore();
 
@@ -67,14 +67,14 @@ const Register: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
 
     await register({
       email: formData.email,
-      password_hash: formData.password,
+      password: formData.password,
       name: formData.name,
       role: formData.role
     });
@@ -86,7 +86,7 @@ const Register: React.FC = () => {
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
-    
+
     // Clear error for this field when user starts typing
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
@@ -119,7 +119,7 @@ const Register: React.FC = () => {
               Fill in your information to get started
             </CardDescription>
           </CardHeader>
-          
+
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-4">
               {(error || Object.keys(errors).length > 0) && (
@@ -129,7 +129,7 @@ const Register: React.FC = () => {
                   </AlertDescription>
                 </Alert>
               )}
-              
+
               <div className="space-y-2">
                 <Label htmlFor="name">Full Name</Label>
                 <Input
@@ -239,7 +239,7 @@ const Register: React.FC = () => {
                   id="agreeToTerms"
                   name="agreeToTerms"
                   checked={formData.agreeToTerms}
-                  onCheckedChange={(checked) => 
+                  onCheckedChange={(checked) =>
                     setFormData(prev => ({ ...prev, agreeToTerms: checked as boolean }))
                   }
                 />
@@ -257,9 +257,9 @@ const Register: React.FC = () => {
             </CardContent>
 
             <CardFooter>
-              <Button 
-                type="submit" 
-                className="w-full" 
+              <Button
+                type="submit"
+                className="w-full"
                 disabled={isLoading}
               >
                 {isLoading ? (

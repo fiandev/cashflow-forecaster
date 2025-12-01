@@ -28,7 +28,7 @@ const UserManagement: React.FC = () => {
     email: '',
     name: '',
     role: 'user',
-    password_hash: ''
+    password: ''
   });
 
   useEffect(() => {
@@ -160,7 +160,7 @@ const UserManagement: React.FC = () => {
       email: user.email,
       name: user.name || '',
       role: user.role || 'user',
-      password_hash: ''
+      password: ''
     });
     setIsEditDialogOpen(true);
   };
@@ -170,7 +170,7 @@ const UserManagement: React.FC = () => {
       email: '',
       name: '',
       role: 'user',
-      password_hash: ''
+      password: ''
     });
     setSelectedUser(null);
   };
@@ -245,12 +245,12 @@ const UserManagement: React.FC = () => {
                 </Select>
               </div>
               <div>
-                <Label htmlFor="password_hash">Password</Label>
+                <Label htmlFor="password">Password</Label>
                 <Input
-                  id="password_hash"
-                  name="password_hash"
+                  id="password"
+                  name="password"
                   type="password"
-                  value={formData.password_hash}
+                  value={formData.password}
                   onChange={handleInputChange}
                   placeholder="Enter password"
                   required
@@ -367,9 +367,9 @@ const UserManagement: React.FC = () => {
               <Label htmlFor="edit-password">New Password (optional)</Label>
               <Input
                 id="edit-password"
-                name="password_hash"
+                name="password"
                 type="password"
-                value={formData.password_hash}
+                value={formData.password}
                 onChange={handleInputChange}
                 placeholder="Leave blank to keep current password"
               />
