@@ -8,7 +8,10 @@
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "npm run test:unit",
+    "test:unit": "echo 'No unit tests set up yet'",
+    "test:e2e": "echo 'No e2e tests set up yet'"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

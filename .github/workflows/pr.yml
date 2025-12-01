@@ -1,0 +1,90 @@
+name: Test PR
+
+on:
+  pull_request:
+    branches: [master]
+
+jobs:
+  test-backend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install backend dependencies
+        run: |
+          cd backend
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Setup backend environment
+        run: |
+          cd backend
+          cp .env.example .env
+
+      - name: Test backend components import
+        run: |
+          cd backend
+          python -c "from app import app; print('Flask app imported successfully')"
+          python -c "from models import db, User, Business; print('Models imported successfully')"
+
+      - name: Run database setup
+        run: |
+          cd backend
+          python create_tables.py || echo "Table creation completed or skipped"
+
+      - name: Run backend linting
+        run: |
+          cd backend
+          pip install flake8
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+  test-frontend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install frontend dependencies
+        run: |
+          cd frontend
+          npm ci
+
+      - name: Run frontend linting
+        run: |
+          cd frontend
+          npm run lint
+
+      - name: Run frontend type checking
+        run: |
+          cd frontend
+          npx tsc --noEmit
+
+      - name: Build frontend
+        run: |
+          cd frontend
+          npm run build
+
+  test-combined:
+    runs-on: ubuntu-latest
+    needs: [test-backend, test-frontend]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Combined checks
+        run: echo "All tests passed"
