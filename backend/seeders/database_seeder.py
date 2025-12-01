@@ -63,28 +63,16 @@ class DatabaseSeeder:
                 "role": "admin",
             },
             {
-                "email": "john.doe@gmail.com",
+                "email": "user@gmail.com",
                 "password": "password",
-                "name": "John Doe",
-                "role": "owner",
+                "name": "Owner Bisnis",
+                "role": "business_owner",
             },
             {
                 "email": "jane.smith@gmail.com",
                 "password": "password",
                 "name": "Jane Smith",
-                "role": "owner",
-            },
-            {
-                "email": "mike.wilson@gmail.com",
-                "password": "password",
-                "name": "Mike Wilson",
-                "role": "manager",
-            },
-            {
-                "email": "sarah.brown@gmail.com",
-                "password": "password",
-                "name": "Sarah Brown",
-                "role": "analyst",
+                "role": "business_owner",
             },
         ]
 
@@ -349,7 +337,7 @@ class DatabaseSeeder:
             },
             {
                 "business_id": self.businesses[0].id,
-                "uploaded_by": self.users[3].id,  # Mike Wilson
+                "uploaded_by": self.users[1].id,  # John Doe
                 "raw_text": "EXPENSE REPORT\nCloud Infrastructure\nAWS Services\nAmount: $8,750.00",
                 "parsed": {
                     "type": "expense_report",
@@ -711,7 +699,7 @@ class DatabaseSeeder:
                     "implementation_cost": 75000,
                     "risk_level": "low",
                 },
-                "run_by": self.users[3].id,  # Mike Wilson
+                "run_by": self.users[1].id,  # John Doe
             },
         ]
 

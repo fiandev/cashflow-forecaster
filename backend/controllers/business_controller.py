@@ -8,6 +8,26 @@ class BusinessController:
     def __init__(self):
         self.business_repository = BusinessRepository()
 
+    def create_business(self):
+        """Create new business"""
+        data = request.get_json()
+
+        if (
+            not data
+            or not data.get("name")
+            or not data.get("currency")
+            or not data.get("owner_id")
+        ):
+            return jsonify({"error": "Name, currency, and owner_id are required"}), 400
+
+        # Verify owner exists
+        owner = User.query.get(data["owner_id"])
+        if not owner:
+            return jsonify({"error": "Owner not found"}), 404
+
+        business = self.business_repository.createWithOwner(data, data["owner_id"])
+        return jsonify(self.business_repository.to_dict(business)), 201
+
     def index(self):
         """Get all businesses"""
         businesses = self.business_repository.all()
@@ -134,6 +154,46 @@ class BusinessController:
         business_data["alerts_count"] = len(business.alerts)
 
         return jsonify(business_data)
+
+    def get_business(self, business_id):
+        """Get specific business"""
+        business = self.business_repository.find(business_id)
+        if not business:
+            return jsonify({"error": "Business not found"}), 404
+
+        return jsonify(self.business_repository.to_dict(business))
+
+    def get_businesses(self):
+        """Get all businesses"""
+        businesses = self.business_repository.all()
+        return jsonify(
+            [self.business_repository.to_dict(business) for business in businesses]
+        )
+
+    def update_business(self, business_id):
+        """Update business"""
+        business = self.business_repository.find(business_id)
+        if not business:
+            return jsonify({"error": "Business not found"}), 404
+
+        data = request.get_json()
+
+        # If owner_id is being updated, verify the owner exists
+        if "owner_id" in data:
+            owner = User.query.get(data["owner_id"])
+            if not owner:
+                return jsonify({"error": "Owner not found"}), 404
+
+        updated_business = self.business_repository.update(business_id, data)
+        return jsonify(self.business_repository.to_dict(updated_business))
+
+    def delete_business(self, business_id):
+        """Delete business"""
+        if not self.business_repository.find(business_id):
+            return jsonify({"error": "Business not found"}), 404
+
+        self.business_repository.delete(business_id)
+        return jsonify({"message": "Business deleted successfully"})
 
     def update_settings(self, business_id):
         """Update business settings"""

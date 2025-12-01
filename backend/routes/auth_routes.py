@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 from controllers.user_controller import UserController
+from controllers.business_controller import BusinessController
 from middleware import validate_json
 from models import User
 from middleware.auth import AuthenticationMiddleware
@@ -7,6 +8,8 @@ from utils.crypto import hash_password
 import os
 
 auth_bp = Blueprint("auth", __name__)
+
+business_controller = BusinessController()
 
 
 @auth_bp.route("/login", methods=["POST"])
@@ -40,7 +43,7 @@ def login():
 @validate_json(["email", "password", "name"])
 def register():
     """Register new user"""
-    return UserController().store()
+    return UserController().bussinessOwnerStore()
 
 
 @auth_bp.route("/me", methods=["GET"])
@@ -53,3 +56,9 @@ def get_current_user():
         return UserController().profile()
 
     return _get_current_user()
+
+
+@auth_bp.route("/business/register", methods=["POST"])
+def register_business():
+    """Register new business for the authenticated user"""
+    return business_controller.create_business()

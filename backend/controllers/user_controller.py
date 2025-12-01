@@ -34,6 +34,20 @@ class UserController:
         user = self.user_repository.create(data)
         return jsonify(self.user_repository.to_dict(user)), 201
 
+    def bussinessOwnerStore(self):
+        """Create new user"""
+        data = request.get_json()
+        data["role"] = "business_owner"
+        
+        if not data or not data.get("email") or not data.get("password"):
+            return jsonify({"error": "Email and password are required"}), 400
+
+        if self.user_repository.exists(email=data["email"]):
+            return jsonify({"error": "Email already exists"}), 400
+
+        user = self.user_repository.createWithPassword(data, data["password"])
+        return jsonify(self.user_repository.to_dict(user)), 201
+
     def update(self, user_id):
         """Update user"""
         user = self.user_repository.find(user_id)

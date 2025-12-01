@@ -1,6 +1,6 @@
 from flask import request, jsonify, g
 from functools import wraps
-from models import Business, User
+from models import Business, User, Transaction
 
 
 class PermissionPolicies:
@@ -276,6 +276,32 @@ def business_owner_required(f):
             return jsonify({"error": "Business owner access required"}), 403
 
         g.current_business = business
+        return f(*args, **kwargs)
+
+    return decorated_function
+
+
+def transaction_access_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not hasattr(g, "current_user") or not g.current_user:
+            return jsonify({"error": "Authentication required"}), 401
+
+        transaction_id = kwargs.get("transaction_id") or request.view_args.get("transaction_id")
+
+        if not transaction_id:
+            return f(*args, **kwargs)  # Allow for create operations that don't have transaction_id yet
+
+        # Get the transaction to check ownership
+        transaction = Transaction.query.get(transaction_id)
+        if not transaction:
+            return jsonify({"error": "Transaction not found"}), 404
+
+        # Allow access if user is admin or owner of the business that owns the transaction
+        if g.current_user.role != "admin" and transaction.business.owner_id != g.current_user.id:
+            return jsonify({"error": "Transaction access denied"}), 403
+
+        g.current_transaction = transaction
         return f(*args, **kwargs)
 
     return decorated_function

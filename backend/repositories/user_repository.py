@@ -4,6 +4,7 @@ from typing import List, Optional, Dict, Any
 from sqlalchemy.orm import joinedload
 from datetime import datetime, date
 from decimal import Decimal
+from utils.crypto import hash_password
 
 class UserRepository(BaseRepository):
     def __init__(self):
@@ -20,7 +21,7 @@ class UserRepository(BaseRepository):
     def createWithPassword(self, data: Dict[str, Any], password: str) -> User:
         """Create user with password hash"""
         user_data = data.copy()
-        user_data["password"] = password
+        user_data["password"] = hash_password(password)
         return self.create(user_data)
 
     def updateLastLogin(self, user_id: int) -> Optional[User]:
