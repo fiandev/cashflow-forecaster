@@ -1,4 +1,4 @@
-from flask import request, jsonify
+from flask import request, jsonify, g
 from models import db, Alert, Business, Transaction, Forecast
 from datetime import datetime
 
@@ -21,6 +21,11 @@ class AlertController:
         business = Business.query.get(data["business_id"])
         if not business:
             return jsonify({"error": "Business not found"}), 404
+
+        # Check if the authenticated user can create an alert for this business
+        if g.current_user.role != "admin":
+            if business.owner_id != g.current_user.id:
+                return jsonify({"error": "You can only create alerts for your own businesses"}), 403
 
         if "linked_transaction_id" in data and data["linked_transaction_id"]:
             transaction = Transaction.query.get(data["linked_transaction_id"])
@@ -69,7 +74,12 @@ class AlertController:
 
     @staticmethod
     def get_alerts():
-        alerts = Alert.query.all()
+        # Only admin users can see all alerts, regular users can only see their own business alerts
+        if g.current_user.role == "admin":
+            alerts = Alert.query.all()
+        else:
+            alerts = Alert.query.join(Business).filter(Business.owner_id == g.current_user.id).all()
+
         return jsonify(
             [
                 {
@@ -98,6 +108,11 @@ class AlertController:
         if not alert:
             return jsonify({"error": "Alert not found"}), 404
 
+        # Non-admin users can only access alerts from their own businesses
+        if g.current_user.role != "admin":
+            if alert.business.owner_id != g.current_user.id:
+                return jsonify({"error": "Access denied. You can only view alerts from your own businesses."}), 403
+
         return jsonify(
             {
                 "id": alert.id,
@@ -122,6 +137,10 @@ class AlertController:
         alert = Alert.query.get(alert_id)
         if not alert:
             return jsonify({"error": "Alert not found"}), 404
+
+        # Only admin users can update alerts
+        if g.current_user.role != "admin":
+            return jsonify({"error": "Admin access required to update alerts"}), 403
 
         data = request.get_json()
 
@@ -195,6 +214,10 @@ class AlertController:
         if not alert:
             return jsonify({"error": "Alert not found"}), 404
 
+        # Only admin users can delete alerts
+        if g.current_user.role != "admin":
+            return jsonify({"error": "Admin access required to delete alerts"}), 403
+
         db.session.delete(alert)
         db.session.commit()
 
@@ -205,6 +228,10 @@ class AlertController:
         business = Business.query.get(business_id)
         if not business:
             return jsonify({"error": "Business not found"}), 404
+
+        # Check if the user has access to this business
+        if g.current_user.role != "admin" and business.owner_id != g.current_user.id:
+            return jsonify({"error": "Access denied. You can only view alerts from your own businesses."}), 403
 
         alerts = Alert.query.filter_by(business_id=business_id).all()
         return jsonify(
@@ -231,7 +258,11 @@ class AlertController:
 
     @staticmethod
     def get_alerts_by_level(level):
-        alerts = Alert.query.filter_by(level=level).all()
+        # Only admin users can see all alerts by level, regular users can only see their own business alerts by level
+        if g.current_user.role == "admin":
+            alerts = Alert.query.filter_by(level=level).all()
+        else:
+            alerts = Alert.query.join(Business).filter(Business.owner_id == g.current_user.id, Alert.level == level).all()
         return jsonify(
             [
                 {
@@ -256,7 +287,11 @@ class AlertController:
 
     @staticmethod
     def get_unresolved_alerts():
-        alerts = Alert.query.filter_by(resolved=False).all()
+        # Only admin users can see all unresolved alerts, regular users can only see their own business unresolved alerts
+        if g.current_user.role == "admin":
+            alerts = Alert.query.filter_by(resolved=False).all()
+        else:
+            alerts = Alert.query.join(Business).filter(Business.owner_id == g.current_user.id, Alert.resolved == False).all()
         return jsonify(
             [
                 {
@@ -284,6 +319,10 @@ class AlertController:
         alert = Alert.query.get(alert_id)
         if not alert:
             return jsonify({"error": "Alert not found"}), 404
+
+        # Only admin users can resolve any alert, but regular users can only resolve alerts from their own businesses
+        if g.current_user.role != "admin" and alert.business.owner_id != g.current_user.id:
+            return jsonify({"error": "Access denied. You can only resolve alerts from your own businesses."}), 403
 
         alert.resolved = True
         alert.resolved_at = datetime.utcnow()

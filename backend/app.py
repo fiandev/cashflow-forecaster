@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from flask_cors import CORS
 from dotenv import load_dotenv
 import os
 
@@ -14,6 +15,11 @@ app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv(
 )
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
+
+# Enable CORS for localhost:5173
+CORS(app, 
+    origins=["http://localhost:5173/", "http://127.0.0.1:5173/"]
+)
 
 from models import (
     db,
@@ -44,4 +50,4 @@ def index():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=os.getenv("APP_ENV", "development") != "production")

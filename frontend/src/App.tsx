@@ -16,6 +16,7 @@ import ForecastResults from "./pages/ForecastResults";
 import Profile from "./pages/Profile";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import RegisterBusiness from "./pages/RegisterBusiness";
 import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 
@@ -36,8 +37,9 @@ const App = () => (
               {/* Auth Routes */}
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
+              <Route path="/register-business" element={<RegisterBusiness />} />
               <Route path="/reset-password" element={<ResetPassword />} />
-              
+
               {/* Protected Routes */}
               <Route path="/" element={
                 <ProtectedRoute>
@@ -69,7 +71,7 @@ const App = () => (
                   <Profile />
                 </ProtectedRoute>
               } />
-              
+
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

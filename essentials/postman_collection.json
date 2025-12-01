@@ -1,0 +1,1983 @@
+{
+	"info": {
+		"_postman_id": "6d8449e1-39b2-4f1e-8dcd-d7a996cee951",
+		"name": "AI cashflow backend API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "23200119"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Bussiness",
+					"item": [
+						{
+							"name": "Register",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Business Name\",\n    \"currency\": \"IDR\",\n    \"owner_id\": 1\n}\n"
+								},
+								"url": "{{DEV_URL}}/api/auth//business/register"
+							},
+							"response": [
+								{
+									"name": "400",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer {{token}}",
+												"type": "text"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"name\": \"Updated Business Name\",\n    \"description\": \"Updated Description\"\n}\n"
+										},
+										"url": "{{DEV_URL}}/api/auth//business/register"
+									},
+									"status": "BAD REQUEST",
+									"code": 400,
+									"_postman_previewlanguage": null,
+									"header": [
+										{
+											"key": "Server",
+											"value": "Werkzeug/3.1.3 Python/3.14.0"
+										},
+										{
+											"key": "Date",
+											"value": "Mon, 01 Dec 2025 03:51:47 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "59"
+										},
+										{
+											"key": "Connection",
+											"value": "close"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"error\": \"Name, currency, and owner_id are required\"\n}"
+								},
+								{
+									"name": "201",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer {{token}}",
+												"type": "text"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"name\": \"Business Name\",\n    \"currency\": \"IDR\",\n    \"owner_id\": 1\n}\n"
+										},
+										"url": "{{DEV_URL}}/api/auth//business/register"
+									},
+									"status": "CREATED",
+									"code": 201,
+									"_postman_previewlanguage": null,
+									"header": [
+										{
+											"key": "Server",
+											"value": "Werkzeug/3.1.3 Python/3.14.0"
+										},
+										{
+											"key": "Date",
+											"value": "Mon, 01 Dec 2025 04:28:43 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "211"
+										},
+										{
+											"key": "Connection",
+											"value": "close"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"city\": null,\n    \"country\": null,\n    \"created_at\": \"2025-12-01T04:28:43\",\n    \"currency\": \"IDR\",\n    \"id\": 4,\n    \"name\": \"Updated Business Name\",\n    \"owner_id\": 1,\n    \"settings\": null,\n    \"timezone\": \"Asia/Jakarta\"\n}"
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let json = pm.response.json();",
+									"",
+									"pm.collectionVariables.set(\"token\", json.token);"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"user@gmail.com\",\n    \"password\": \"password\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{DEV_URL}}/api/auth/login"
+					},
+					"response": [
+						{
+							"name": "200",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"admin@gmail.com\",\n    \"password\": \"password\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{DEV_URL}}/api/auth/login"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.14.0"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 30 Nov 2025 13:50:10 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "280"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJleHAiOjE3NjQ1OTcwMTAsImlhdCI6MTc2NDUxMDYxMH0.GcqNHW7oSdC1wTqBUsuohhH88XQ7jlysuURW867aWpU\",\n    \"user\": {\n        \"email\": \"admin@gmail.com\",\n        \"id\": 1,\n        \"name\": \"System Administrator\",\n        \"role\": \"admin\"\n    }\n}"
+						},
+						{
+							"name": "401",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"admin@gmail.com\",\n    \"password\": \"no\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{DEV_URL}}/api/auth/login"
+							},
+							"status": "UNAUTHORIZED",
+							"code": 401,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.14.0"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 30 Nov 2025 13:50:37 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "37"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"error\": \"Invalid credentials\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"newuser@gmail.com\",\n    \"password\": \"password\",\n    \"name\": \"New User\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{DEV_URL}}/api/auth/register"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Current User",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": "{{DEV_URL}}/api/auth/me"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Profile",
+			"item": [
+				{
+					"name": "Get Profile",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": "{{DEV_URL}}/api/profile/"
+					},
+					"response": [
+						{
+							"name": "200",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}",
+										"type": "text"
+									}
+								],
+								"url": "{{DEV_URL}}/api/profile/"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.14.0"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 30 Nov 2025 14:03:06 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "1077"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"auth_method\": \"token\",\n    \"businesses\": [],\n    \"created_at\": \"2025-11-30T13:34:53\",\n    \"email\": \"admin@gmail.com\",\n    \"id\": 1,\n    \"last_login\": null,\n    \"name\": \"System Administrator\",\n    \"permissions\": [\n        \"users:read\",\n        \"users:write\",\n        \"users:delete\",\n        \"businesses:read\",\n        \"businesses:write\",\n        \"businesses:delete\",\n        \"categories:read\",\n        \"categories:write\",\n        \"categories:delete\",\n        \"transactions:read\",\n        \"transactions:write\",\n        \"transactions:delete\",\n        \"ocr_documents:read\",\n        \"ocr_documents:write\",\n        \"ocr_documents:delete\",\n        \"models:read\",\n        \"models:write\",\n        \"models:delete\",\n        \"model_runs:read\",\n        \"model_runs:write\",\n        \"model_runs:delete\",\n        \"forecasts:read\",\n        \"forecasts:write\",\n        \"forecasts:delete\",\n        \"risk_scores:read\",\n        \"risk_scores:write\",\n        \"risk_scores:delete\",\n        \"alerts:read\",\n        \"alerts:write\",\n        \"alerts:delete\",\n        \"scenarios:read\",\n        \"scenarios:write\",\n        \"scenarios:delete\",\n        \"api_keys:read\",\n        \"api_keys:write\",\n        \"api_keys:delete\"\n    ],\n    \"role\": \"admin\",\n    \"scenarios\": []\n}"
+						}
+					]
+				},
+				{
+					"name": "Update Profile",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Updated Name\",\n    \"email\": \"updated@example.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{DEV_URL}}/api/profile/"
+					},
+					"response": []
+				},
+				{
+					"name": "Change Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"current_password\": \"old_password\",\n    \"new_password\": \"new_password\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{DEV_URL}}/api/profile/change-password"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "Get All Users",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": "{{DEV_URL}}/api/users/"
+					},
+					"response": [
+						{
+							"name": "200",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}",
+										"type": "text"
+									}
+								],
+								"url": "{{DEV_URL}}/api/users/"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.14.0"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 30 Nov 2025 14:03:47 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "862"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"created_at\": \"2025-11-30T13:34:53\",\n        \"email\": \"admin@gmail.com\",\n        \"id\": 1,\n        \"last_login\": null,\n        \"name\": \"System Administrator\",\n        \"role\": \"admin\"\n    },\n    {\n        \"created_at\": \"2025-11-30T13:34:53\",\n        \"email\": \"john.doe@gmail.com\",\n        \"id\": 2,\n        \"last_login\": null,\n        \"name\": \"John Doe\",\n        \"role\": \"owner\"\n    },\n    {\n        \"created_at\": \"2025-11-30T13:34:53\",\n        \"email\": \"jane.smith@gmail.com\",\n        \"id\": 3,\n        \"last_login\": null,\n        \"name\": \"Jane Smith\",\n        \"role\": \"owner\"\n    },\n    {\n        \"created_at\": \"2025-11-30T13:34:53\",\n        \"email\": \"mike.wilson@gmail.com\",\n        \"id\": 4,\n        \"last_login\": null,\n        \"name\": \"Mike Wilson\",\n        \"role\": \"manager\"\n    },\n    {\n        \"created_at\": \"2025-11-30T13:34:53\",\n        \"email\": \"sarah.brown@gmail.com\",\n        \"id\": 5,\n        \"last_login\": null,\n        \"name\": \"Sarah Brown\",\n        \"role\": \"analyst\"\n    }\n]"
+						}
+					]
+				},
+				{
+					"name": "Create User",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"newuser@example.com\",\n    \"password\": \"password\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{DEV_URL}}/api/users/"
+					},
+					"response": [
+						{
+							"name": "401",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"newuser@example.com\",\n    \"password\": \"password\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{DEV_URL}}/api/users/"
+							},
+							"status": "UNAUTHORIZED",
+							"code": 401,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.14.0"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 30 Nov 2025 14:04:55 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "41"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"error\": \"Authentication required\"\n}"
+						},
+						{
+							"name": "200",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"newuser@example.com\",\n    \"password\": \"password\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{DEV_URL}}/api/users/"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.14.0"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 30 Nov 2025 14:18:52 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "1020"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"created_at\": \"2025-11-30T13:34:53\",\n        \"email\": \"admin@gmail.com\",\n        \"id\": 1,\n        \"last_login\": null,\n        \"name\": \"System Administrator\",\n        \"role\": \"admin\"\n    },\n    {\n        \"created_at\": \"2025-11-30T13:34:53\",\n        \"email\": \"john.doe@gmail.com\",\n        \"id\": 2,\n        \"last_login\": null,\n        \"name\": \"John Doe\",\n        \"role\": \"owner\"\n    },\n    {\n        \"created_at\": \"2025-11-30T13:34:53\",\n        \"email\": \"jane.smith@gmail.com\",\n        \"id\": 3,\n        \"last_login\": null,\n        \"name\": \"Jane Smith\",\n        \"role\": \"owner\"\n    },\n    {\n        \"created_at\": \"2025-11-30T13:34:53\",\n        \"email\": \"mike.wilson@gmail.com\",\n        \"id\": 4,\n        \"last_login\": null,\n        \"name\": \"Mike Wilson\",\n        \"role\": \"manager\"\n    },\n    {\n        \"created_at\": \"2025-11-30T13:34:53\",\n        \"email\": \"sarah.brown@gmail.com\",\n        \"id\": 5,\n        \"last_login\": null,\n        \"name\": \"Sarah Brown\",\n        \"role\": \"analyst\"\n    },\n    {\n        \"created_at\": \"2025-11-30T14:04:09\",\n        \"email\": \"newuser@example.com\",\n        \"id\": 6,\n        \"last_login\": null,\n        \"name\": null,\n        \"role\": null\n    }\n]"
+						}
+					]
+				},
+				{
+					"name": "Get User by ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": "{{DEV_URL}}/api/users/{{user_id}}"
+					},
+					"response": [
+						{
+							"name": "200",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}",
+										"type": "text"
+									}
+								],
+								"url": "{{DEV_URL}}/api/users/{{user_id}}"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.14.0"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 30 Nov 2025 14:25:48 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "158"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"created_at\": \"2025-11-30T13:34:53\",\n    \"email\": \"admin@gmail.com\",\n    \"id\": 1,\n    \"last_login\": null,\n    \"name\": \"System Administrator\",\n    \"role\": \"admin\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Update User by ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Yui\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{DEV_URL}}/api/users/{{user_id}}"
+					},
+					"response": [
+						{
+							"name": "200",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Yui\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{DEV_URL}}/api/users/{{user_id}}"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.14.0"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 30 Nov 2025 14:29:31 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "141"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"created_at\": \"2025-11-30T13:34:53\",\n    \"email\": \"admin@gmail.com\",\n    \"id\": 1,\n    \"last_login\": null,\n    \"name\": \"Yui\",\n    \"role\": \"admin\"\n}"
+						},
+						{
+							"name": "200",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Yui\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{DEV_URL}}/api/users/{{user_id}}"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.14.0"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 30 Nov 2025 15:13:10 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "141"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"created_at\": \"2025-11-30T15:11:45\",\n    \"email\": \"admin@gmail.com\",\n    \"id\": 1,\n    \"last_login\": null,\n    \"name\": \"Yui\",\n    \"role\": \"admin\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Delete User by ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": "{{DEV_URL}}/api/users/1"
+					},
+					"response": [
+						{
+							"name": "200",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}",
+										"type": "text"
+									}
+								],
+								"url": "{{DEV_URL}}/api/users/1"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.14.0"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 30 Nov 2025 15:13:26 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "45"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"User deleted successfully\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Search Users",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{DEV_URL}}/api/users/search?q=a",
+							"host": [
+								"{{DEV_URL}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"search"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": "a"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{DEV_URL}}/api/users/search?q=a",
+									"host": [
+										"{{DEV_URL}}"
+									],
+									"path": [
+										"api",
+										"users",
+										"search"
+									],
+									"query": [
+										{
+											"key": "q",
+											"value": "a"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.14.0"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 30 Nov 2025 15:14:18 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "862"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"created_at\": \"2025-11-30T15:13:51\",\n        \"email\": \"admin@gmail.com\",\n        \"id\": 1,\n        \"last_login\": null,\n        \"name\": \"System Administrator\",\n        \"role\": \"admin\"\n    },\n    {\n        \"created_at\": \"2025-11-30T15:13:51\",\n        \"email\": \"john.doe@gmail.com\",\n        \"id\": 2,\n        \"last_login\": null,\n        \"name\": \"John Doe\",\n        \"role\": \"owner\"\n    },\n    {\n        \"created_at\": \"2025-11-30T15:13:51\",\n        \"email\": \"jane.smith@gmail.com\",\n        \"id\": 3,\n        \"last_login\": null,\n        \"name\": \"Jane Smith\",\n        \"role\": \"owner\"\n    },\n    {\n        \"created_at\": \"2025-11-30T15:13:51\",\n        \"email\": \"mike.wilson@gmail.com\",\n        \"id\": 4,\n        \"last_login\": null,\n        \"name\": \"Mike Wilson\",\n        \"role\": \"manager\"\n    },\n    {\n        \"created_at\": \"2025-11-30T15:13:51\",\n        \"email\": \"sarah.brown@gmail.com\",\n        \"id\": 5,\n        \"last_login\": null,\n        \"name\": \"Sarah Brown\",\n        \"role\": \"analyst\"\n    }\n]"
+						}
+					]
+				},
+				{
+					"name": "Get Users by Role",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": "{{DEV_URL}}/api/users/role/{{role}}"
+					},
+					"response": [
+						{
+							"name": "200",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}",
+										"type": "text"
+									}
+								],
+								"url": "{{DEV_URL}}/api/users/role/{{role}}"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.14.0"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 30 Nov 2025 15:14:40 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "178"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"created_at\": \"2025-11-30T15:13:51\",\n        \"email\": \"admin@gmail.com\",\n        \"id\": 1,\n        \"last_login\": null,\n        \"name\": \"System Administrator\",\n        \"role\": \"admin\"\n    }\n]"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Businesses",
+			"item": [
+				{
+					"name": "Get All Businesses",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": "{{DEV_URL}}/api/businesses/"
+					},
+					"response": [
+						{
+							"name": "200",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}",
+										"type": "text"
+									}
+								],
+								"url": "{{DEV_URL}}/api/businesses/"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.14.0"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 01 Dec 2025 03:47:14 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "923"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"city\": \"San Francisco\",\n        \"country\": \"United States\",\n        \"created_at\": \"2025-11-30T15:13:51\",\n        \"currency\": \"USD\",\n        \"id\": 1,\n        \"name\": \"TechCorp Solutions\",\n        \"owner_id\": 2,\n        \"settings\": {\n            \"employees\": 150,\n            \"industry\": \"technology\"\n        },\n        \"timezone\": \"America/Los_Angeles\"\n    },\n    {\n        \"city\": \"Toronto\",\n        \"country\": \"Canada\",\n        \"created_at\": \"2025-11-30T15:13:51\",\n        \"currency\": \"CAD\",\n        \"id\": 2,\n        \"name\": \"RetailCo Stores\",\n        \"owner_id\": 3,\n        \"settings\": {\n            \"industry\": \"retail\",\n            \"stores\": 25\n        },\n        \"timezone\": \"America/Toronto\"\n    },\n    {\n        \"city\": \"New York\",\n        \"country\": \"United States\",\n        \"created_at\": \"2025-11-30T15:13:51\",\n        \"currency\": \"USD\",\n        \"id\": 3,\n        \"name\": \"CloudTech Services\",\n        \"owner_id\": 2,\n        \"settings\": {\n            \"clients\": 500,\n            \"industry\": \"cloud_services\"\n        },\n        \"timezone\": \"America/New_York\"\n    }\n]"
+						}
+					]
+				},
+				{
+					"name": "Get Business by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": "{{DEV_URL}}/api/businesses/3"
+					},
+					"response": [
+						{
+							"name": "200",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}",
+										"type": "text"
+									}
+								],
+								"url": "{{DEV_URL}}/api/businesses/3"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.14.0"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 01 Dec 2025 03:49:13 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "283"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"city\": \"New York\",\n    \"country\": \"United States\",\n    \"created_at\": \"2025-11-30T15:13:51\",\n    \"currency\": \"USD\",\n    \"id\": 3,\n    \"name\": \"CloudTech Services\",\n    \"owner_id\": 2,\n    \"settings\": {\n        \"clients\": 500,\n        \"industry\": \"cloud_services\"\n    },\n    \"timezone\": \"America/New_York\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Update Business by ID",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Updated Business Name\",\n    \"description\": \"Updated Description\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{DEV_URL}}/api/businesses/2"
+					},
+					"response": [
+						{
+							"name": "200",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Updated Business Name\",\n    \"description\": \"Updated Description\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{DEV_URL}}/api/businesses/2"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.14.0"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 01 Dec 2025 03:49:33 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "267"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"city\": \"Toronto\",\n    \"country\": \"Canada\",\n    \"created_at\": \"2025-11-30T15:13:51\",\n    \"currency\": \"CAD\",\n    \"id\": 2,\n    \"name\": \"Updated Business Name\",\n    \"owner_id\": 3,\n    \"settings\": {\n        \"industry\": \"retail\",\n        \"stores\": 25\n    },\n    \"timezone\": \"America/Toronto\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Delete Business by ID",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": "{{DEV_URL}}/api/businesses/3"
+					},
+					"response": [
+						{
+							"name": "200",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}",
+										"type": "text"
+									}
+								],
+								"url": "{{DEV_URL}}/api/businesses/3"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.14.0"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 01 Dec 2025 03:59:55 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "49"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"Business deleted successfully\"\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Transactions",
+			"item": [
+				{
+					"name": "Get All Transactions",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": "{{DEV_URL}}/api/transactions/"
+					},
+					"response": [
+						{
+							"name": "200",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}",
+										"type": "text"
+									}
+								],
+								"url": "{{DEV_URL}}/api/transactions/"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.14.0"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 01 Dec 2025 04:00:23 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "8751"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"ai_tag\": null,\n        \"amount\": 20177.59,\n        \"business_id\": 1,\n        \"category_id\": 1,\n        \"created_at\": \"2025-11-30T15:13:51\",\n        \"date\": \"2025-09-01\",\n        \"datetime\": \"2025-09-01T00:00:00\",\n        \"description\": \"Client payment #1\",\n        \"direction\": \"inflow\",\n        \"id\": 1,\n        \"is_anomalous\": false,\n        \"ocr_document_id\": null,\n        \"source\": \"bank_transfer\",\n        \"tags\": [\n            \"client\",\n            \"software\"\n        ],\n        \"updated_at\": null\n    },\n    {\n        \"ai_tag\": null,\n        \"amount\": 12105.82,\n        \"business_id\": 1,\n        \"category_id\": 3,\n        \"created_at\": \"2025-11-30T15:13:51\",\n        \"date\": \"2025-09-05\",\n        \"datetime\": \"2025-09-05T00:00:00\",\n        \"description\": \"Salary payment #2\",\n        \"direction\": \"outflow\",\n        \"id\": 2,\n        \"is_anomalous\": false,\n        \"ocr_document_id\": null,\n        \"source\": \"bank_transfer\",\n        \"tags\": [\n            \"payroll\"\n        ],\n        \"updated_at\": null\n    },\n    {\n        \"ai_tag\": null,\n        \"amount\": 9971.72,\n        \"business_id\": 1,\n        \"category_id\": 3,\n        \"created_at\": \"2025-11-30T15:13:51\",\n        \"date\": \"2025-09-09\",\n        \"datetime\": \"2025-09-09T00:00:00\",\n        \"description\": \"Salary payment #3\",\n        \"direction\": \"outflow\",\n        \"id\": 3,\n        \"is_anomalous\": false,\n        \"ocr_document_id\": null,\n        \"source\": \"bank_transfer\",\n        \"tags\": [\n            \"payroll\"\n        ],\n        \"updated_at\": null\n    },\n    {\n        \"ai_tag\": null,\n        \"amount\": 14979.05,\n        \"business_id\": 1,\n        \"category_id\": 1,\n        \"created_at\": \"2025-11-30T15:13:51\",\n        \"date\": \"2025-09-13\",\n        \"datetime\": \"2025-09-13T00:00:00\",\n        \"description\": \"Client payment #4\",\n        \"direction\": \"inflow\",\n        \"id\": 4,\n        \"is_anomalous\": false,\n        \"ocr_document_id\": null,\n        \"source\": \"bank_transfer\",\n        \"tags\": [\n            \"client\",\n            \"software\"\n        ],\n        \"updated_at\": null\n    },\n    {\n        \"ai_tag\": null,\n        \"amount\": 13074.04,\n        \"business_id\": 1,\n        \"category_id\": 3,\n        \"created_at\": \"2025-11-30T15:13:51\",\n        \"date\": \"2025-09-17\",\n        \"datetime\": \"2025-09-17T00:00:00\",\n        \"description\": \"Salary payment #5\",\n        \"direction\": \"outflow\",\n        \"id\": 5,\n        \"is_anomalous\": false,\n        \"ocr_document_id\": null,\n        \"source\": \"bank_transfer\",\n        \"tags\": [\n            \"payroll\"\n        ],\n        \"updated_at\": null\n    },\n    {\n        \"ai_tag\": null,\n        \"amount\": 14214.73,\n        \"business_id\": 1,\n        \"category_id\": 3,\n        \"created_at\": \"2025-11-30T15:13:51\",\n        \"date\": \"2025-09-21\",\n        \"datetime\": \"2025-09-21T00:00:00\",\n        \"description\": \"Salary payment #6\",\n        \"direction\": \"outflow\",\n        \"id\": 6,\n        \"is_anomalous\": false,\n        \"ocr_document_id\": null,\n        \"source\": \"bank_transfer\",\n        \"tags\": [\n            \"payroll\"\n        ],\n        \"updated_at\": null\n    },\n    {\n        \"ai_tag\": null,\n        \"amount\": 21040.07,\n        \"business_id\": 1,\n        \"category_id\": 1,\n        \"created_at\": \"2025-11-30T15:13:51\",\n        \"date\": \"2025-09-25\",\n        \"datetime\": \"2025-09-25T00:00:00\",\n        \"description\": \"Client payment #7\",\n        \"direction\": \"inflow\",\n        \"id\": 7,\n        \"is_anomalous\": false,\n        \"ocr_document_id\": null,\n        \"source\": \"bank_transfer\",\n        \"tags\": [\n            \"client\",\n            \"software\"\n        ],\n        \"updated_at\": null\n    },\n    {\n        \"ai_tag\": null,\n        \"amount\": 11183.92,\n        \"business_id\": 1,\n        \"category_id\": 3,\n        \"created_at\": \"2025-11-30T15:13:51\",\n        \"date\": \"2025-09-29\",\n        \"datetime\": \"2025-09-29T00:00:00\",\n        \"description\": \"Salary payment #8\",\n        \"direction\": \"outflow\",\n        \"id\": 8,\n        \"is_anomalous\": false,\n        \"ocr_document_id\": null,\n        \"source\": \"bank_transfer\",\n        \"tags\": [\n            \"payroll\"\n        ],\n        \"updated_at\": null\n    },\n    {\n        \"ai_tag\": null,\n        \"amount\": 14690.21,\n        \"business_id\": 1,\n        \"category_id\": 3,\n        \"created_at\": \"2025-11-30T15:13:51\",\n        \"date\": \"2025-10-03\",\n        \"datetime\": \"2025-10-03T00:00:00\",\n        \"description\": \"Salary payment #9\",\n        \"direction\": \"outflow\",\n        \"id\": 9,\n        \"is_anomalous\": false,\n        \"ocr_document_id\": null,\n        \"source\": \"bank_transfer\",\n        \"tags\": [\n            \"payroll\"\n        ],\n        \"updated_at\": null\n    },\n    {\n        \"ai_tag\": null,\n        \"amount\": 19997.9,\n        \"business_id\": 1,\n        \"category_id\": 1,\n        \"created_at\": \"2025-11-30T15:13:51\",\n        \"date\": \"2025-10-07\",\n        \"datetime\": \"2025-10-07T00:00:00\",\n        \"description\": \"Client payment #10\",\n        \"direction\": \"inflow\",\n        \"id\": 10,\n        \"is_anomalous\": false,\n        \"ocr_document_id\": null,\n        \"source\": \"bank_transfer\",\n        \"tags\": [\n            \"client\",\n            \"software\"\n        ],\n        \"updated_at\": null\n    },\n    {\n        \"ai_tag\": null,\n        \"amount\": 14526.87,\n        \"business_id\": 1,\n        \"category_id\": 3,\n        \"created_at\": \"2025-11-30T15:13:51\",\n        \"date\": \"2025-10-11\",\n        \"datetime\": \"2025-10-11T00:00:00\",\n        \"description\": \"Salary payment #11\",\n        \"direction\": \"outflow\",\n        \"id\": 11,\n        \"is_anomalous\": false,\n        \"ocr_document_id\": null,\n        \"source\": \"bank_transfer\",\n        \"tags\": [\n            \"payroll\"\n        ],\n        \"updated_at\": null\n    },\n    {\n        \"ai_tag\": null,\n        \"amount\": 8275.64,\n        \"business_id\": 1,\n        \"category_id\": 3,\n        \"created_at\": \"2025-11-30T15:13:51\",\n        \"date\": \"2025-10-15\",\n        \"datetime\": \"2025-10-15T00:00:00\",\n        \"description\": \"Salary payment #12\",\n        \"direction\": \"outflow\",\n        \"id\": 12,\n        \"is_anomalous\": false,\n        \"ocr_document_id\": null,\n        \"source\": \"bank_transfer\",\n        \"tags\": [\n            \"payroll\"\n        ],\n        \"updated_at\": null\n    },\n    {\n        \"ai_tag\": null,\n        \"amount\": 7218.88,\n        \"business_id\": 1,\n        \"category_id\": 1,\n        \"created_at\": \"2025-11-30T15:13:51\",\n        \"date\": \"2025-10-19\",\n        \"datetime\": \"2025-10-19T00:00:00\",\n        \"description\": \"Client payment #13\",\n        \"direction\": \"inflow\",\n        \"id\": 13,\n        \"is_anomalous\": false,\n        \"ocr_document_id\": null,\n        \"source\": \"bank_transfer\",\n        \"tags\": [\n            \"client\",\n            \"software\"\n        ],\n        \"updated_at\": null\n    },\n    {\n        \"ai_tag\": null,\n        \"amount\": 13578.62,\n        \"business_id\": 1,\n        \"category_id\": 3,\n        \"created_at\": \"2025-11-30T15:13:51\",\n        \"date\": \"2025-10-23\",\n        \"datetime\": \"2025-10-23T00:00:00\",\n        \"description\": \"Salary payment #14\",\n        \"direction\": \"outflow\",\n        \"id\": 14,\n        \"is_anomalous\": false,\n        \"ocr_document_id\": null,\n        \"source\": \"bank_transfer\",\n        \"tags\": [\n            \"payroll\"\n        ],\n        \"updated_at\": null\n    },\n    {\n        \"ai_tag\": null,\n        \"amount\": 13458.22,\n        \"business_id\": 1,\n        \"category_id\": 3,\n        \"created_at\": \"2025-11-30T15:13:51\",\n        \"date\": \"2025-10-27\",\n        \"datetime\": \"2025-10-27T00:00:00\",\n        \"description\": \"Salary payment #15\",\n        \"direction\": \"outflow\",\n        \"id\": 15,\n        \"is_anomalous\": false,\n        \"ocr_document_id\": null,\n        \"source\": \"bank_transfer\",\n        \"tags\": [\n            \"payroll\"\n        ],\n        \"updated_at\": null\n    },\n    {\n        \"ai_tag\": null,\n        \"amount\": 5793.35,\n        \"business_id\": 1,\n        \"category_id\": 1,\n        \"created_at\": \"2025-11-30T15:13:51\",\n        \"date\": \"2025-10-31\",\n        \"datetime\": \"2025-10-31T00:00:00\",\n        \"description\": \"Client payment #16\",\n        \"direction\": \"inflow\",\n        \"id\": 16,\n        \"is_anomalous\": false,\n        \"ocr_document_id\": null,\n        \"source\": \"bank_transfer\",\n        \"tags\": [\n            \"client\",\n            \"software\"\n        ],\n        \"updated_at\": null\n    },\n    {\n        \"ai_tag\": null,\n        \"amount\": 14466.32,\n        \"business_id\": 1,\n        \"category_id\": 3,\n        \"created_at\": \"2025-11-30T15:13:51\",\n        \"date\": \"2025-11-04\",\n        \"datetime\": \"2025-11-04T00:00:00\",\n        \"description\": \"Salary payment #17\",\n        \"direction\": \"outflow\",\n        \"id\": 17,\n        \"is_anomalous\": false,\n        \"ocr_document_id\": null,\n        \"source\": \"bank_transfer\",\n        \"tags\": [\n            \"payroll\"\n        ],\n        \"updated_at\": null\n    },\n    {\n        \"ai_tag\": null,\n        \"amount\": 10007.77,\n        \"business_id\": 1,\n        \"category_id\": 3,\n        \"created_at\": \"2025-11-30T15:13:51\",\n        \"date\": \"2025-11-08\",\n        \"datetime\": \"2025-11-08T00:00:00\",\n        \"description\": \"Salary payment #18\",\n        \"direction\": \"outflow\",\n        \"id\": 18,\n        \"is_anomalous\": false,\n        \"ocr_document_id\": null,\n        \"source\": \"bank_transfer\",\n        \"tags\": [\n            \"payroll\"\n        ],\n        \"updated_at\": null\n    },\n    {\n        \"ai_tag\": null,\n        \"amount\": 15768.16,\n        \"business_id\": 1,\n        \"category_id\": 1,\n        \"created_at\": \"2025-11-30T15:13:51\",\n        \"date\": \"2025-11-12\",\n        \"datetime\": \"2025-11-12T00:00:00\",\n        \"description\": \"Client payment #19\",\n        \"direction\": \"inflow\",\n        \"id\": 19,\n        \"is_anomalous\": false,\n        \"ocr_document_id\": null,\n        \"source\": \"bank_transfer\",\n        \"tags\": [\n            \"client\",\n            \"software\"\n        ],\n        \"updated_at\": null\n    },\n    {\n        \"ai_tag\": null,\n        \"amount\": 8871.74,\n        \"business_id\": 1,\n        \"category_id\": 3,\n        \"created_at\": \"2025-11-30T15:13:51\",\n        \"date\": \"2025-11-16\",\n        \"datetime\": \"2025-11-16T00:00:00\",\n        \"description\": \"Salary payment #20\",\n        \"direction\": \"outflow\",\n        \"id\": 20,\n        \"is_anomalous\": false,\n        \"ocr_document_id\": null,\n        \"source\": \"bank_transfer\",\n        \"tags\": [\n            \"payroll\"\n        ],\n        \"updated_at\": null\n    }\n]"
+						}
+					]
+				},
+				{
+					"name": "Create Transaction",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"amount\": 100.50,\n    \"description\": \"Sample transaction\",\n    \"type\": \"income\",\n    \"date\": \"2025-11-30\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{DEV_URL}}/api/transactions/"
+					},
+					"response": [
+						{
+							"name": "400",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"amount\": 100.50,\n    \"description\": \"Sample transaction\",\n    \"type\": \"income\",\n    \"date\": \"2025-11-30\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{DEV_URL}}/api/transactions/"
+							},
+							"status": "BAD REQUEST",
+							"code": 400,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.14.0"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 01 Dec 2025 04:20:28 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "58"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"error\": \"date, amount, and direction are required\"\n}"
+						},
+						{
+							"name": "200",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"amount\": 100.50,\n    \"description\": \"Sample transaction\",\n    \"type\": \"income\",\n    \"date\": \"2025-11-30\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{DEV_URL}}/api/transactions/"
+							},
+							"status": "CREATED",
+							"code": 201,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.14.0"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 01 Dec 2025 04:22:46 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "350"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"ai_tag\": null,\n    \"amount\": 100.5,\n    \"business_id\": 1,\n    \"category_id\": null,\n    \"created_at\": \"2025-12-01T04:22:46\",\n    \"date\": \"2025-11-30\",\n    \"datetime\": null,\n    \"description\": \"Sample transaction\",\n    \"direction\": \"inflow\",\n    \"id\": 46,\n    \"is_anomalous\": false,\n    \"ocr_document_id\": null,\n    \"source\": null,\n    \"tags\": null,\n    \"updated_at\": null\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Transaction by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": "{{DEV_URL}}/api/transactions/1"
+					},
+					"response": [
+						{
+							"name": "200",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}",
+										"type": "text"
+									}
+								],
+								"url": "{{DEV_URL}}/api/transactions/1"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.14.0"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 01 Dec 2025 04:23:24 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "406"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"ai_tag\": null,\n    \"amount\": 18484.72,\n    \"business_id\": 1,\n    \"category_id\": 1,\n    \"created_at\": \"2025-12-01T04:06:51\",\n    \"date\": \"2025-09-02\",\n    \"datetime\": \"2025-09-02T00:00:00\",\n    \"description\": \"Client payment #1\",\n    \"direction\": \"inflow\",\n    \"id\": 1,\n    \"is_anomalous\": false,\n    \"ocr_document_id\": null,\n    \"source\": \"bank_transfer\",\n    \"tags\": [\n        \"client\",\n        \"software\"\n    ],\n    \"updated_at\": null\n}"
+						}
+					]
+				},
+				{
+					"name": "Update Transaction by ID",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"amount\": 150.75,\n    \"description\": \"Updated transaction\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{DEV_URL}}/api/transactions/2"
+					},
+					"response": [
+						{
+							"name": "200",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"amount\": 150.75,\n    \"description\": \"Updated transaction\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{DEV_URL}}/api/transactions/2"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.14.0"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 01 Dec 2025 04:23:46 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "416"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"ai_tag\": null,\n    \"amount\": 150.75,\n    \"business_id\": 1,\n    \"category_id\": 3,\n    \"created_at\": \"2025-12-01T04:06:51\",\n    \"date\": \"2025-09-06\",\n    \"datetime\": \"2025-09-06T00:00:00\",\n    \"description\": \"Updated transaction\",\n    \"direction\": \"outflow\",\n    \"id\": 2,\n    \"is_anomalous\": false,\n    \"ocr_document_id\": null,\n    \"source\": \"bank_transfer\",\n    \"tags\": [\n        \"payroll\"\n    ],\n    \"updated_at\": \"2025-12-01T04:23:46.792763\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Delete Transaction by ID",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": "{{DEV_URL}}/api/transactions/2"
+					},
+					"response": [
+						{
+							"name": "200",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}",
+										"type": "text"
+									}
+								],
+								"url": "{{DEV_URL}}/api/transactions/2"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.14.0"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 01 Dec 2025 04:24:01 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "52"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"Transaction deleted successfully\"\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Forecasts",
+			"item": [
+				{
+					"name": "Get All Forecasts",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": "{{DEV_URL}}/api/forecasts/"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Forecast",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"New Forecast\",\n    \"description\": \"Forecast Description\",\n    \"parameters\": {}\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{DEV_URL}}/api/forecasts/"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Forecast by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": "{{DEV_URL}}/api/forecasts/{{forecast_id}}"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Forecast by ID",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Updated Forecast Name\",\n    \"description\": \"Updated Description\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{DEV_URL}}/api/forecasts/{{forecast_id}}"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Forecast by ID",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": "{{DEV_URL}}/api/forecasts/{{forecast_id}}"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Alerts",
+			"item": [
+				{
+					"name": "Get All Alerts",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": "{{DEV_URL}}/api/alerts/"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Alert",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"New Alert\",\n    \"message\": \"Alert Message\",\n    \"type\": \"warning\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{DEV_URL}}/api/alerts/"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Alert by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": "{{DEV_URL}}/api/alerts/{{alert_id}}"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Alert by ID",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Updated Alert Title\",\n    \"message\": \"Updated Alert Message\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{DEV_URL}}/api/alerts/{{alert_id}}"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Alert by ID",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": "{{DEV_URL}}/api/alerts/{{alert_id}}"
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "DEV_URL",
+			"value": "http://localhost:5000",
+			"type": "default"
+		},
+		{
+			"key": "token",
+			"value": "",
+			"type": "default"
+		},
+		{
+			"key": "user_id",
+			"value": "1",
+			"type": "default"
+		},
+		{
+			"key": "business_id",
+			"value": "1",
+			"type": "default"
+		},
+		{
+			"key": "transaction_id",
+			"value": "1",
+			"type": "default"
+		},
+		{
+			"key": "forecast_id",
+			"value": "1",
+			"type": "default"
+		},
+		{
+			"key": "alert_id",
+			"value": "1",
+			"type": "default"
+		},
+		{
+			"key": "role",
+			"value": "admin",
+			"type": "default"
+		}
+	]
+}

@@ -1,7 +1,7 @@
-import { 
-  LayoutDashboard, 
-  Receipt, 
-  Settings, 
+import {
+  LayoutDashboard,
+  Receipt,
+  Settings,
   TrendingUp,
   User
 } from "lucide-react";
@@ -18,6 +18,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { useAuthStore } from '@/stores/auth-store';
 
 const navigationItems = [
   {
@@ -43,6 +44,13 @@ const navigationItems = [
 ];
 
 export const AppSidebar = () => {
+  const { isAuthenticated } = useAuthStore();
+
+  // Don't render the sidebar if the user is not authenticated
+  if (!isAuthenticated) {
+    return null;
+  }
+
   return (
     <Sidebar>
       <SidebarHeader>
@@ -55,7 +63,7 @@ export const AppSidebar = () => {
           </p>
         </div>
       </SidebarHeader>
-      
+
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Navigation</SidebarGroupLabel>
@@ -80,13 +88,15 @@ export const AppSidebar = () => {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      
+
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton>
-              <User className="h-4 w-4" />
-              <span>Profile</span>
+            <SidebarMenuButton asChild>
+              <NavLink to="/profile">
+                <User className="h-4 w-4" />
+                <span>Profile</span>
+              </NavLink>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

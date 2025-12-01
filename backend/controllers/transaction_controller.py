@@ -1,4 +1,4 @@
-from flask import request, jsonify
+from flask import request, jsonify, g
 from models import db, Transaction, Business, Category, OCRDocument
 from datetime import datetime, date
 
@@ -8,15 +8,48 @@ class TransactionController:
     def create_transaction():
         data = request.get_json()
 
-        required_fields = ["business_id", "date", "amount", "direction"]
+        # Verify user is authenticated
+        if not hasattr(g, 'current_user') or not g.current_user:
+            return jsonify({"error": "Authentication required"}), 401
+
+        # Map 'type' to 'direction' for compatibility
+        if 'type' in data and 'direction' not in data:
+            # Convert type to direction: 'income' -> 'inflow', 'expense' -> 'outflow'
+            transaction_type = data['type'].lower()
+            if transaction_type in ['income', 'inflow']:
+                data['direction'] = 'inflow'
+            elif transaction_type in ['expense', 'outflow']:
+                data['direction'] = 'outflow'
+            else:
+                return jsonify({"error": "Invalid transaction type. Use 'income' or 'expense'"}), 400
+        elif 'type' in data and 'direction' in data:
+            # If both are provided, prefer direction but warn if they conflict
+            pass
+
+        required_fields = ["date", "amount", "direction"]
         if not data or not all(field in data for field in required_fields):
             return jsonify(
-                {"error": "business_id, date, amount, and direction are required"}
+                {"error": "date, amount, and direction are required"}
             ), 400
 
-        business = Business.query.get(data["business_id"])
-        if not business:
-            return jsonify({"error": "Business not found"}), 404
+        # Auto-fill business_id from user's business
+        business_id = data.get("business_id")
+
+        # If business_id is provided in the request, verify user owns that business
+        if business_id:
+            business = Business.query.get(business_id)
+            if not business:
+                return jsonify({"error": "Business not found"}), 404
+            # Check if the user is the owner of this business or an admin
+            if business.owner_id != g.current_user.id and g.current_user.role != "admin":
+                return jsonify({"error": "You can only create transactions for your own business"}), 403
+        else:
+            # If no business_id provided, use the user's first business
+            user_business = Business.query.filter_by(owner_id=g.current_user.id).first()
+            if not user_business:
+                return jsonify({"error": "User has no business"}), 404
+            business = user_business
+            business_id = user_business.id
 
         if "category_id" in data and data["category_id"]:
             category = Category.query.get(data["category_id"])
@@ -33,7 +66,7 @@ class TransactionController:
             transaction_date = datetime.fromisoformat(transaction_date).date()
 
         transaction = Transaction(
-            business_id=data["business_id"],
+            business_id=business.id,
             date=transaction_date,
             datetime=datetime.fromisoformat(data["datetime"])
             if data.get("datetime")
@@ -80,7 +113,16 @@ class TransactionController:
 
     @staticmethod
     def get_transactions():
-        transactions = Transaction.query.all()
+        # Verify user is authenticated
+        if not hasattr(g, 'current_user') or not g.current_user:
+            return jsonify({"error": "Authentication required"}), 401
+
+        # Only return transactions for businesses the user owns or if user is admin
+        if g.current_user.role == "admin":
+            transactions = Transaction.query.all()
+        else:
+            transactions = Transaction.query.join(Business).filter(Business.owner_id == g.current_user.id).all()
+
         return jsonify(
             [
                 {
@@ -112,9 +154,14 @@ class TransactionController:
 
     @staticmethod
     def get_transaction(transaction_id):
-        transaction = Transaction.query.get(transaction_id)
-        if not transaction:
-            return jsonify({"error": "Transaction not found"}), 404
+        # The transaction_access_required decorator handles authentication and authorization
+        # Get the transaction from the g object, if available, otherwise query from db
+        if hasattr(g, 'current_transaction') and g.current_transaction:
+            transaction = g.current_transaction
+        else:
+            transaction = Transaction.query.get(transaction_id)
+            if not transaction:
+                return jsonify({"error": "Transaction not found"}), 404
 
         return jsonify(
             {
@@ -144,13 +191,22 @@ class TransactionController:
 
     @staticmethod
     def update_transaction(transaction_id):
-        transaction = Transaction.query.get(transaction_id)
-        if not transaction:
-            return jsonify({"error": "Transaction not found"}), 404
+        # The transaction_access_required decorator handles authentication and authorization
+        # Get the transaction from the g object, if available, otherwise query from db
+        if hasattr(g, 'current_transaction') and g.current_transaction:
+            transaction = g.current_transaction
+        else:
+            transaction = Transaction.query.get(transaction_id)
+            if not transaction:
+                return jsonify({"error": "Transaction not found"}), 404
 
         data = request.get_json()
 
-        if "business_id" in data:
+        # Note: business_id changes are not allowed for security reasons
+        # Only admin can change the business association of a transaction
+        if "business_id" in data and data["business_id"] != transaction.business_id:
+            if not hasattr(g, 'current_user') or g.current_user.role != "admin":
+                return jsonify({"error": "Cannot change business association of transaction"}), 403
             business = Business.query.get(data["business_id"])
             if not business:
                 return jsonify({"error": "Business not found"}), 404
@@ -233,9 +289,14 @@ class TransactionController:
 
     @staticmethod
     def delete_transaction(transaction_id):
-        transaction = Transaction.query.get(transaction_id)
-        if not transaction:
-            return jsonify({"error": "Transaction not found"}), 404
+        # The transaction_access_required decorator handles authentication and authorization
+        # Get the transaction from the g object, if available, otherwise query from db
+        if hasattr(g, 'current_transaction') and g.current_transaction:
+            transaction = g.current_transaction
+        else:
+            transaction = Transaction.query.get(transaction_id)
+            if not transaction:
+                return jsonify({"error": "Transaction not found"}), 404
 
         db.session.delete(transaction)
         db.session.commit()
@@ -247,6 +308,14 @@ class TransactionController:
         business = Business.query.get(business_id)
         if not business:
             return jsonify({"error": "Business not found"}), 404
+
+        # Verify user is authenticated
+        if not hasattr(g, 'current_user') or not g.current_user:
+            return jsonify({"error": "Authentication required"}), 401
+
+        # Verify user owns this business or is an admin
+        if business.owner_id != g.current_user.id and g.current_user.role != "admin":
+            return jsonify({"error": "You can only view transactions for your own business"}), 403
 
         transactions = Transaction.query.filter_by(business_id=business_id).all()
         return jsonify(
@@ -283,6 +352,14 @@ class TransactionController:
         category = Category.query.get(category_id)
         if not category:
             return jsonify({"error": "Category not found"}), 404
+
+        # Verify user is authenticated
+        if not hasattr(g, 'current_user') or not g.current_user:
+            return jsonify({"error": "Authentication required"}), 401
+
+        # Verify user owns the business associated with this category
+        if category.business.owner_id != g.current_user.id and g.current_user.role != "admin":
+            return jsonify({"error": "You can only view transactions for your own business"}), 403
 
         transactions = Transaction.query.filter_by(category_id=category_id).all()
         return jsonify(
