@@ -59,7 +59,7 @@ const UserProfileCard: React.FC = () => {
         </DropdownMenuItem>
         <DropdownMenuItem>
           <CreditCard className="mr-2 h-4 w-4" />
-          <a href="/business-setup" className="w-full">Business Setup</a>
+          <a href="/business-setup" className="w-full">Business Overview</a>
         </DropdownMenuItem>
         <DropdownMenuItem>
           <Settings className="mr-2 h-4 w-4" />

@@ -148,6 +148,7 @@ class RiskScore(db.Model):
     drawdown_prob = db.Column(db.Numeric(10, 4))
     source_forecast_id = db.Column(db.Integer, db.ForeignKey("forecasts.id", ondelete="CASCADE"))
     details = db.Column(db.JSON)
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
 
 
 class Alert(db.Model):

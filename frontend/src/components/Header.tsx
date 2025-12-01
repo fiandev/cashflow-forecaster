@@ -1,5 +1,6 @@
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import UserProfileCard from "@/components/UserProfileCard";
+import BusinessSelector from "@/components/BusinessSelector";
 
 export const Header = () => {
   return (
@@ -13,6 +14,9 @@ export const Header = () => {
         </div>
 
         <div className="flex items-center gap-3">
+          <div className="hidden md:block w-48">
+            <BusinessSelector />
+          </div>
           <UserProfileCard />
         </div>
       </div>

@@ -9,34 +9,11 @@ interface Alert {
   timestamp: string;
 }
 
-const alerts: Alert[] = [
-  {
-    id: 1,
-    type: "warning",
-    message: "Potential negative cashflow next week",
-    timestamp: "2 hours ago",
-  },
-  {
-    id: 2,
-    type: "critical",
-    message: "Unusual spike in operational expenses",
-    timestamp: "5 hours ago",
-  },
-  {
-    id: 3,
-    type: "warning",
-    message: "Low liquidity window expected in 14 days",
-    timestamp: "1 day ago",
-  },
-  {
-    id: 4,
-    type: "info",
-    message: "Income pattern aligned with seasonal trends",
-    timestamp: "2 days ago",
-  },
-];
+interface AIAlertsPanelProps {
+  alerts: Alert[];
+}
 
-export const AIAlertsPanel = () => {
+export const AIAlertsPanel = ({ alerts = [] }: AIAlertsPanelProps) => {
   const getIcon = (type: string) => {
     switch (type) {
       case "critical":

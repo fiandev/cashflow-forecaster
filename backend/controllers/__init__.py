@@ -10,6 +10,7 @@ from .risk_score_controller import RiskScoreController
 from .alert_controller import AlertController
 from .scenario_controller import ScenarioController
 from .api_key_controller import APIKeyController
+from .dashboard_controller import DashboardController
 
 __all__ = [
     "UserController",

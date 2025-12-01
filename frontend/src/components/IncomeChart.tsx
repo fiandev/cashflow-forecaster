@@ -1,14 +1,23 @@
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { Card } from "@/components/ui/card";
 
-const data = [
-  { source: "Product Sales", amount: 45000 },
-  { source: "Services", amount: 32000 },
-  { source: "Subscriptions", amount: 18000 },
-  { source: "Consulting", amount: 12000 },
-];
+interface IncomeData {
+  source: string;
+  amount: number;
+}
 
-export const IncomeChart = () => {
+interface IncomeChartProps {
+  incomeData: IncomeData[];
+}
+
+export const IncomeChart = ({ incomeData }: IncomeChartProps) => {
+  const data = incomeData || [
+    { source: "Product Sales", amount: 45000 },
+    { source: "Services", amount: 32000 },
+    { source: "Subscriptions", amount: 18000 },
+    { source: "Consulting", amount: 12000 },
+  ];
+
   return (
     <Card className="p-6 animate-slide-up">
       <h3 className="text-lg font-semibold mb-4">Income Stream Breakdown</h3>

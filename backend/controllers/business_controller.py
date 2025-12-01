@@ -1,7 +1,8 @@
 from flask import request, jsonify, g
 from models import db, Business, User
 from repositories.business_repository import BusinessRepository
-from middleware import authenticate_request
+from middleware.auth import authenticate_request
+from middleware.permissions import PermissionPolicies
 
 
 class BusinessController:
@@ -29,7 +30,14 @@ class BusinessController:
         return jsonify(self.business_repository.to_dict(business)), 201
 
     def index(self):
-        """Get all businesses"""
+        """Get all businesses - restricted to admins only"""
+        if not hasattr(g, "current_user") or not g.current_user:
+            return jsonify({"error": "Authentication required"}), 401
+
+        # Only admins can access all businesses
+        if g.current_user.role != "admin":
+            return jsonify({"error": "Admin access required"}), 403
+
         businesses = self.business_repository.all()
         return jsonify(
             [self.business_repository.to_dict(business) for business in businesses]
@@ -164,8 +172,17 @@ class BusinessController:
         return jsonify(self.business_repository.to_dict(business))
 
     def get_businesses(self):
-        """Get all businesses"""
-        businesses = self.business_repository.all()
+        """Get current user's businesses or all businesses for admin"""
+        if not hasattr(g, "current_user") or not g.current_user:
+            return jsonify({"error": "Authentication required"}), 401
+
+        # If user is admin, they can access all businesses
+        if g.current_user.role == "admin":
+            businesses = self.business_repository.all()
+        else:
+            # Regular users can only access their own businesses
+            businesses = self.business_repository.findByOwner(g.current_user.id)
+
         return jsonify(
             [self.business_repository.to_dict(business) for business in businesses]
         )

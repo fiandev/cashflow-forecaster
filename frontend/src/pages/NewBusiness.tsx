@@ -8,12 +8,12 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { registerBusiness, updateBusiness, getBusinesses, ApiError, Business } from "@/lib/api";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useAuthStore } from "@/stores/auth-store";
 import { useBusiness } from "@/contexts/BusinessContext";
 import { useNavigate } from "react-router-dom";
 
-const businessSchema = z.object({
+const newBusinessSchema = z.object({
   businessName: z
     .string()
     .trim()
@@ -61,13 +61,12 @@ const businessSchema = z.object({
     .optional(),
 });
 
-type BusinessForm = z.infer<typeof businessSchema>;
+type NewBusinessForm = z.infer<typeof newBusinessSchema>;
 
-const BusinessSetup = () => {
+const NewBusiness = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
   const { user } = useAuthStore();
-  const { updateBusinessInContext, currentBusiness, businesses } = useBusiness();
+  const { addBusiness } = useBusiness();
   const navigate = useNavigate();
 
   const {
@@ -75,13 +74,12 @@ const BusinessSetup = () => {
     handleSubmit,
     formState: { errors },
     reset,
-    setValue,
-  } = useForm<BusinessForm>({
-    resolver: zodResolver(businessSchema),
+  } = useForm<NewBusinessForm>({
+    resolver: zodResolver(newBusinessSchema),
     defaultValues: {
       businessName: "",
       industry: "",
-      currency: "USD",
+      currency: "USD", // Default currency for new businesses
       monthlyRevenue: "",
       monthlyExpenses: "",
       currentCash: "",
@@ -91,90 +89,19 @@ const BusinessSetup = () => {
     }
   });
 
-  // Load the current business data on component mount
-  useEffect(() => {
-    const loadBusinessData = async () => {
-      try {
-        setIsLoading(true);
-
-        if (currentBusiness) {
-          // Set basic business info
-          setValue("businessName", currentBusiness.name || "");
-          setValue("currency", currentBusiness.currency || "USD");
-
-          // Set settings data if available
-          if (currentBusiness.settings) {
-            setValue("industry", currentBusiness.settings.industry || "");
-            setValue("monthlyRevenue", currentBusiness.settings.monthlyRevenue ? String(currentBusiness.settings.monthlyRevenue) : "");
-            setValue("monthlyExpenses", currentBusiness.settings.monthlyExpenses ? String(currentBusiness.settings.monthlyExpenses) : "");
-            setValue("currentCash", currentBusiness.settings.currentCash ? String(currentBusiness.settings.currentCash) : "");
-            setValue("outstandingDebt", currentBusiness.settings.outstandingDebt ? String(currentBusiness.settings.outstandingDebt) : "");
-            setValue("employees", currentBusiness.settings.employees ? String(currentBusiness.settings.employees) : "");
-            setValue("businessGoals", currentBusiness.settings.businessGoals || "");
-          }
-        } else {
-          // If no current business, redirect to new business page if no businesses exist
-          if (businesses.length === 0) {
-            navigate('/business/new');
-            return;
-          }
-
-          // Otherwise, try to fetch the first business
-          const fetchedBusinesses = await getBusinesses();
-          if (fetchedBusinesses.length > 0) {
-            const business = fetchedBusinesses[0];
-            setValue("businessName", business.name || "");
-            setValue("currency", business.currency || "USD");
-
-            if (business.settings) {
-              setValue("industry", business.settings.industry || "");
-              setValue("monthlyRevenue", business.settings.monthlyRevenue ? String(business.settings.monthlyRevenue) : "");
-              setValue("monthlyExpenses", business.settings.monthlyExpenses ? String(business.settings.monthlyExpenses) : "");
-              setValue("currentCash", business.settings.currentCash ? String(business.settings.currentCash) : "");
-              setValue("outstandingDebt", business.settings.outstandingDebt ? String(business.settings.outstandingDebt) : "");
-              setValue("employees", business.settings.employees ? String(business.settings.employees) : "");
-              setValue("businessGoals", business.settings.businessGoals || "");
-            }
-          } else {
-            // No businesses exist, redirect to create new
-            navigate('/business/new');
-            return;
-          }
-        }
-      } catch (error) {
-        console.error("Error loading business data:", error);
-        toast.error("Failed to load business data", {
-          description: "Could not retrieve business information. Please try again later.",
-        });
-        // Redirect to create new if there are no businesses
-        const fetchedBusinesses = await getBusinesses();
-        if (fetchedBusinesses.length === 0) {
-          navigate('/business/new');
-        }
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadBusinessData();
-  }, [setValue, reset, currentBusiness, businesses.length, navigate]);
-
-  const onSubmit = async (data: BusinessForm) => {
+  const onSubmit = async (data: NewBusinessForm) => {
     setIsSubmitting(true);
 
     try {
-      const businesses = await getBusinesses();
-
-      // Update the current business
-      if (!currentBusiness) {
-        toast.error("No business selected", {
-          description: "Please select a business to update or create a new one.",
-        });
-        return;
-      }
-
-      const updatedBusiness = await updateBusiness(currentBusiness.id, {
+      // Register the business (basic info only)
+      const businessResponse = await registerBusiness({
         name: data.businessName,
+        currency: data.currency || "USD", // Use default if not provided
+        owner_id: user?.id || 1, // Get user ID from auth store or default to 1
+      });
+
+      // Update the business with additional details using settings field
+      const fullBusiness = await updateBusiness(businessResponse.id, {
         settings: {
           industry: data.industry,
           monthlyRevenue: Number(data.monthlyRevenue),
@@ -186,26 +113,20 @@ const BusinessSetup = () => {
         }
       });
 
-      // Update the context with the updated business
-      updateBusinessInContext(updatedBusiness);
+      // Add the new business to the context
+      addBusiness(fullBusiness);
 
-      toast.success("Business profile updated!", {
-        description: "Your business metrics have been updated successfully.",
+      toast.success("Business created successfully!", {
+        description: "Your new business has been set up successfully.",
       });
 
-      // Update form with the saved values
-      setValue("businessName", data.businessName);
-      setValue("currency", data.currency || "USD");
-      setValue("industry", data.industry);
-      setValue("monthlyRevenue", data.monthlyRevenue);
-      setValue("monthlyExpenses", data.monthlyExpenses);
-      setValue("currentCash", data.currentCash);
-      setValue("outstandingDebt", data.outstandingDebt);
-      setValue("employees", data.employees);
-      setValue("businessGoals", data.businessGoals || "");
-
+      // Reset the form
+      reset();
+      
+      // Redirect to the main business setup page to view/edit the business
+      navigate('/business-setup');
     } catch (error: any) {
-      console.error("Error saving business profile:", error);
+      console.error("Error creating business:", error);
 
       // Check if it's an ApiError with status
       if (error.status) {
@@ -238,7 +159,7 @@ const BusinessSetup = () => {
         }
       } else {
         // Generic error (not an HTTP error)
-        toast.error("Failed to save business profile", {
+        toast.error("Failed to create business", {
           description: error.message || "An unknown error occurred",
         });
       }
@@ -251,22 +172,14 @@ const BusinessSetup = () => {
     <div className="flex-1 space-y-4 p-4 pt-6">
       <div className="max-w-3xl mx-auto">
         <div className="mb-8">
-          <h2 className="text-3xl font-bold mb-2">Business Profile</h2>
+          <h2 className="text-3xl font-bold mb-2">Create New Business</h2>
           <p className="text-muted-foreground">
-            Update your business metrics for accurate AI-powered financial analysis.
+            Set up a new business profile for financial analysis.
           </p>
         </div>
 
-        {isLoading ? (
-          <Card className="p-6 flex items-center justify-center h-64">
-            <div className="text-center">
-              <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary mb-3"></div>
-              <p className="text-muted-foreground">Loading business data...</p>
-            </div>
-          </Card>
-        ) : (
-          <Card className="p-6">
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <Card className="p-6">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div className="grid md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <Label htmlFor="businessName">Business Name</Label>
@@ -395,15 +308,19 @@ const BusinessSetup = () => {
 
             <div className="flex gap-4">
               <Button type="submit" className="flex-1" disabled={isSubmitting}>
-                {isSubmitting ? "Saving..." : "Save Business Profile"}
+                {isSubmitting ? "Creating..." : "Create Business"}
               </Button>
-              <Button type="button" variant="outline" onClick={() => reset()} disabled={isSubmitting}>
-                Reset
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => navigate('/business-setup')}
+                disabled={isSubmitting}
+              >
+                Cancel
               </Button>
             </div>
           </form>
         </Card>
-        )}
 
         <Card className="p-6 mt-6 bg-primary/5 border-primary/20">
           <h3 className="font-semibold mb-2 flex items-center gap-2">
@@ -419,4 +336,4 @@ const BusinessSetup = () => {
   );
 };
 
-export default BusinessSetup;
+export default NewBusiness;

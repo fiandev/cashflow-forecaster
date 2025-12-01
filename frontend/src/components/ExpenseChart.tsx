@@ -1,13 +1,14 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
 import { Card } from "@/components/ui/card";
 
-const data = [
-  { name: "Operations", value: 35 },
-  { name: "Payroll", value: 30 },
-  { name: "Marketing", value: 15 },
-  { name: "Utilities", value: 12 },
-  { name: "Other", value: 8 },
-];
+interface ExpenseData {
+  name: string;
+  value: number;
+}
+
+interface ExpenseChartProps {
+  expenseData: ExpenseData[];
+}
 
 const COLORS = [
   "hsl(var(--chart-1))",
@@ -17,7 +18,15 @@ const COLORS = [
   "hsl(var(--chart-5))",
 ];
 
-export const ExpenseChart = () => {
+export const ExpenseChart = ({ expenseData }: ExpenseChartProps) => {
+  const data = expenseData || [
+    { name: "Operations", value: 35 },
+    { name: "Payroll", value: 30 },
+    { name: "Marketing", value: 15 },
+    { name: "Utilities", value: 12 },
+    { name: "Other", value: 8 },
+  ];
+
   return (
     <Card className="p-6 animate-slide-up">
       <h3 className="text-lg font-semibold mb-4">Expense Composition</h3>

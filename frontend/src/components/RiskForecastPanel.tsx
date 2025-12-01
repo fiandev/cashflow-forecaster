@@ -8,14 +8,11 @@ interface RiskItem {
   description: string;
 }
 
-const riskData: RiskItem[] = [
-  { category: "Cashflow Risk", level: 35, description: "Moderate risk of negative cashflow in next 2 weeks" },
-  { category: "Debt Risk", level: 15, description: "Low debt exposure relative to revenue" },
-  { category: "Burn Rate Risk", level: 65, description: "Current spending rate may exceed income" },
-  { category: "Drawdown Probability", level: 45, description: "Medium probability of needing emergency funds" },
-];
+interface RiskForecastPanelProps {
+  riskData: RiskItem[];
+}
 
-export const RiskForecastPanel = () => {
+export const RiskForecastPanel = ({ riskData = [] }: RiskForecastPanelProps) => {
   const getRiskColor = (level: number) => {
     if (level < 30) return "bg-success";
     if (level < 60) return "bg-warning";

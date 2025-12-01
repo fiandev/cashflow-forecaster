@@ -3,39 +3,32 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsi
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
-const dailyData = [
-  { date: "Mon", cashIn: 12000, cashOut: 8000, anomaly: false },
-  { date: "Tue", cashIn: 15000, cashOut: 9500, anomaly: false },
-  { date: "Wed", cashIn: 11000, cashOut: 13000, anomaly: true },
-  { date: "Thu", cashIn: 18000, cashOut: 10000, anomaly: false },
-  { date: "Fri", cashIn: 20000, cashOut: 12000, anomaly: false },
-  { date: "Sat", cashIn: 8000, cashOut: 7000, anomaly: false },
-  { date: "Sun", cashIn: 6000, cashOut: 5000, anomaly: false },
-];
+interface CashflowDataPoint {
+  date: string;
+  cashIn: number;
+  cashOut: number;
+  anomaly: boolean;
+}
 
-const weeklyData = [
-  { date: "Week 1", cashIn: 85000, cashOut: 62000, anomaly: false },
-  { date: "Week 2", cashIn: 92000, cashOut: 68000, anomaly: false },
-  { date: "Week 3", cashIn: 78000, cashOut: 85000, anomaly: true },
-  { date: "Week 4", cashIn: 105000, cashOut: 72000, anomaly: false },
-];
+interface CashflowChartData {
+  daily: CashflowDataPoint[];
+  weekly: CashflowDataPoint[];
+  monthly: CashflowDataPoint[];
+}
 
-const monthlyData = [
-  { date: "Jan", cashIn: 340000, cashOut: 280000, anomaly: false },
-  { date: "Feb", cashIn: 360000, cashOut: 295000, anomaly: false },
-  { date: "Mar", cashIn: 320000, cashOut: 310000, anomaly: true },
-  { date: "Apr", cashIn: 395000, cashOut: 285000, anomaly: false },
-];
+interface CashflowChartProps {
+  chartData: CashflowChartData;
+}
 
 type TimeFrame = "daily" | "weekly" | "monthly";
 
-export const CashflowChart = () => {
+export const CashflowChart = ({ chartData }: CashflowChartProps) => {
   const [timeFrame, setTimeFrame] = useState<TimeFrame>("daily");
 
   const dataMap = {
-    daily: dailyData,
-    weekly: weeklyData,
-    monthly: monthlyData,
+    daily: chartData?.daily || [],
+    weekly: chartData?.weekly || [],
+    monthly: chartData?.monthly || [],
   };
 
   const data = dataMap[timeFrame];

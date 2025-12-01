@@ -2,7 +2,6 @@ from flask import request, jsonify, g
 from functools import wraps
 from models import Business, User, Transaction
 
-
 class PermissionPolicies:
     ROLE_PERMISSIONS = {
         "admin": [
@@ -322,6 +321,37 @@ def self_or_admin_required(f):
         ):
             return jsonify({"error": "Self or admin access required"}), 403
 
+        return f(*args, **kwargs)
+
+    return decorated_function
+
+def business_owner_or_admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not hasattr(g, "current_user") or not g.current_user:
+            return jsonify({"error": "Authentication required"}), 401
+
+        business_id = kwargs.get("business_id") or request.view_args.get("business_id")
+
+        if not business_id:
+            if g.current_user.role == "admin":
+                return f(*args, **kwargs)
+            else:
+                # Attempt to infer business_id for non-admin users if not provided
+                owned_businesses = Business.query.filter_by(owner_id=g.current_user.id).all()
+                if len(owned_businesses) == 1:
+                    business_id = owned_businesses[0].id
+                else:
+                    return jsonify({"error": "Business ID required"}), 400
+
+        business = Business.query.get(business_id)
+        if not business:
+            return jsonify({"error": "Business not found"}), 404
+
+        if business.owner_id != g.current_user.id and g.current_user.role != "admin":
+            return jsonify({"error": "Business owner access required"}), 403
+
+        g.current_business = business
         return f(*args, **kwargs)
 
     return decorated_function

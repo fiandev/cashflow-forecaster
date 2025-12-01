@@ -24,6 +24,9 @@ export const API_ENDPOINTS = {
 
   // Business endpoints
   registerBusiness: buildEndpoint('/auth/business/register'),
+  getBusinesses: buildEndpoint('/businesses/'),
+  getBusinessById: (id: number) => buildEndpoint(`/businesses/${id}`),
+  updateBusiness: (id: number) => buildEndpoint(`/businesses/${id}`),
 
   // Profile endpoints
   profile: buildEndpoint('/profile/'),
@@ -33,6 +36,12 @@ export const API_ENDPOINTS = {
 export interface ApiResponse<T = any> {
   data?: T;
   error?: string;
+}
+
+export interface ApiError {
+  error?: string;
+  message?: string;
+  status: number;
 }
 
 export const apiRequest = async (
@@ -52,7 +61,11 @@ export const apiRequest = async (
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+    const apiError: ApiError = {
+      error: errorData.error || errorData.message,
+      status: response.status,
+    };
+    throw apiError;
   }
 
   return response
@@ -78,4 +91,55 @@ export const authenticatedRequest = async <T = any>(
     ...options,
     headers: mergedHeaders,
   });
+};
+
+// Business API functions
+export interface RegisterBusinessData {
+  name: string;
+  currency: string;
+  owner_id: number;
+}
+
+export interface Business {
+  id: number;
+  name: string;
+  currency: string;
+  owner_id: number;
+  timezone: string;
+  city?: string | null;
+  country?: string | null;
+  settings?: Record<string, any> | null;
+  created_at: string;
+}
+
+export interface UpdateBusinessData {
+  name?: string;
+  description?: string;
+  settings?: Record<string, any>;
+}
+
+export const registerBusiness = async (data: RegisterBusinessData): Promise<Business> => {
+  const response = await authenticatedRequest(API_ENDPOINTS.registerBusiness, {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+  return response.json();
+};
+
+export const getBusinesses = async (): Promise<Business[]> => {
+  const response = await authenticatedRequest(API_ENDPOINTS.getBusinesses);
+  return response.json();
+};
+
+export const getBusinessById = async (id: number): Promise<Business> => {
+  const response = await authenticatedRequest(API_ENDPOINTS.getBusinessById(id));
+  return response.json();
+};
+
+export const updateBusiness = async (id: number, data: UpdateBusinessData): Promise<Business> => {
+  const response = await authenticatedRequest(API_ENDPOINTS.updateBusiness(id), {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  });
+  return response.json();
 };
