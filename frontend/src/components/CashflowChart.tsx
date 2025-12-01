@@ -23,7 +23,7 @@ interface CashflowChartProps {
 type TimeFrame = "daily" | "weekly" | "monthly";
 
 export const CashflowChart = ({ chartData }: CashflowChartProps) => {
-  const [timeFrame, setTimeFrame] = useState<TimeFrame>("daily");
+  const [timeFrame, setTimeFrame] = useState<TimeFrame>("daily"); // Keep default as daily
 
   const dataMap = {
     daily: chartData?.daily || [],
@@ -31,7 +31,32 @@ export const CashflowChart = ({ chartData }: CashflowChartProps) => {
     monthly: chartData?.monthly || [],
   };
 
-  const data = dataMap[timeFrame];
+  // Get the current data based on selected time frame
+  let data = dataMap[timeFrame];
+
+  // Special handling for daily chart when there's sparse data (0 or 1 data points)
+  // Expand to show all 7 days of the week for better context
+  if (timeFrame === "daily" && data.length <= 1) {
+    // Create full week data in chronological order: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+    const allDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    const expandedData = allDays.map(day => {
+      // Check if this day exists in the original sparse data
+      const originalDataPoint = data.find(d => d.date === day);
+      if (originalDataPoint) {
+        // Use original values if day exists
+        return originalDataPoint;
+      } else {
+        // Return zero values for days without data
+        return {
+          date: day,
+          cashIn: 0,
+          cashOut: 0,
+          anomaly: false,
+        };
+      }
+    });
+    data = expandedData;
+  }
 
   return (
     <Card className="p-6 animate-slide-up">

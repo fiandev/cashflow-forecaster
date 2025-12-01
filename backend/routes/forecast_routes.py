@@ -8,7 +8,6 @@ forecast_bp = Blueprint("forecasts", __name__)
 
 @forecast_bp.route("/", methods=["POST"])
 @authenticate_request
-@business_owner_or_admin_required
 def create_forecast():
     return ForecastController.create_forecast()
 
@@ -35,3 +34,8 @@ def update_forecast(forecast_id):
 @forecast_bp.route("/<int:forecast_id>", methods=["DELETE"])
 def delete_forecast(forecast_id):
     return ForecastController.delete_forecast(forecast_id)
+
+@forecast_bp.route("/llm", methods=["POST"])
+@authenticate_request
+def create_forecast_with_llm():
+    return ForecastController.create_forecast_with_llm()

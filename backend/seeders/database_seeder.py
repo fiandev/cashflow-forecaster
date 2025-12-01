@@ -2,6 +2,7 @@ from datetime import datetime, date, timedelta
 from decimal import Decimal
 from utils.crypto import hash_password
 import random, hashlib
+from faker import Faker
 
 from models import (
     db,
@@ -18,6 +19,8 @@ from models import (
     Scenario,
     APIKey,
 )
+
+fake = Faker()
 
 
 class DatabaseSeeder:
@@ -92,7 +95,8 @@ class DatabaseSeeder:
     def seed_businesses(self):
         print("Seeding businesses...")
 
-        businesses_data = [
+        # Keep the original 3 businesses and add 30+ more with Faker
+        original_businesses = [
             {
                 "owner_id": self.users[1].id,  # John Doe
                 "name": "TechCorp Solutions",
@@ -122,8 +126,30 @@ class DatabaseSeeder:
             },
         ]
 
-        for business_data in businesses_data:
+        for business_data in original_businesses:
             business = Business(**business_data)
+            db.session.add(business)
+            self.businesses.append(business)
+
+        # Generate additional 30+ businesses using Faker
+        for i in range(30):
+            random_user = random.choice(self.users)
+            business = Business(
+                owner_id=random_user.id,
+                name=fake.company(),
+                country=fake.country(),
+                city=fake.city(),
+                currency=random.choice(['USD', 'EUR', 'GBP', 'CAD', 'AUD', 'JPY', 'CHF']),
+                timezone=fake.random_element(elements=('America/New_York', 'America/Los_Angeles',
+                                                     'Europe/London', 'Europe/Paris',
+                                                     'Asia/Tokyo', 'Asia/Shanghai', 'Australia/Sydney')),
+                settings={
+                    "industry": fake.random_element(elements=('technology', 'retail', 'healthcare',
+                                                              'finance', 'manufacturing', 'education',
+                                                              'hospitality', 'transportation')),
+                    "employees": fake.random_int(min=5, max=1000)
+                }
+            )
             db.session.add(business)
             self.businesses.append(business)
 
@@ -133,7 +159,8 @@ class DatabaseSeeder:
     def seed_categories(self):
         print("Seeding categories...")
 
-        categories_data = [
+        # Keep the original categories for the first 3 businesses
+        original_categories = [
             # TechCorp Categories
             {
                 "business_id": self.businesses[0].id,
@@ -199,10 +226,40 @@ class DatabaseSeeder:
             },
         ]
 
-        for category_data in categories_data:
+        for category_data in original_categories:
             category = Category(**category_data)
             db.session.add(category)
             self.categories.append(category)
+
+        # Generate additional categories with better randomization per business
+        # Ensure each business gets a mix of income and expense categories
+        income_suffixes = ["Revenue", "Income", "Sales", "Funding", "Proceeds", "Earnings", "Returns", "Royalties", "Commissions", "Interest"]
+        expense_suffixes = ["Expense", "Cost", "Payment", "Charge", "Fee", "Outlay", "Expenditure", "Tax", "Interest", "Dividend"]
+
+        for business in self.businesses[3:]:  # Skip the first 3 businesses that already have categories
+            # Add 2-4 income categories per business
+            num_income_categories = random.randint(2, 4)
+            for i in range(num_income_categories):
+                category = Category(
+                    business_id=business.id,
+                    name=fake.word().title() + " " + random.choice(income_suffixes),
+                    type="income",
+                    parent_id=None
+                )
+                db.session.add(category)
+                self.categories.append(category)
+
+            # Add 2-4 expense categories per business
+            num_expense_categories = random.randint(2, 4)
+            for i in range(num_expense_categories):
+                category = Category(
+                    business_id=business.id,
+                    name=fake.word().title() + " " + random.choice(expense_suffixes),
+                    type="expense",
+                    parent_id=None
+                )
+                db.session.add(category)
+                self.categories.append(category)
 
         db.session.commit()
         print(f"Created {len(self.categories)} categories.")
@@ -214,6 +271,7 @@ class DatabaseSeeder:
 
         transactions_data = []
 
+        # Original transactions for the first 3 businesses
         # TechCorp transactions
         for i in range(20):
             trans_date = base_date + timedelta(days=i * 4)
@@ -225,7 +283,7 @@ class DatabaseSeeder:
                         "date": trans_date,
                         "datetime": datetime.combine(trans_date, datetime.min.time()),
                         "description": f"Client payment #{i + 1}",
-                        "amount": Decimal(str(random.uniform(5000, 25000))),
+                        "amount": Decimal(str(random.uniform(1000, 100000000))),
                         "direction": "inflow",
                         "category_id": self.categories[0].id,  # Software Revenue
                         "source": "bank_transfer",
@@ -240,7 +298,7 @@ class DatabaseSeeder:
                         "date": trans_date,
                         "datetime": datetime.combine(trans_date, datetime.min.time()),
                         "description": f"Salary payment #{i + 1}",
-                        "amount": Decimal(str(random.uniform(8000, 15000))),
+                        "amount": Decimal(str(random.uniform(1000, 100000000))),
                         "direction": "outflow",
                         "category_id": self.categories[2].id,  # Salaries
                         "source": "bank_transfer",
@@ -259,7 +317,7 @@ class DatabaseSeeder:
                         "date": trans_date,
                         "datetime": datetime.combine(trans_date, datetime.min.time()),
                         "description": f"Daily sales #{i + 1}",
-                        "amount": Decimal(str(random.uniform(3000, 12000))),
+                        "amount": Decimal(str(random.uniform(1000, 100000000))),
                         "direction": "inflow",
                         "category_id": self.categories[4].id,  # Product Sales
                         "source": "cash_register",
@@ -274,7 +332,7 @@ class DatabaseSeeder:
                         "date": trans_date,
                         "datetime": datetime.combine(trans_date, datetime.min.time()),
                         "description": f"Inventory purchase #{i + 1}",
-                        "amount": Decimal(str(random.uniform(2000, 8000))),
+                        "amount": Decimal(str(random.uniform(1000, 100000000))),
                         "direction": "outflow",
                         "category_id": self.categories[6].id,  # Inventory
                         "source": "supplier",
@@ -291,7 +349,7 @@ class DatabaseSeeder:
                     "date": trans_date,
                     "datetime": datetime.combine(trans_date, datetime.min.time()),
                     "description": f"Monthly subscription #{i + 1}",
-                    "amount": Decimal(str(random.uniform(15000, 45000))),
+                    "amount": Decimal(str(random.uniform(1000, 100000000))),
                     "direction": "inflow",
                     "category_id": self.categories[8].id,  # Subscription Revenue
                     "source": "stripe",
@@ -304,13 +362,76 @@ class DatabaseSeeder:
             db.session.add(transaction)
             self.transactions.append(transaction)
 
+        # Generate additional 100-200 transactions using Faker (random number in range)
+        num_additional_transactions = random.randint(100, 200)
+        for i in range(num_additional_transactions):
+            random_business = random.choice(self.businesses)
+            random_category = random.choice(self.categories)
+            direction = random.choice(["inflow", "outflow"])
+
+            # Random amount between 1000 and 100 million
+            amount = Decimal(str(random.uniform(1000, 100000000)))
+
+            transaction = Transaction(
+                business_id=random_business.id,
+                date=fake.date_between(start_date=base_date, end_date=date.today()),
+                datetime=datetime.combine(
+                    fake.date_between(start_date=base_date, end_date=date.today()),
+                    datetime.min.time()
+                ),
+                description=fake.sentence(nb_words=4),
+                amount=amount,
+                direction=direction,
+                category_id=random_category.id,
+                source=fake.random_element(elements=(
+                    "bank_transfer", "cash", "credit_card", "debit_card",
+                    "paypal", "stripe", "check", "wire_transfer"
+                )),
+                tags=[fake.word() for _ in range(random.randint(1, 3))]
+            )
+            db.session.add(transaction)
+            self.transactions.append(transaction)
+
+        # Add transactions for each day of the current week to ensure daily chart has data
+        current_week_start = date.today() - timedelta(days=date.today().weekday())  # Monday of current week
+        for i in range(7):  # Create a transaction for each day of the week
+            current_day = current_week_start + timedelta(days=i)
+            if current_day <= date.today():  # Only create for days that haven't passed yet
+                random_business = random.choice(self.businesses)
+                random_category = random.choice(self.categories)
+                direction = random.choice(["inflow", "outflow"])
+
+                # Random amount between 1000 and 100 million
+                amount = Decimal(str(random.uniform(1000, 100000000)))
+
+                transaction = Transaction(
+                    business_id=random_business.id,
+                    date=current_day,
+                    datetime=datetime.combine(
+                        current_day,
+                        datetime.min.time()
+                    ),
+                    description=f"Current week transaction - Day {i+1}: " + fake.sentence(nb_words=3),
+                    amount=amount,
+                    direction=direction,
+                    category_id=random_category.id,
+                    source=fake.random_element(elements=(
+                        "bank_transfer", "cash", "credit_card", "debit_card",
+                        "paypal", "stripe", "check", "wire_transfer"
+                    )),
+                    tags=["current_week", f"day_{i+1}"] + [fake.word() for _ in range(random.randint(1, 2))]
+                )
+                db.session.add(transaction)
+                self.transactions.append(transaction)
+
         db.session.commit()
         print(f"Created {len(self.transactions)} transactions.")
 
     def seed_ocr_documents(self):
         print("Seeding OCR documents...")
 
-        ocr_data = [
+        # Keep original OCR documents
+        original_ocr_data = [
             {
                 "business_id": self.businesses[0].id,
                 "uploaded_by": self.users[1].id,  # John Doe
@@ -357,8 +478,30 @@ class DatabaseSeeder:
             },
         ]
 
-        for doc_data in ocr_data:
+        for doc_data in original_ocr_data:
             ocr_doc = OCRDocument(**doc_data)
+            db.session.add(ocr_doc)
+            self.ocr_documents.append(ocr_doc)
+
+        # Generate additional 30+ OCR documents using Faker
+        document_types = ["invoice", "receipt", "expense_report", "contract", "bill", "statement"]
+        for i in range(30):
+            random_business = random.choice(self.businesses)
+            random_user = random.choice(self.users)
+            doc_type = random.choice(document_types)
+
+            ocr_doc = OCRDocument(
+                business_id=random_business.id,
+                uploaded_by=random_user.id,
+                raw_text=fake.paragraph(nb_sentences=3),
+                parsed={
+                    f"{doc_type}_number": f"{doc_type.upper()}-{fake.random_number(digits=4)}",
+                    "amount": float(Decimal(str(random.uniform(50, 10000)))),
+                    "date": str(fake.date_between(start_date="-30d", end_date="today"))
+                },
+                confidence=Decimal(str(round(random.uniform(0.7, 0.99), 4))),
+                source_image_url=fake.image_url()
+            )
             db.session.add(ocr_doc)
             self.ocr_documents.append(ocr_doc)
 
@@ -368,7 +511,8 @@ class DatabaseSeeder:
     def seed_models(self):
         print("Seeding ML models...")
 
-        models_data = [
+        # Keep original models
+        original_models_data = [
             {
                 "business_id": self.businesses[0].id,
                 "name": "TechCorp Cash Flow Predictor",
@@ -403,8 +547,34 @@ class DatabaseSeeder:
             },
         ]
 
-        for model_data in models_data:
+        for model_data in original_models_data:
             model = Model(**model_data)
+            db.session.add(model)
+            self.models.append(model)
+
+        # Generate additional 30+ models using Faker
+        model_types = ["lstm", "arima", "prophet", "isolation_forest", "random_forest", "xgboost", "linear_regression"]
+        industries = ["technology", "retail", "healthcare", "finance", "manufacturing", "education", "hospitality"]
+
+        for i in range(30):
+            random_business = random.choice(self.businesses)
+            industry = random.choice(industries)
+
+            model = Model(
+                business_id=random_business.id,
+                name=fake.company() + " " + fake.random_element(elements=(
+                    "Cash Flow Predictor", "Sales Forecaster", "Revenue Model",
+                    "Anomaly Detector", "Trend Analyzer", "Risk Model", "Forecast Engine"
+                )),
+                model_type=random.choice(model_types),
+                params={
+                    "algorithm": random.choice(model_types),
+                    "features": fake.random_int(min=5, max=50),
+                    "training_period": fake.random_int(min=30, max=365)
+                },
+                version=f"v{fake.random_int(min=1, max=5)}.{fake.random_int(min=0, max=9)}.{fake.random_int(min=0, max=9)}",
+                last_trained_at=fake.date_time_between(start_date="-30d", end_date="now")
+            )
             db.session.add(model)
             self.models.append(model)
 
@@ -414,7 +584,8 @@ class DatabaseSeeder:
     def seed_model_runs(self):
         print("Seeding model runs...")
 
-        runs_data = [
+        # Keep original model runs
+        original_runs_data = [
             {
                 "model_id": self.models[0].id,
                 "input_summary": {"period": "90_days", "features": 15},
@@ -445,8 +616,31 @@ class DatabaseSeeder:
             },
         ]
 
-        for run_data in runs_data:
+        for run_data in original_runs_data:
             model_run = ModelRun(**run_data)
+            db.session.add(model_run)
+            self.model_runs.append(model_run)
+
+        # Generate additional 30+ model runs using Faker
+        run_statuses = ["completed", "failed", "running", "queued", "cancelled"]
+        for i in range(30):
+            random_model = random.choice(self.models)
+
+            model_run = ModelRun(
+                model_id=random_model.id,
+                input_summary={
+                    "period": f"{fake.random_int(min=30, max=365)}_days",
+                    "features": fake.random_int(min=5, max=50),
+                    "data_quality": round(random.uniform(0.7, 1.0), 2)
+                },
+                output_summary={
+                    "accuracy": round(random.uniform(0.7, 0.99), 4),
+                    "processing_time": round(random.uniform(1.0, 60.0), 2),
+                    "records_processed": fake.random_int(min=100, max=10000)
+                },
+                run_status=random.choice(run_statuses),
+                notes=fake.sentence()
+            )
             db.session.add(model_run)
             self.model_runs.append(model_run)
 
@@ -456,7 +650,8 @@ class DatabaseSeeder:
     def seed_forecasts(self):
         print("Seeding forecasts...")
 
-        forecasts_data = [
+        # Keep original forecasts
+        original_forecasts_data = [
             {
                 "business_id": self.businesses[0].id,
                 "model_run_id": self.model_runs[0].id,
@@ -506,8 +701,54 @@ class DatabaseSeeder:
             },
         ]
 
-        for forecast_data in forecasts_data:
+        for forecast_data in original_forecasts_data:
             forecast = Forecast(**forecast_data)
+            db.session.add(forecast)
+            self.forecasts.append(forecast)
+
+        # Generate additional 30+ forecasts using Faker
+        granularities = ["daily", "weekly", "monthly", "quarterly", "yearly"]
+        trends = ["increasing", "decreasing", "stable", "volatile"]
+
+        for i in range(30):
+            random_business = random.choice(self.businesses)
+            random_model = random.choice(self.models)
+            random_run = random.choice(self.model_runs) if self.model_runs else None
+            granularity = random.choice(granularities)
+
+            # Determine date range based on granularity
+            if granularity == "daily":
+                period_start = date.today()
+                period_end = period_start + timedelta(days=1)
+            elif granularity == "weekly":
+                period_start = date.today()
+                period_end = period_start + timedelta(weeks=1)
+            elif granularity == "monthly":
+                period_start = date.today()
+                period_end = period_start + timedelta(days=30)
+            elif granularity == "quarterly":
+                period_start = date.today()
+                period_end = period_start + timedelta(days=90)
+            else:  # yearly
+                period_start = date.today()
+                period_end = period_start + timedelta(days=365)
+
+            forecast = Forecast(
+                business_id=random_business.id,
+                model_id=random_model.id,
+                model_run_id=random_run.id if random_run else None,
+                granularity=granularity,
+                period_start=period_start,
+                period_end=period_end,
+                predicted_value=Decimal(str(round(random.uniform(1000, 100000), 2))),
+                lower_bound=Decimal(str(round(random.uniform(500, 90000), 2))),
+                upper_bound=Decimal(str(round(random.uniform(2000, 110000), 2))),
+                forecast_metadata={
+                    "confidence": round(random.uniform(0.7, 0.99), 2),
+                    "trend": random.choice(trends),
+                    "seasonality": fake.boolean()
+                }
+            )
             db.session.add(forecast)
             self.forecasts.append(forecast)
 
@@ -517,7 +758,8 @@ class DatabaseSeeder:
     def seed_risk_scores(self):
         print("Seeding risk scores...")
 
-        risk_scores_data = [
+        # Keep original risk scores
+        original_risk_scores_data = [
             {
                 "business_id": self.businesses[0].id,
                 "liquidity_score": Decimal("85.50"),
@@ -570,8 +812,35 @@ class DatabaseSeeder:
             },
         ]
 
-        for risk_data in risk_scores_data:
+        for risk_data in original_risk_scores_data:
             risk_score = RiskScore(**risk_data)
+            db.session.add(risk_score)
+            self.risk_scores.append(risk_score)
+
+        # Generate additional 30+ risk scores using Faker
+        risk_levels = ["very_low", "low", "medium", "high", "very_high"]
+        recommendations = [
+            "maintain_current_strategy", "increase_cash_reserves", "monitor_seasonality",
+            "reduce_expenses", "secure_funding", "diversify_revenue", "review_costs",
+            "improve_collection", "adjust_inventory", "optimize_operations"
+        ]
+
+        for i in range(30):
+            random_business = random.choice(self.businesses)
+            random_forecast = random.choice(self.forecasts) if self.forecasts else None
+
+            risk_score = RiskScore(
+                business_id=random_business.id,
+                liquidity_score=Decimal(str(round(random.uniform(50, 100), 2))),
+                cashflow_risk_score=Decimal(str(round(random.uniform(5, 80), 2))),
+                volatility_index=Decimal(str(round(random.uniform(0.05, 0.5), 4))),
+                drawdown_prob=Decimal(str(round(random.uniform(0.01, 0.3), 4))),
+                source_forecast_id=random_forecast.id if random_forecast else None,
+                details={
+                    "overall_risk": random.choice(risk_levels),
+                    "recommendations": random.sample(recommendations, k=random.randint(1, 3))
+                }
+            )
             db.session.add(risk_score)
             self.risk_scores.append(risk_score)
 
@@ -581,7 +850,8 @@ class DatabaseSeeder:
     def seed_alerts(self):
         print("Seeding alerts...")
 
-        alerts_data = [
+        # Keep original alerts
+        original_alerts_data = [
             {
                 "business_id": self.businesses[0].id,
                 "level": "warning",
@@ -629,8 +899,53 @@ class DatabaseSeeder:
             },
         ]
 
-        for alert_data in alerts_data:
+        for alert_data in original_alerts_data:
             alert = Alert(**alert_data)
+            db.session.add(alert)
+            self.alerts.append(alert)
+
+        # Generate additional 30+ alerts using Faker
+        alert_levels = ["info", "warning", "critical", "success"]
+        alert_messages = [
+            "Cash flow projection shows significant change",
+            "Unusual transaction pattern detected",
+            "Revenue target exceeded expectations",
+            "Expense pattern requires attention",
+            "Model prediction confidence low",
+            "Seasonal pattern detected",
+            "Cash reserves below threshold",
+            "High risk transaction identified",
+            "Forecast accuracy degraded",
+            "Unexpected data anomaly"
+        ]
+
+        for i in range(30):
+            random_business = random.choice(self.businesses)
+            alert_level = random.choice(alert_levels)
+            alert_message = random.choice(alert_messages) + " - " + fake.sentence(nb_words=3)
+
+            alert = Alert(
+                business_id=random_business.id,
+                level=alert_level,
+                message=alert_message,
+                resolved=fake.boolean(),
+                forecast_metadata={
+                    "severity": random.choice(["low", "medium", "high", "info"]),
+                    "action_required": fake.boolean(),
+                    "auto_detected": fake.boolean()
+                }
+            )
+
+            # Randomly assign linked entities
+            if fake.boolean() and self.forecasts:
+                alert.linked_forecast_id = random.choice(self.forecasts).id
+            elif fake.boolean() and self.transactions:
+                alert.linked_transaction_id = random.choice(self.transactions).id
+
+            # Set resolved_at if alert is resolved
+            if alert.resolved:
+                alert.resolved_at = fake.date_time_between(start_date="-7d", end_date="now")
+
             db.session.add(alert)
             self.alerts.append(alert)
 
@@ -640,7 +955,8 @@ class DatabaseSeeder:
     def seed_scenarios(self):
         print("Seeding scenarios...")
 
-        scenarios_data = [
+        # Keep original scenarios
+        original_scenarios_data = [
             {
                 "business_id": self.businesses[0].id,
                 "name": "Market Expansion Scenario",
@@ -703,8 +1019,42 @@ class DatabaseSeeder:
             },
         ]
 
-        for scenario_data in scenarios_data:
+        for scenario_data in original_scenarios_data:
             scenario = Scenario(**scenario_data)
+            db.session.add(scenario)
+            self.scenarios.append(scenario)
+
+        # Generate additional 30+ scenarios using Faker
+        scenario_names = [
+            "Market Expansion", "Cost Reduction", "Revenue Diversification",
+            "Pricing Strategy", "Digital Transformation", "Supply Chain Optimization",
+            "Customer Acquisition", "Operational Efficiency", "Risk Mitigation",
+            "Growth Investment", "Market Entry", "Product Development"
+        ]
+
+        risk_levels = ["low", "medium", "high", "very_high"]
+        timeframes = ["3_months", "6_months", "9_months", "12_months", "18_months", "24_months"]
+
+        for i in range(30):
+            random_business = random.choice(self.businesses)
+            random_user = random.choice(self.users)
+            scenario_name = random.choice(scenario_names)
+
+            scenario = Scenario(
+                business_id=random_business.id,
+                name=f"{fake.company()} {scenario_name}",
+                params={
+                    "investment": fake.random_int(min=10000, max=1000000),
+                    "timeline": random.choice(timeframes),
+                    "assumptions": fake.sentences(nb=2)
+                },
+                result_summary={
+                    "projected_roi": round(random.uniform(0.05, 0.5), 4),
+                    "break_even": random.choice(timeframes),
+                    "risk_level": random.choice(risk_levels)
+                },
+                run_by=random_user.id
+            )
             db.session.add(scenario)
             self.scenarios.append(scenario)
 
@@ -714,7 +1064,8 @@ class DatabaseSeeder:
     def seed_api_keys(self):
         print("Seeding API keys...")
 
-        api_keys_data = [
+        # Keep original API keys
+        original_api_keys_data = [
             {
                 "business_id": self.businesses[0].id,
                 "name": "TechCorp Production API",
@@ -753,8 +1104,24 @@ class DatabaseSeeder:
             },
         ]
 
-        for api_key_data in api_keys_data:
+        for api_key_data in original_api_keys_data:
             api_key = APIKey(**api_key_data)
+            db.session.add(api_key)
+            self.api_keys.append(api_key)
+
+        # Generate additional 30+ API keys using Faker
+        scope_options = ["read", "write", "read,write", "read,write,admin", "admin"]
+        for i in range(30):
+            random_business = random.choice(self.businesses)
+            api_key = APIKey(
+                business_id=random_business.id,
+                name=f"{fake.company()} {fake.random_element(elements=('API', 'Integration', 'Analytics', 'Production', 'Test'))} Key",
+                key_hash=hashlib.sha256(
+                    f"api_key_{fake.uuid4()}_{i}".encode()
+                ).hexdigest(),
+                scopes=random.choice(scope_options),
+                revoked=fake.boolean()
+            )
             db.session.add(api_key)
             self.api_keys.append(api_key)
 

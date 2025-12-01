@@ -17,7 +17,7 @@ def example_usage():
         llm_service = LLMService.create(
             provider="gemini",
             api_key=gemini_api_key,
-            model="gemini-pro",
+            model="gemini-1.0-pro",
             temperature=0.7
         )
         

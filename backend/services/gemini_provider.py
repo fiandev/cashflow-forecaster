@@ -9,7 +9,7 @@ from .llm_base import LLMProvider
 class GeminiProvider(LLMProvider):
     """Google Gemini API provider implementation"""
     
-    def __init__(self, api_key: str, model: str = "gemini-pro", **kwargs):
+    def __init__(self, api_key: str, model: str = "gemini-1.0-pro", **kwargs):
         self.api_key = api_key
         self.model_name = model
         genai.configure(api_key=api_key)

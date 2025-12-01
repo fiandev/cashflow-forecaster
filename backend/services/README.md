@@ -35,7 +35,7 @@ from services.llm_service import LLMService
 llm_service = LLMService.create(
     provider="gemini",
     api_key=os.getenv("GEMINI_API_KEY"),
-    model="gemini-pro",
+    model="gemini-1.0-pro",
     temperature=0.7
 )
 
@@ -52,7 +52,7 @@ from services.llm_service import create_gemini_service, create_openrouter_servic
 # Create Gemini service
 gemini_service = create_gemini_service(
     api_key=os.getenv("GEMINI_API_KEY"),
-    model="gemini-pro"
+    model="gemini-1.0-pro"
 )
 
 # Create OpenRouter service

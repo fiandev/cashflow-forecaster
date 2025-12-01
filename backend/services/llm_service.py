@@ -61,7 +61,7 @@ class LLMService:
 
 
 # Convenience functions for common use cases
-def create_gemini_service(api_key: str, model: str = "gemini-pro", **kwargs) -> LLMService:
+def create_gemini_service(api_key: str, model: str = "gemini-1.0-pro", **kwargs) -> LLMService:
     """Create a Gemini-based LLM service"""
     return LLMService.create("gemini", api_key, model, **kwargs)
 

@@ -69,6 +69,7 @@ const Index = () => {
   const { currentBusiness } = useBusiness();
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [generatingAlerts, setGeneratingAlerts] = useState(false);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -88,6 +89,32 @@ const Index = () => {
 
     fetchDashboardData();
   }, [currentBusiness]);
+
+  const handleGenerateAIAlerts = async () => {
+    if (!currentBusiness) return;
+
+    try {
+      setGeneratingAlerts(true);
+      const response = await authenticatedRequest(`/api/dashboard/generate-ai-alerts/${currentBusiness.id}`, {
+        method: "POST",
+      });
+      const data = await response.json();
+
+      if (response.ok) {
+        // Refresh dashboard data to show new alerts
+        const refreshResponse = await authenticatedRequest(`/api/dashboard/stats/${currentBusiness.id}`);
+        const refreshData = await refreshResponse.json();
+        setDashboardData(refreshData);
+        console.log("AI alerts generated successfully:", data);
+      } else {
+        console.error("Error generating AI alerts:", data.error);
+      }
+    } catch (error) {
+      console.error("Error generating AI alerts:", error);
+    } finally {
+      setGeneratingAlerts(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -147,7 +174,28 @@ const Index = () => {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <ExpenseChart expenseData={dashboardData?.expense_chart || []} />
         <IncomeChart incomeData={dashboardData?.income_chart || []} />
-        <AIAlertsPanel alerts={dashboardData?.ai_alerts || []} />
+        <div>
+          <div className="flex justify-between items-center mb-2">
+            <h3 className="text-lg font-semibold">AI Alerts</h3>
+            <button
+              onClick={handleGenerateAIAlerts}
+              disabled={generatingAlerts}
+              className="p-2 rounded-md hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              title="Refresh AI Alerts"
+            >
+              {generatingAlerts ? (
+                <svg className="w-5 h-5 text-blue-500 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              ) : (
+                <svg className="w-5 h-5 text-gray-600 hover:text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              )}
+            </button>
+          </div>
+          <AIAlertsPanel alerts={dashboardData?.ai_alerts || []} />
+        </div>
       </div>
 
       {/* Transactions Table */}
