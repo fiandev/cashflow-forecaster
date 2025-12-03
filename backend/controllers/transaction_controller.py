@@ -1,6 +1,8 @@
 from flask import request, jsonify, g
-from models import db, Transaction, Business, Category, OCRDocument
+from models import db, Transaction, Business, Category, OCRDocument, Alert
 from datetime import datetime, date
+from services.ai_service import AIService
+import json
 
 
 class TransactionController:
@@ -35,21 +37,21 @@ class TransactionController:
         # Auto-fill business_id from user's business
         business_id = data.get("business_id")
 
-        # If business_id is provided in the request, verify user owns that business
+        business = None
         if business_id:
+            # If business_id provided, verify it exists and user owns it
             business = Business.query.get(business_id)
             if not business:
                 return jsonify({"error": "Business not found"}), 404
-            # Check if the user is the owner of this business or an admin
+            
             if business.owner_id != g.current_user.id and g.current_user.role != "admin":
                 return jsonify({"error": "You can only create transactions for your own business"}), 403
         else:
-            # If no business_id provided, use the user's first business
-            user_business = Business.query.filter_by(owner_id=g.current_user.id).first()
-            if not user_business:
-                return jsonify({"error": "User has no business"}), 404
-            business = user_business
-            business_id = user_business.id
+            # If no business_id provided, automatically find the user's business
+            business = Business.query.filter_by(owner_id=g.current_user.id).first()
+            if not business:
+                return jsonify({"error": "No business found for this user. Please create a business profile first."}), 404
+            # No ownership check needed here since we queried by owner_id
 
         if "category_id" in data and data["category_id"]:
             category = Category.query.get(data["category_id"])
@@ -65,6 +67,37 @@ class TransactionController:
         if isinstance(transaction_date, str):
             transaction_date = datetime.fromisoformat(transaction_date).date()
 
+        # AI Anomaly Detection
+        is_anomalous = data.get("is_anomalous", False)
+        ai_tag = data.get("ai_tag")
+
+        try:
+            ai_service = AIService()
+            analysis_data = {
+                "description": data.get("description", ""),
+                "amount": data["amount"],
+                "date": str(transaction_date),
+                "category": category.name if "category_id" in data and data["category_id"] else "Unknown",
+                "direction": data["direction"]
+            }
+            
+            ai_response = ai_service.analyze_transaction_anomaly(analysis_data)
+            
+            # Handle JSON response from AI Service
+            if isinstance(ai_response, dict):
+                if ai_response.get("is_anomalous"):
+                    is_anomalous = True
+                    ai_tag = ai_response.get("tag", "Anomalous")
+            elif isinstance(ai_response, str):
+                # Fallback for older text-based responses (just in case)
+                if "unusual" in ai_response.lower() or "anomaly" in ai_response.lower():
+                    is_anomalous = True
+                    ai_tag = ai_response[:50]
+            
+        except Exception as e:
+            print(f"AI Anomaly Detection Failed: {e}")
+            # Fail silently, don't block transaction creation
+
         transaction = Transaction(
             business_id=business.id,
             date=transaction_date,
@@ -78,12 +111,24 @@ class TransactionController:
             source=data.get("source"),
             ocr_document_id=data.get("ocr_document_id"),
             tags=data.get("tags"),
-            is_anomalous=data.get("is_anomalous", False),
-            ai_tag=data.get("ai_tag"),
+            is_anomalous=is_anomalous,
+            ai_tag=ai_tag,
         )
 
         db.session.add(transaction)
         db.session.commit()
+
+        # Automatically create an alert if anomalous
+        if is_anomalous:
+            alert = Alert(
+                business_id=business.id,
+                level="warning",
+                message=f"Suspicious Transaction Detected: {transaction.description}",
+                linked_transaction_id=transaction.id,
+                forecast_metadata={"ai_reason": ai_tag}
+            )
+            db.session.add(alert)
+            db.session.commit()
 
         return jsonify(
             {

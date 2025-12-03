@@ -18,16 +18,31 @@ const buildEndpoint = (path: string): string => {
 // Define API endpoints
 export const API_ENDPOINTS = {
   // Auth endpoints
-  login: buildEndpoint('/auth/login'),
-  register: buildEndpoint('/auth/register'),
-  me: buildEndpoint('/auth/me'),
+  login: buildEndpoint('/api/auth/login'),
+  register: buildEndpoint('/api/auth/register'),
+  me: buildEndpoint('/api/auth/me'),
 
   // Business endpoints
-  registerBusiness: buildEndpoint('/auth/business/register'),
+  registerBusiness: buildEndpoint('/api/auth/business/register'),
 
   // Profile endpoints
-  profile: buildEndpoint('/profile/'),
-  changePassword: buildEndpoint('/profile/change-password'),
+  profile: buildEndpoint('/api/profile/'),
+  changePassword: buildEndpoint('/api/profile/change-password'),
+
+  // Forecast endpoints
+  forecasts: buildEndpoint('/api/forecasts/'),
+
+  // Alert endpoints
+  alerts: buildEndpoint('/api/alerts/'),
+
+  // Transaction endpoints
+  transactions: buildEndpoint('/api/transactions/'),
+
+  // Category endpoints
+  categories: buildEndpoint('/api/categories/'),
+
+  // Dashboard endpoints
+  dashboardMetrics: buildEndpoint('/api/dashboard/metrics'),
 };
 
 export interface ApiResponse<T = any> {
@@ -43,6 +58,7 @@ export const apiRequest = async (
   const headers: HeadersInit = {
     ...options.headers,  // User headers first
     'Content-Type': 'application/json', // This will ensure it's always set to application/json
+    'ngrok-skip-browser-warning': 'true', // Bypass ngrok browser warning for free accounts
   };
 
   const response = await fetch(endpoint, {

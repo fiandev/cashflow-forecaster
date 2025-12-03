@@ -7,7 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Loader2 } from "lucide-react";
+import { authenticatedRequest, API_ENDPOINTS } from "@/lib/api";
+import { useState } from "react";
 
 const forecastItemSchema = z.object({
   description: z
@@ -33,6 +35,8 @@ type ForecastForm = z.infer<typeof forecastSchema>;
 
 const Forecast = () => {
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
+
   const {
     register,
     control,
@@ -67,27 +71,77 @@ const Forecast = () => {
     name: "expectedOutflows",
   });
 
-  const onSubmit = (data: ForecastForm) => {
-    console.log("Forecast data:", {
-      ...data,
-      expectedInflows: data.expectedInflows.map((item) => ({
-        ...item,
-        amount: Number(item.amount),
-      })),
-      expectedOutflows: data.expectedOutflows.map((item) => ({
-        ...item,
-        amount: Number(item.amount),
-      })),
-    });
-    
-    toast.success("Forecast saved successfully!", {
-      description: `${data.forecastPeriod}-day cashflow projection has been generated.`,
-    });
+  const calculateMonthlyTotal = (items: any[]) => {
+    return items.reduce((total, item) => {
+      const amount = Number(item.amount);
+      switch (item.frequency) {
+        case "daily": return total + (amount * 30);
+        case "weekly": return total + (amount * 4);
+        case "quarterly": return total + (amount / 3);
+        case "annual": return total + (amount / 12);
+        default: return total + amount;
+      }
+    }, 0);
+  };
 
-    // Navigate to results page
-    navigate("/forecast/results", {
-      state: { forecastPeriod: data.forecastPeriod },
-    });
+  const onSubmit = async (data: ForecastForm) => {
+    setIsLoading(true);
+    try {
+      // Calculate metrics for the API
+      const monthlyInflow = calculateMonthlyTotal(data.expectedInflows);
+      const monthlyOutflow = calculateMonthlyTotal(data.expectedOutflows);
+      const netMonthly = monthlyInflow - monthlyOutflow;
+      
+      const months = Number(data.forecastPeriod) / 30;
+      const predictedValue = netMonthly * months;
+      
+      // Simple variance for bounds
+      const variance = Math.abs(predictedValue * 0.2); // 20% variance
+
+      const startDate = new Date();
+      const endDate = new Date();
+      endDate.setDate(endDate.getDate() + Number(data.forecastPeriod));
+
+      const payload = {
+        business_id: 1, // TODO: Fetch from user profile/context
+        granularity: "monthly",
+        period_start: startDate.toISOString().split('T')[0],
+        period_end: endDate.toISOString().split('T')[0],
+        predicted_value: predictedValue,
+        lower_bound: predictedValue - variance,
+        upper_bound: predictedValue + variance,
+        forecast_metadata: {
+          inputs: data // Store form inputs for reference
+        }
+      };
+
+      const response = await authenticatedRequest(API_ENDPOINTS.forecasts, {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      });
+
+      const result = await response.json();
+
+      toast.success("Forecast generated successfully!", {
+        description: "AI analysis complete.",
+      });
+
+      // Navigate to results with the API response
+      navigate("/forecast/results", {
+        state: { 
+          forecastData: result,
+          forecastPeriod: data.forecastPeriod 
+        },
+      });
+
+    } catch (error) {
+      console.error("Forecast creation failed:", error);
+      toast.error("Failed to generate forecast", {
+        description: error instanceof Error ? error.message : "Please try again",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -266,8 +320,15 @@ const Forecast = () => {
               )}
             </div>
 
-            <Button type="submit" className="w-full" size="lg">
-              Generate AI Forecast
+            <Button type="submit" className="w-full" size="lg" disabled={isLoading}>
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Generating AI Forecast...
+                </>
+              ) : (
+                'Generate AI Forecast'
+              )}
             </Button>
           </form>
         </Card>

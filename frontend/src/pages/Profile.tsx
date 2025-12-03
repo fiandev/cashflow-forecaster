@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { toast } from '@/hooks/use-toast';
+import { authenticatedRequest, API_ENDPOINTS } from '@/lib/api';
 
 interface User {
   id: number;
@@ -32,20 +33,31 @@ const Profile: React.FC = () => {
 
   const fetchUserProfile = async () => {
     try {
-      const response = await fetch('/api/users/1');
-      if (response.ok) {
-        const userData = await response.json();
-        setUser(userData);
-        setFormData({
-          name: userData.name || '',
-          email: userData.email,
-          role: userData.role || ''
-        });
+      const response = await authenticatedRequest(API_ENDPOINTS.profile);
+      
+      let userData;
+      try {
+        userData = await response.json();
+      } catch (jsonError) {
+        console.error("Failed to parse profile response JSON:", jsonError);
+        throw new Error("Invalid response format from server");
       }
+
+      if (!userData) {
+        throw new Error("Empty user data received");
+      }
+
+      setUser(userData);
+      setFormData({
+        name: userData.name || '',
+        email: userData.email || '',
+        role: userData.role || ''
+      });
     } catch (error) {
+      console.error("Error fetching profile:", error);
       toast({
         title: "Error",
-        description: "Failed to fetch user profile",
+        description: error instanceof Error ? error.message : "Failed to fetch user profile",
         variant: "destructive"
       });
     }
@@ -53,23 +65,18 @@ const Profile: React.FC = () => {
 
   const handleUpdateProfile = async () => {
     try {
-      const response = await fetch('/api/users/1', {
+      const response = await authenticatedRequest(API_ENDPOINTS.profile, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify(formData),
       });
 
-      if (response.ok) {
-        const updatedUser = await response.json();
-        setUser(updatedUser);
-        setIsEditing(false);
-        toast({
-          title: "Success",
-          description: "Profile updated successfully",
-        });
-      }
+      const updatedUser = await response.json();
+      setUser(updatedUser);
+      setIsEditing(false);
+      toast({
+        title: "Success",
+        description: "Profile updated successfully",
+      });
     } catch (error) {
       toast({
         title: "Error",

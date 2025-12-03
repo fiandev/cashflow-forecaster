@@ -12,13 +12,15 @@ class BusinessController:
         """Create new business"""
         data = request.get_json()
 
-        if (
-            not data
-            or not data.get("name")
-            or not data.get("currency")
-            or not data.get("owner_id")
-        ):
-            return jsonify({"error": "Name, currency, and owner_id are required"}), 400
+        if not data or not data.get("name") or not data.get("currency"):
+            return jsonify({"error": "Name and currency are required"}), 400
+
+        # Auto-assign owner_id from authenticated user if not provided
+        if "owner_id" not in data:
+            if hasattr(g, 'current_user') and g.current_user:
+                data['owner_id'] = g.current_user.id
+            else:
+                return jsonify({"error": "owner_id is required"}), 400
 
         # Verify owner exists
         owner = User.query.get(data["owner_id"])
@@ -44,24 +46,8 @@ class BusinessController:
         return jsonify(self.business_repository.to_dict(business))
 
     def store(self):
-        """Create new business"""
-        data = request.get_json()
-
-        if (
-            not data
-            or not data.get("name")
-            or not data.get("currency")
-            or not data.get("owner_id")
-        ):
-            return jsonify({"error": "Name, currency, and owner_id are required"}), 400
-
-        # Verify owner exists
-        owner = User.query.get(data["owner_id"])
-        if not owner:
-            return jsonify({"error": "Owner not found"}), 404
-
-        business = self.business_repository.createWithOwner(data, data["owner_id"])
-        return jsonify(self.business_repository.to_dict(business)), 201
+        """Create new business (Alias for create_business logic)"""
+        return self.create_business()
 
     def update(self, business_id):
         """Update business"""

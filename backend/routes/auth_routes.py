@@ -61,4 +61,10 @@ def get_current_user():
 @auth_bp.route("/business/register", methods=["POST"])
 def register_business():
     """Register new business for the authenticated user"""
-    return business_controller.create_business()
+    from middleware.auth import authenticate_request
+
+    @authenticate_request
+    def _register_business():
+        return business_controller.create_business()
+        
+    return _register_business()

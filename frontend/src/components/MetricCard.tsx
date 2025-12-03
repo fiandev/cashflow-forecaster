@@ -1,41 +1,57 @@
-import { TrendingUp, TrendingDown, Minus } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { TrendingUp, TrendingDown, Minus } from "lucide-react";
 
 interface MetricCardProps {
   title: string;
   value: string;
-  trend: "up" | "down" | "neutral";
-  trendValue: string;
-  risk: "low" | "medium" | "high";
+  trend?: "up" | "down" | "neutral";
+  trendValue?: string;
+  risk?: "low" | "medium" | "high" | "critical";
 }
 
-export const MetricCard = ({ title, value, trend, trendValue, risk }: MetricCardProps) => {
-  const riskColors = {
-    low: "text-success",
-    medium: "text-warning",
-    high: "text-destructive",
-  };
-
-  const TrendIcon = trend === "up" ? TrendingUp : trend === "down" ? TrendingDown : Minus;
+export const MetricCard: React.FC<MetricCardProps> = ({
+  title,
+  value,
+  trend = "neutral",
+  trendValue,
+  risk,
+}) => {
+  const trendColor = trend === "up" ? "text-success" : trend === "down" ? "text-destructive" : "text-muted-foreground";
+  const trendIcon =
+    trend === "up" ? (
+      <TrendingUp className="w-4 h-4" />
+    ) : trend === "down" ? (
+      <TrendingDown className="w-4 h-4" />
+    ) : (
+      <Minus className="w-4 h-4" />
+    );
 
   return (
-    <Card className="p-6 hover:shadow-lg transition-shadow duration-300 animate-slide-up">
-      <div className="space-y-3">
-        <p className="text-sm font-medium text-muted-foreground">{title}</p>
-        <div className="flex items-baseline justify-between">
-          <h3 className="text-3xl font-bold tracking-tight">{value}</h3>
-          <div className={`flex items-center gap-1 text-sm font-medium ${riskColors[risk]}`}>
-            <TrendIcon className="w-4 h-4" />
-            <span>{trendValue}</span>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className={`h-1 flex-1 rounded-full ${risk === "low" ? "bg-success/20" : risk === "medium" ? "bg-warning/20" : "bg-destructive/20"}`}>
-            <div 
-              className={`h-full rounded-full transition-all duration-500 ${risk === "low" ? "bg-success w-3/4" : risk === "medium" ? "bg-warning w-1/2" : "bg-destructive w-1/4"}`}
-            />
-          </div>
-        </div>
+    <Card className="p-4 animate-slide-up">
+      <div className="text-sm text-muted-foreground mb-1">{title}</div>
+      <div className="text-2xl font-bold text-foreground">{value}</div>
+      <div className="flex items-center gap-1 mt-2">
+        {trendValue && (
+          <span className={`flex items-center gap-1 text-sm ${trendColor}`}>
+            {trendIcon}
+            {trendValue}
+          </span>
+        )}
+        {risk && (
+          <span
+            className={`text-xs capitalize px-2 py-1 rounded-full ${
+              risk === "low"
+                ? "bg-success/20 text-success"
+                : risk === "medium"
+                ? "bg-warning/20 text-warning"
+                : risk === "high" || risk === "critical"
+                ? "bg-destructive/20 text-destructive"
+                : "bg-muted text-muted-foreground"
+            }`}
+          >
+            {risk}
+          </span>
+        )}
       </div>
     </Card>
   );
