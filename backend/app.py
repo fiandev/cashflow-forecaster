@@ -16,10 +16,8 @@ app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv(
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 
-# Enable CORS for localhost:5173
-CORS(app, 
-    origins=["http://localhost:5173/", "http://127.0.0.1:5173/"]
-)
+# Enable CORS for development (allow all origins for ngrok support)
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 from models import (
     db,

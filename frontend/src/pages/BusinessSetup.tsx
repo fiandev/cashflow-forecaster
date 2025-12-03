@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -7,6 +8,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
+import { authenticatedRequest, API_ENDPOINTS } from "@/lib/api";
+import { Loader2 } from "lucide-react";
 
 const businessSchema = z.object({
   businessName: z
@@ -54,6 +58,9 @@ const businessSchema = z.object({
 type BusinessForm = z.infer<typeof businessSchema>;
 
 const BusinessSetup = () => {
+  const navigate = useNavigate();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const {
     register,
     handleSubmit,
@@ -63,19 +70,42 @@ const BusinessSetup = () => {
     resolver: zodResolver(businessSchema),
   });
 
-  const onSubmit = (data: BusinessForm) => {
-    console.log("Business setup data:", {
-      ...data,
-      monthlyRevenue: Number(data.monthlyRevenue),
-      monthlyExpenses: Number(data.monthlyExpenses),
-      currentCash: Number(data.currentCash),
-      outstandingDebt: Number(data.outstandingDebt),
-      employees: Number(data.employees),
-    });
-    
-    toast.success("Business profile saved!", {
-      description: "Your business metrics have been updated successfully.",
-    });
+  const onSubmit = async (data: BusinessForm) => {
+    setIsSubmitting(true);
+    try {
+      const payload = {
+        name: data.businessName,
+        currency: "USD", // Default for now, can add selector later
+        country: "USA", // Default for now
+        settings: {
+          industry: data.industry,
+          monthly_revenue: Number(data.monthlyRevenue),
+          monthly_expenses: Number(data.monthlyExpenses),
+          current_cash: Number(data.currentCash),
+          outstanding_debt: Number(data.outstandingDebt),
+          employees: Number(data.employees),
+          goals: data.businessGoals,
+        }
+      };
+
+      await authenticatedRequest(API_ENDPOINTS.registerBusiness, {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      });
+      
+      toast.success("Business profile saved!", {
+        description: "Your business metrics have been updated successfully.",
+      });
+
+      navigate("/"); // Redirect to dashboard
+    } catch (error) {
+      console.error("Business setup failed:", error);
+      toast.error("Failed to save business profile", {
+        description: "Please try again later.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -203,10 +233,17 @@ const BusinessSetup = () => {
             </div>
 
             <div className="flex gap-4">
-              <Button type="submit" className="flex-1">
-                Save Business Profile
+              <Button type="submit" className="flex-1" disabled={isSubmitting}>
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  'Save Business Profile'
+                )}
               </Button>
-              <Button type="button" variant="outline" onClick={() => reset()}>
+              <Button type="button" variant="outline" onClick={() => reset()} disabled={isSubmitting}>
                 Reset
               </Button>
             </div>

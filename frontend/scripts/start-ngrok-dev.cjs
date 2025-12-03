@@ -75,6 +75,15 @@ async function startDevWithNgrok() {
              cleanup();
         }
 
+        // 2.5 Initialize Database (Match Docker behavior)
+        console.log('Initializing database (init_db.py)...');
+        try {
+            execSync(`${pythonExecutable} init_db.py`, { cwd: backendDir, stdio: 'inherit' });
+        } catch (e) {
+             console.error('Failed to initialize database:', e);
+             cleanup();
+        }
+
         // 3. Run App using venv python
         backendProcess = spawn(pythonExecutable, ['app.py'], {
             cwd: backendDir,

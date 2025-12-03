@@ -2,6 +2,7 @@ from flask import request, jsonify
 from models import db, Forecast, Business, Model, ModelRun
 from datetime import datetime, date
 from decimal import Decimal
+from services.ai_service import AIService
 
 
 class ForecastController:
@@ -39,6 +40,28 @@ class ForecastController:
         if isinstance(period_end, str):
             period_end = datetime.fromisoformat(period_end).date()
 
+        # Initialize metadata if not present
+        metadata = data.get("forecast_metadata") or {}
+
+        # Generate AI Insight
+        try:
+            ai_service = AIService()
+            # Prepare data for AI analysis
+            analysis_input = {
+                'period_start': period_start,
+                'period_end': period_end,
+                'granularity': data["granularity"],
+                'predicted_value': data.get("predicted_value"),
+                'lower_bound': data.get("lower_bound"),
+                'upper_bound': data.get("upper_bound")
+            }
+            
+            insight = ai_service.generate_forecast_insight(analysis_input)
+            metadata['ai_analysis'] = insight
+        except Exception as e:
+            print(f"AI Integration Error: {e}")
+            metadata['ai_error'] = str(e)
+
         forecast = Forecast(
             business_id=data["business_id"],
             model_run_id=data.get("model_run_id"),
@@ -55,7 +78,7 @@ class ForecastController:
             upper_bound=Decimal(str(data["upper_bound"]))
             if data.get("upper_bound")
             else None,
-            forecast_metadata=data.get("forecast_metadata"),
+            forecast_metadata=metadata,
         )
 
         db.session.add(forecast)

@@ -1,74 +1,109 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceDot } from "recharts";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { authenticatedRequest, API_ENDPOINTS } from "@/lib/api";
+import { Loader2 } from "lucide-react";
+import { format, parseISO } from "date-fns";
 
-const dailyData = [
-  { date: "Mon", cashIn: 12000, cashOut: 8000, anomaly: false },
-  { date: "Tue", cashIn: 15000, cashOut: 9500, anomaly: false },
-  { date: "Wed", cashIn: 11000, cashOut: 13000, anomaly: true },
-  { date: "Thu", cashIn: 18000, cashOut: 10000, anomaly: false },
-  { date: "Fri", cashIn: 20000, cashOut: 12000, anomaly: false },
-  { date: "Sat", cashIn: 8000, cashOut: 7000, anomaly: false },
-  { date: "Sun", cashIn: 6000, cashOut: 5000, anomaly: false },
-];
+interface Transaction {
+  date: string;
+  amount: number;
+  direction: "inflow" | "outflow";
+  is_anomalous: boolean;
+}
 
-const weeklyData = [
-  { date: "Week 1", cashIn: 85000, cashOut: 62000, anomaly: false },
-  { date: "Week 2", cashIn: 92000, cashOut: 68000, anomaly: false },
-  { date: "Week 3", cashIn: 78000, cashOut: 85000, anomaly: true },
-  { date: "Week 4", cashIn: 105000, cashOut: 72000, anomaly: false },
-];
-
-const monthlyData = [
-  { date: "Jan", cashIn: 340000, cashOut: 280000, anomaly: false },
-  { date: "Feb", cashIn: 360000, cashOut: 295000, anomaly: false },
-  { date: "Mar", cashIn: 320000, cashOut: 310000, anomaly: true },
-  { date: "Apr", cashIn: 395000, cashOut: 285000, anomaly: false },
-];
-
-type TimeFrame = "daily" | "weekly" | "monthly";
+interface ChartData {
+  date: string;
+  cashIn: number;
+  cashOut: number;
+  anomaly: boolean;
+}
 
 export const CashflowChart = () => {
-  const [timeFrame, setTimeFrame] = useState<TimeFrame>("daily");
+  const [data, setData] = useState<ChartData[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const dataMap = {
-    daily: dailyData,
-    weekly: weeklyData,
-    monthly: monthlyData,
-  };
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await authenticatedRequest(API_ENDPOINTS.transactions);
+        const transactions: Transaction[] = await response.json();
 
-  const data = dataMap[timeFrame];
+        // Process transactions into daily chart data
+        const groupedData: Record<string, ChartData> = {};
+
+        transactions.forEach((t) => {
+          // Normalize date string just in case
+          const dateStr = t.date.split('T')[0]; 
+          
+          if (!groupedData[dateStr]) {
+            groupedData[dateStr] = {
+              date: dateStr,
+              cashIn: 0,
+              cashOut: 0,
+              anomaly: false,
+            };
+          }
+
+          if (t.direction === "inflow") {
+            groupedData[dateStr].cashIn += t.amount;
+          } else {
+            groupedData[dateStr].cashOut += t.amount;
+          }
+
+          if (t.is_anomalous) {
+            groupedData[dateStr].anomaly = true;
+          }
+        });
+
+        // Convert to array and sort by date
+        const chartData = Object.values(groupedData).sort((a, b) => 
+          new Date(a.date).getTime() - new Date(b.date).getTime()
+        );
+
+        // Format dates for display (e.g., "Jan 20")
+        const formattedData = chartData.map(item => ({
+          ...item,
+          date: format(parseISO(item.date), "MMM d"),
+          rawDate: item.date // Keep raw for sorting validation if needed
+        }));
+
+        setData(formattedData);
+      } catch (error) {
+        console.error("Failed to load cashflow data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <Card className="p-6 animate-slide-up min-h-[300px] flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+      </Card>
+    );
+  }
 
   return (
     <Card className="p-6 animate-slide-up">
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-semibold">Cashflow Timeline</h3>
-        <div className="flex gap-2">
-          {(["daily", "weekly", "monthly"] as TimeFrame[]).map((frame) => (
-            <Button
-              key={frame}
-              variant={timeFrame === frame ? "default" : "outline"}
-              size="sm"
-              onClick={() => setTimeFrame(frame)}
-              className="capitalize"
-            >
-              {frame}
-            </Button>
-          ))}
-        </div>
+        <h3 className="text-lg font-semibold">Cashflow Timeline (Daily)</h3>
       </div>
       <ResponsiveContainer width="100%" height={300}>
         <LineChart data={data}>
           <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-          <XAxis dataKey="date" stroke="hsl(var(--muted-foreground))" />
-          <YAxis stroke="hsl(var(--muted-foreground))" />
+          <XAxis dataKey="date" stroke="hsl(var(--muted-foreground))" tick={{ fontSize: 12 }} />
+          <YAxis stroke="hsl(var(--muted-foreground))" tick={{ fontSize: 12 }} />
           <Tooltip
             contentStyle={{
               backgroundColor: "hsl(var(--card))",
               border: "1px solid hsl(var(--border))",
               borderRadius: "var(--radius)",
             }}
+            formatter={(value: number) => [`$${value.toLocaleString()}`, ""]}
           />
           <Legend />
           <Line
@@ -76,7 +111,8 @@ export const CashflowChart = () => {
             dataKey="cashIn"
             stroke="hsl(var(--chart-2))"
             strokeWidth={2}
-            dot={{ fill: "hsl(var(--chart-2))" }}
+            dot={{ fill: "hsl(var(--chart-2))", r: 4 }}
+            activeDot={{ r: 6 }}
             name="Cash In"
           />
           <Line
@@ -84,7 +120,8 @@ export const CashflowChart = () => {
             dataKey="cashOut"
             stroke="hsl(var(--chart-1))"
             strokeWidth={2}
-            dot={{ fill: "hsl(var(--chart-1))" }}
+            dot={{ fill: "hsl(var(--chart-1))", r: 4 }}
+            activeDot={{ r: 6 }}
             name="Cash Out"
           />
           {data.map((entry, index) =>
@@ -92,16 +129,21 @@ export const CashflowChart = () => {
               <ReferenceDot
                 key={index}
                 x={entry.date}
-                y={entry.cashOut}
-                r={8}
+                y={entry.cashOut > entry.cashIn ? entry.cashOut : entry.cashIn}
+                r={6}
                 fill="hsl(var(--destructive))"
-                stroke="hsl(var(--card))"
-                strokeWidth={2}
+                stroke="none"
+                ifOverflow="extendDomain"
               />
             ) : null
           )}
         </LineChart>
       </ResponsiveContainer>
+      {data.length === 0 && (
+        <div className="text-center text-muted-foreground mt-4">
+          No transaction data available to display.
+        </div>
+      )}
     </Card>
   );
 };

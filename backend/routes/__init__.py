@@ -5,6 +5,8 @@ from .forecast_routes import forecast_bp
 from .alert_routes import alert_bp
 from .auth_routes import auth_bp
 from .profile_routes import profile_bp
+from .category_routes import category_bp
+from .dashboard_routes import dashboard_bp
 
 
 def register_routes(app):
@@ -15,3 +17,5 @@ def register_routes(app):
     app.register_blueprint(alert_bp, url_prefix="/api/alerts")
     app.register_blueprint(auth_bp, url_prefix="/api/auth")
     app.register_blueprint(profile_bp, url_prefix="/api/profile")
+    app.register_blueprint(category_bp, url_prefix="/api/categories")
+    app.register_blueprint(dashboard_bp, url_prefix="/api/dashboard")

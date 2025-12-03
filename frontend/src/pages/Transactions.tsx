@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -10,8 +10,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Loader2 } from "lucide-react";
 import { format } from "date-fns";
+import { authenticatedRequest, API_ENDPOINTS } from "@/lib/api";
 
 const transactionSchema = z.object({
   date: z.date({ required_error: "Date is required" }),
@@ -26,35 +27,94 @@ const transactionSchema = z.object({
     .min(1, "Amount is required")
     .refine((val) => !isNaN(Number(val)) && Number(val) > 0, "Amount must be a positive number"),
   type: z.enum(["inflow", "outflow"], { required_error: "Transaction type is required" }),
-  category: z.string().min(1, "Category is required"),
+  category_id: z.string().min(1, "Category is required"),
 });
 
 type TransactionForm = z.infer<typeof transactionSchema>;
 
+interface Category {
+  id: number;
+  name: string;
+  type: string;
+}
+
 const Transactions = () => {
   const [date, setDate] = useState<Date>();
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
     setValue,
+    watch,
   } = useForm<TransactionForm>({
     resolver: zodResolver(transactionSchema),
   });
 
-  const onSubmit = (data: TransactionForm) => {
-    console.log("Transaction data:", {
-      ...data,
-      amount: Number(data.amount),
-    });
-    
-    toast.success("Transaction added successfully!", {
-      description: `${data.type === "inflow" ? "Income" : "Expense"} of $${Number(data.amount).toLocaleString()} recorded.`,
-    });
-    
-    reset();
-    setDate(undefined);
+  const selectedType = watch("type");
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      setIsLoading(true);
+      try {
+        const response = await authenticatedRequest(API_ENDPOINTS.categories);
+        const data = await response.json();
+        setCategories(data);
+      } catch (error) {
+        console.error("Failed to fetch categories:", error);
+        toast.error("Failed to load categories");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  const filteredCategories = categories.filter(cat => {
+    if (!selectedType) return true;
+    // Map transaction type to category type logic if needed, 
+    // but for now assuming categories might be mixed or we just show all.
+    // Ideally backend categories have 'income' or 'expense' types.
+    // Let's filter if the category type matches.
+    const typeMap: Record<string, string> = { inflow: 'income', outflow: 'expense' };
+    return cat.type === typeMap[selectedType];
+  });
+
+  const onSubmit = async (data: TransactionForm) => {
+    setIsSubmitting(true);
+    try {
+      const payload = {
+        date: format(data.date, "yyyy-MM-dd"),
+        description: data.description,
+        amount: Number(data.amount),
+        direction: data.type,
+        category_id: Number(data.category_id),
+        // business_id will be auto-assigned by the backend based on the authenticated user
+      };
+
+      await authenticatedRequest(API_ENDPOINTS.transactions, {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      });
+      
+      toast.success("Transaction added successfully!", {
+        description: `${data.type === "inflow" ? "Income" : "Expense"} of $${Number(data.amount).toLocaleString()} recorded.`,
+      });
+      
+      reset();
+      setDate(undefined);
+      setValue("category_id", ""); // Reset select
+    } catch (error) {
+      console.error("Failed to create transaction:", error);
+      toast.error("Failed to add transaction");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -115,23 +175,24 @@ const Transactions = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="category">Category</Label>
-              <Select onValueChange={(value) => setValue("category", value)}>
+              <Label htmlFor="category_id">Category</Label>
+              <Select onValueChange={(value) => setValue("category_id", value)} disabled={!selectedType || isLoading}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select category" />
+                  <SelectValue placeholder={isLoading ? "Loading..." : "Select category"} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="revenue">Revenue</SelectItem>
-                  <SelectItem value="operations">Operations</SelectItem>
-                  <SelectItem value="payroll">Payroll</SelectItem>
-                  <SelectItem value="marketing">Marketing</SelectItem>
-                  <SelectItem value="utilities">Utilities</SelectItem>
-                  <SelectItem value="consulting">Consulting</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
+                  {filteredCategories.map((category) => (
+                    <SelectItem key={category.id} value={category.id.toString()}>
+                      {category.name}
+                    </SelectItem>
+                  ))}
+                  {filteredCategories.length === 0 && !isLoading && (
+                    <SelectItem value="no_categories" disabled>No categories found for this type</SelectItem>
+                  )}
                 </SelectContent>
               </Select>
-              {errors.category && (
-                <p className="text-sm text-destructive">{errors.category.message}</p>
+              {errors.category_id && (
+                <p className="text-sm text-destructive">{errors.category_id.message}</p>
               )}
             </div>
 
@@ -161,8 +222,15 @@ const Transactions = () => {
               )}
             </div>
 
-            <Button type="submit" className="w-full">
-              Add Transaction
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Adding Transaction...
+                </>
+              ) : (
+                'Add Transaction'
+              )}
             </Button>
           </form>
         </Card>
