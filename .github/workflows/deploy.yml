@@ -8,12 +8,13 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Deploy with rsync
-        uses: burnett01/rsync-deployments@v6
+        uses: burnett01/rsync-deployments@v5
         with:
           switches: -avz --delete --exclude=node_modules --exclude=.git
           path: ./
@@ -22,7 +23,7 @@ jobs:
           remote_user: ${{ secrets.VPS_USER }}
           remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      - name: Run Docker on VPS
+      - name: Run docker.sh on VPS
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.VPS_HOST }}
@@ -30,9 +31,11 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd /root/ai-cashflow-forecaster
+
+            # export env biar docker.sh ga bengong
             export JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}
             export KOLOSAL_API_KEY=${{ secrets.KOLOSAL_API_KEY }}
             export KOLOSAL_BASE_URL=${{ secrets.KOLOSAL_BASE_URL }}
-            docker compose down
-            docker compose build
-            docker compose up -d
+
+            chmod +x docker.sh
+            ./docker.sh up
