@@ -11,7 +11,10 @@ RUN bun install
 # Copy frontend source code
 COPY ./frontend/ .
 
-# Build the frontend
+# Build the frontend with production API settings
+# Using /proxy prefix to work with nginx proxy configuration
+ARG VITE_API_BASE_URL="/proxy"
+ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 RUN bun run build
 
 

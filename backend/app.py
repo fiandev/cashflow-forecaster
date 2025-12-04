@@ -1,10 +1,8 @@
 import os
 
 from dotenv import load_dotenv
-from flask import Flask
-from flask_cors import CORS
+from flask import Flask, make_response, request
 from flask_migrate import Migrate
-from flask_sqlalchemy import SQLAlchemy
 
 load_dotenv()
 
@@ -17,44 +15,41 @@ app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv(
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 
-# Enable CORS for development (allow frontend origin for Docker)
-frontend_origin = os.getenv("FRONTEND_ORIGIN", "http://localhost:3001")
 
-CORS(
-    app,
-    resources={
-        r"/*": {
-            "origins": [
-                frontend_origin,
-                "http://localhost:3000",
-                "http://localhost:3001",
-                "http://localhost:5173",
-            ]
-        }
-    },
-)
-
-from models import (
-    Alert,
-    APIKey,
-    Business,
-    Category,
-    Forecast,
-    Model,
-    ModelRun,
-    OCRDocument,
-    RiskScore,
-    Scenario,
-    Transaction,
-    User,
-    db,
-)
-from routes import register_routes
+from models import db
 
 db.init_app(app)
 migrate = Migrate(app, db)
 
-register_routes(app)
+
+# Custom CORS middleware - allow all origins
+@app.after_request
+def after_request(response):
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    response.headers.add(
+        "Access-Control-Allow-Headers",
+        "Content-Type,Authorization,X-Requested-With,Accept,Origin",
+    )
+    response.headers.add(
+        "Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS,HEAD"
+    )
+    return response
+
+
+# Handle preflight OPTIONS requests for all routes
+@app.before_request
+def handle_preflight():
+    if request.method == "OPTIONS":
+        response = make_response()
+        response.headers.add("Access-Control-Allow-Origin", "*")
+        response.headers.add(
+            "Access-Control-Allow-Headers",
+            "Content-Type,Authorization,X-Requested-With,Accept,Origin",
+        )
+        response.headers.add(
+            "Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS,HEAD"
+        )
+        return response
 
 
 @app.route("/")

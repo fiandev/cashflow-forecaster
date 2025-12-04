@@ -51,7 +51,9 @@ usage() {
     echo "  shell-frontend       Start a shell in the frontend container"
     echo "  prod-up              Start production services"
     echo "  prod-down            Stop production services"
+    echo "  prod-restart         Restart production services with updated frontend"
     echo "  prod-logs            View logs from production services"
+    echo "  prod-build-frontend  Build/rebuild the production frontend service"
     echo "  db-backup            Create a backup of the SQLite database"
     echo "  db-restore           Restore the SQLite database from backup"
     echo "  seed                 Seed the database with sample data"
@@ -185,10 +187,27 @@ case "$1" in
         run_compose_prod down
         print_success "Production services stopped."
         ;;
-    
+
+    prod-restart)
+        print_info "Stopping production services..."
+        run_compose_prod down
+        print_info "Building production frontend service..."
+        run_compose_prod build frontend
+        print_info "Starting production services..."
+        run_compose_prod up -d
+        print_success "Production services restarted with updated frontend."
+        print_info "Application: http://localhost"
+        ;;
+
     prod-logs)
         print_info "Showing logs from production services..."
         run_compose_prod logs
+        ;;
+
+    prod-build-frontend)
+        print_info "Building production frontend service..."
+        run_compose_prod build frontend
+        print_success "Production frontend service built."
         ;;
     
     db-backup)

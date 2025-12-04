@@ -22,5 +22,5 @@ RUN mkdir -p database
 # Expose port
 EXPOSE 5000
 
-# Run the application with gunicorn
-CMD ["bash", "-c", "python init_db.py && gunicorn --bind 0.0.0.0:5000 --workers 4 app:app"]
+# Default command, will be overridden by docker-compose
+CMD ["python", "app.py"]

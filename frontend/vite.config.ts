@@ -8,13 +8,13 @@ export default defineConfig(({ mode }) => ({
     host: "::",
     allowedHosts: [".ngrok-free.app"],
     // port: 8080,
-    proxy: {
-      "/api": {
-        target: "http://localhost:5000",
-        changeOrigin: true,
-        secure: false,
-      },
-    },
+    // proxy: {
+    //   "/api ": {
+    //     target: "http://localhost:5000",
+    //     changeOrigin: true,
+    //     secure: false,
+    //   },
+    // },
   },
   plugins: [react()].filter(Boolean),
   resolve: {
