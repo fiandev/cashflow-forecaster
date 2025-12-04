@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import { ForecastStore } from './forecast-types';
-
-const API_BASE = '/api';
+import { API_ENDPOINTS, authenticatedRequest } from '@/lib/api';
 
 export const useForecastStore = create<ForecastStore>((set) => ({
   forecasts: [],
@@ -14,7 +13,9 @@ export const useForecastStore = create<ForecastStore>((set) => ({
   fetchForecasts: async (businessId) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await fetch(`${API_BASE}/forecasts?business_id=${businessId}`);
+      const params = new URLSearchParams();
+      if (businessId) params.append('business_id', businessId.toString());
+      const response = await authenticatedRequest(`${API_ENDPOINTS.forecasts}?${params}`);
       if (response.ok) {
         const forecastsData = await response.json();
         set({
@@ -36,11 +37,8 @@ export const useForecastStore = create<ForecastStore>((set) => ({
   createForecast: async (forecastData) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await fetch(`${API_BASE}/forecasts`, {
+      const response = await authenticatedRequest(API_ENDPOINTS.createForecast, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify(forecastData),
       });
 
@@ -66,11 +64,8 @@ export const useForecastStore = create<ForecastStore>((set) => ({
   updateForecast: async (id, forecastData) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await fetch(`${API_BASE}/forecasts/${id}`, {
+      const response = await authenticatedRequest(API_ENDPOINTS.updateForecast(id), {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify(forecastData),
       });
 
@@ -97,7 +92,7 @@ export const useForecastStore = create<ForecastStore>((set) => ({
   deleteForecast: async (id) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await fetch(`${API_BASE}/forecasts/${id}`, {
+      const response = await authenticatedRequest(API_ENDPOINTS.deleteForecast(id), {
         method: 'DELETE',
       });
 
@@ -123,8 +118,15 @@ export const useForecastStore = create<ForecastStore>((set) => ({
   fetchModels: async (businessId) => {
     set({ isLoading: true, error: null });
     try {
-      const url = businessId ? `${API_BASE}/models?business_id=${businessId}` : `${API_BASE}/models`;
-      const response = await fetch(url);
+      let url = API_ENDPOINTS.models;
+      if (businessId) {
+        const params = new URLSearchParams();
+        params.append('business_id', businessId.toString());
+        url = `${API_ENDPOINTS.models}?${params}`;
+      } else {
+        url = API_ENDPOINTS.models;
+      }
+      const response = await authenticatedRequest(url);
       if (response.ok) {
         const modelsData = await response.json();
         set({
@@ -146,11 +148,8 @@ export const useForecastStore = create<ForecastStore>((set) => ({
   createModel: async (modelData) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await fetch(`${API_BASE}/models`, {
+      const response = await authenticatedRequest(API_ENDPOINTS.models, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify(modelData),
       });
 
@@ -176,11 +175,8 @@ export const useForecastStore = create<ForecastStore>((set) => ({
   updateModel: async (id, modelData) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await fetch(`${API_BASE}/models/${id}`, {
+      const response = await authenticatedRequest(`${API_ENDPOINTS.models}/${id}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify(modelData),
       });
 
@@ -206,7 +202,7 @@ export const useForecastStore = create<ForecastStore>((set) => ({
   deleteModel: async (id) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await fetch(`${API_BASE}/models/${id}`, {
+      const response = await authenticatedRequest(`${API_ENDPOINTS.models}/${id}`, {
         method: 'DELETE',
       });
 
@@ -231,8 +227,15 @@ export const useForecastStore = create<ForecastStore>((set) => ({
   fetchModelRuns: async (modelId) => {
     set({ isLoading: true, error: null });
     try {
-      const url = modelId ? `${API_BASE}/model-runs?model_id=${modelId}` : `${API_BASE}/model-runs`;
-      const response = await fetch(url);
+      let url = API_ENDPOINTS.modelRuns;
+      if (modelId) {
+        const params = new URLSearchParams();
+        params.append('model_id', modelId.toString());
+        url = `${API_ENDPOINTS.modelRuns}?${params}`;
+      } else {
+        url = API_ENDPOINTS.modelRuns;
+      }
+      const response = await authenticatedRequest(url);
       if (response.ok) {
         const modelRunsData = await response.json();
         set({
@@ -254,11 +257,8 @@ export const useForecastStore = create<ForecastStore>((set) => ({
   runModel: async (modelId, params = {}) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await fetch(`${API_BASE}/models/${modelId}/run`, {
+      const response = await authenticatedRequest(API_ENDPOINTS.runModel(modelId), {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify({ params }),
       });
 

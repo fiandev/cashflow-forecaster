@@ -54,4 +54,4 @@ jobs:
             KOLOSAL_BASE_URL="${{ secrets.KOLOSAL_BASE_URL }}" \
 
             docker-compose down -v
-            ./docker.sh prod-up
+            ./docker.sh prod-restart

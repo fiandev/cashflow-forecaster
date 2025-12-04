@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 
 export const Header = () => {
   return (
-    <header className="fixed top-0 z-50 w-full border-b border-border bg-card">
+    <header className="fixed lg:sticky top-0 z-50 w-full border-b border-border bg-card">
       <div className="flex items-center gap-4 px-4 py-4">
         <SidebarTrigger />
 
@@ -15,7 +15,9 @@ export const Header = () => {
               AI Cashflow & Risk Analyst
             </Link>
           </h1>
-          <p className="text-xs text-muted-foreground hidden sm:block">MVP Dashboard</p>
+          <p className="text-xs text-muted-foreground hidden sm:block">
+            MVP Dashboard
+          </p>
         </div>
 
         <div className="flex items-center gap-2 md:gap-3">

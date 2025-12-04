@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import { TransactionStore } from './transaction-types';
-
-const API_BASE = '/api/transactions';
+import { API_ENDPOINTS, authenticatedRequest } from '@/lib/api';
 
 export const useTransactionStore = create<TransactionStore>((set, get) => ({
   transactions: [],
@@ -18,23 +17,29 @@ export const useTransactionStore = create<TransactionStore>((set, get) => ({
   fetchTransactions: async (businessId, filters = {}) => {
     set({ isLoading: true, error: null });
     try {
+      // Note: Backend doesn't support business_id as query param for /api/transactions
+      // The backend filters transactions based on user permissions automatically
       const params = new URLSearchParams();
-      params.append('business_id', businessId.toString());
       params.append('page', get().pagination.page.toString());
       params.append('limit', get().pagination.limit.toString());
-      
+
       Object.entries(filters).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
           params.append(key, value.toString());
         }
       });
 
-      const response = await fetch(`${API_BASE}?${params}`);
+      const url = `${API_ENDPOINTS.transactions}?${params}`;
+      const response = await authenticatedRequest(url);
       if (response.ok) {
         const data = await response.json();
+        // Filter transactions by businessId client-side since backend doesn't support query param filtering
+        const allTransactions = data.transactions || data;
+        const filteredByBusiness = businessId ? allTransactions.filter(t => t.business_id === businessId) : allTransactions;
+
         set({
-          transactions: data.transactions || data,
-          filteredTransactions: data.transactions || data,
+          transactions: allTransactions,
+          filteredTransactions: filteredByBusiness,
           pagination: {
             ...get().pagination,
             total: data.total || data.length,
@@ -56,11 +61,8 @@ export const useTransactionStore = create<TransactionStore>((set, get) => ({
   createTransaction: async (transactionData) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await fetch(API_BASE, {
+      const response = await authenticatedRequest(API_ENDPOINTS.transactions, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify(transactionData),
       });
 
@@ -87,11 +89,8 @@ export const useTransactionStore = create<TransactionStore>((set, get) => ({
   updateTransaction: async (id, transactionData) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await fetch(`${API_BASE}/${id}`, {
+      const response = await authenticatedRequest(`${API_ENDPOINTS.transactions}/${id}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify(transactionData),
       });
 
@@ -118,7 +117,7 @@ export const useTransactionStore = create<TransactionStore>((set, get) => ({
   deleteTransaction: async (id) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await fetch(`${API_BASE}/${id}`, {
+      const response = await authenticatedRequest(`${API_ENDPOINTS.transactions}/${id}`, {
         method: 'DELETE',
       });
 
@@ -144,7 +143,7 @@ export const useTransactionStore = create<TransactionStore>((set, get) => ({
   setFilters: (newFilters) => {
     const updatedFilters = { ...get().filters, ...newFilters };
     set({ filters: updatedFilters });
-    
+
     const { transactions } = get();
     let filtered = transactions;
 
@@ -162,7 +161,7 @@ export const useTransactionStore = create<TransactionStore>((set, get) => ({
     }
     if (updatedFilters.search) {
       const searchLower = updatedFilters.search.toLowerCase();
-      filtered = filtered.filter((t) => 
+      filtered = filtered.filter((t) =>
         t.description?.toLowerCase().includes(searchLower) ||
         t.source?.toLowerCase().includes(searchLower)
       );
@@ -175,7 +174,7 @@ export const useTransactionStore = create<TransactionStore>((set, get) => ({
   },
 
   clearFilters: () => {
-    set({ 
+    set({
       filters: {},
       filteredTransactions: get().transactions,
     });

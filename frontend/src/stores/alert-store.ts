@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import { AlertStore, Alert } from './alert-types';
-
-const API_BASE = '/api';
+import { API_ENDPOINTS, authenticatedRequest } from '@/lib/api';
 
 export const useAlertStore = create<AlertStore>((set, get) => ({
   alerts: [],
@@ -22,7 +21,7 @@ export const useAlertStore = create<AlertStore>((set, get) => ({
         }
       });
 
-      const response = await fetch(`${API_BASE}/alerts?${params}`);
+      const response = await authenticatedRequest(`${API_ENDPOINTS.alerts}?${params}`);
       if (response.ok) {
         const alertsData = await response.json();
         const unreadCount = alertsData.filter((alert: Alert) => !alert.resolved).length;
@@ -46,11 +45,8 @@ export const useAlertStore = create<AlertStore>((set, get) => ({
   createAlert: async (alertData) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await fetch(`${API_BASE}/alerts`, {
+      const response = await authenticatedRequest(API_ENDPOINTS.alerts, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify(alertData),
       });
 
@@ -77,11 +73,8 @@ export const useAlertStore = create<AlertStore>((set, get) => ({
   updateAlert: async (id, alertData) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await fetch(`${API_BASE}/alerts/${id}`, {
+      const response = await authenticatedRequest(API_ENDPOINTS.updateAlert(id), {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify(alertData),
       });
 
@@ -89,9 +82,9 @@ export const useAlertStore = create<AlertStore>((set, get) => ({
         const updatedAlert = await response.json();
         set((state) => {
           const oldAlert = state.alerts.find(a => a.id === id);
-          const unreadCountChange = oldAlert && !oldAlert.resolved && updatedAlert.resolved ? -1 : 
+          const unreadCountChange = oldAlert && !oldAlert.resolved && updatedAlert.resolved ? -1 :
                                    oldAlert && oldAlert.resolved && !updatedAlert.resolved ? 1 : 0;
-          
+
           return {
             alerts: state.alerts.map((a) => (a.id === id ? updatedAlert : a)),
             unreadCount: state.unreadCount + unreadCountChange,
@@ -114,13 +107,13 @@ export const useAlertStore = create<AlertStore>((set, get) => ({
   resolveAlert: async (id) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await fetch(`${API_BASE}/alerts/${id}/resolve`, {
+      const response = await authenticatedRequest(API_ENDPOINTS.resolveAlert(id), {
         method: 'POST',
       });
 
       if (response.ok) {
         set((state) => ({
-          alerts: state.alerts.map((a) => 
+          alerts: state.alerts.map((a) =>
             a.id === id ? { ...a, resolved: true, resolved_at: new Date().toISOString() } : a
           ),
           unreadCount: Math.max(0, state.unreadCount - 1),
@@ -142,7 +135,7 @@ export const useAlertStore = create<AlertStore>((set, get) => ({
   deleteAlert: async (id) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await fetch(`${API_BASE}/alerts/${id}`, {
+      const response = await authenticatedRequest(API_ENDPOINTS.deleteAlert(id), {
         method: 'DELETE',
       });
 
@@ -150,7 +143,7 @@ export const useAlertStore = create<AlertStore>((set, get) => ({
         set((state) => {
           const alertToDelete = state.alerts.find(a => a.id === id);
           const unreadCountChange = alertToDelete && !alertToDelete.resolved ? -1 : 0;
-          
+
           return {
             alerts: state.alerts.filter((a) => a.id !== id),
             unreadCount: Math.max(0, state.unreadCount + unreadCountChange),
@@ -173,8 +166,13 @@ export const useAlertStore = create<AlertStore>((set, get) => ({
   fetchRiskScores: async (businessId) => {
     set({ isLoading: true, error: null });
     try {
-      const url = businessId ? `${API_BASE}/risk-scores?business_id=${businessId}` : `${API_BASE}/risk-scores`;
-      const response = await fetch(url);
+      let url = API_ENDPOINTS.riskScores;
+      if (businessId) {
+        const params = new URLSearchParams();
+        params.append('business_id', businessId.toString());
+        url = `${API_ENDPOINTS.riskScores}?${params}`;
+      }
+      const response = await authenticatedRequest(url);
       if (response.ok) {
         const riskScoresData = await response.json();
         set({
@@ -196,11 +194,8 @@ export const useAlertStore = create<AlertStore>((set, get) => ({
   createRiskScore: async (riskData) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await fetch(`${API_BASE}/risk-scores`, {
+      const response = await authenticatedRequest(API_ENDPOINTS.riskScores, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify(riskData),
       });
 
