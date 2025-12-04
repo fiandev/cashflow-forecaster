@@ -16,10 +16,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Create directory for SQLite database
 RUN mkdir -p database
 
-RUN python create_tables.py && echo "yes" | python seed.py || true
-
 # Copy backend application code
 COPY ./backend/ .
+
+RUN python create_tables.py && echo "yes" | python seed.py || true
+
 
 # Expose port
 EXPOSE 5000
