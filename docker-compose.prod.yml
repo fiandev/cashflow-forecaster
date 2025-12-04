@@ -5,9 +5,12 @@ services:
     build: .
     container_name: ai_cashflow_backend
     environment:
+      - APP_ENV=production
       - DB_TYPE=sqlite
       - DB_PATH=/app/database/database.db
-      - SECRET_KEY=your-secret-key-change-in-production
+      - SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}
+      - KOLOSAL_API_KEY=${{ secrets.KOLOSAL_API_KEY }}
+      - KOLOSAL_BASE_URL=${{ secrets.KOLOSAL_BASE_URL }}
     volumes:
       - database_volume:/app/database
     command: >
