@@ -141,23 +141,23 @@ const Transactions = () => {
 
   return (
     <div className="flex-1 space-y-4 p-4 pt-6">
-      <div className="max-w-2xl mx-auto">
-        <div className="mb-8">
-          <h2 className="text-3xl font-bold mb-2">Add Transaction</h2>
-          <p className="text-muted-foreground">
+      <div className="max-w-full sm:max-w-2xl lg:max-w-3xl mx-auto">
+        <div className="mb-6 sm:mb-8">
+          <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold mb-2">Add Transaction</h2>
+          <p className="text-xs sm:text-sm text-muted-foreground">
             Record your business income and expenses for accurate cashflow tracking.
           </p>
         </div>
 
-        <Card className="p-6">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <Card className="p-4 sm:p-6">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 sm:space-y-6">
             <div className="space-y-2">
               <Label htmlFor="date">Transaction Date</Label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
-                    className="w-full justify-start text-left font-normal"
+                    className="w-full justify-start text-left font-normal text-sm sm:text-base"
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
                     {date ? format(date, "PPP") : <span>Pick a date</span>}
@@ -176,14 +176,14 @@ const Transactions = () => {
                 </PopoverContent>
               </Popover>
               {errors.date && (
-                <p className="text-sm text-destructive">{errors.date.message}</p>
+                <p className="text-xs sm:text-sm text-destructive">{errors.date.message}</p>
               )}
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="type">Transaction Type</Label>
               <Select onValueChange={(value) => setValue("type", value as "inflow" | "outflow")}>
-                <SelectTrigger>
+                <SelectTrigger className="text-sm sm:text-base">
                   <SelectValue placeholder="Select type" />
                 </SelectTrigger>
                 <SelectContent>
@@ -192,14 +192,14 @@ const Transactions = () => {
                 </SelectContent>
               </Select>
               {errors.type && (
-                <p className="text-sm text-destructive">{errors.type.message}</p>
+                <p className="text-xs sm:text-sm text-destructive">{errors.type.message}</p>
               )}
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="category_id">Category</Label>
               <Select onValueChange={(value) => setValue("category_id", value)} disabled={!selectedType || isLoading}>
-                <SelectTrigger>
+                <SelectTrigger className="text-sm sm:text-base">
                   <SelectValue placeholder={isLoading ? "Loading..." : "Select category"} />
                 </SelectTrigger>
                 <SelectContent>
@@ -214,7 +214,7 @@ const Transactions = () => {
                 </SelectContent>
               </Select>
               {errors.category_id && (
-                <p className="text-sm text-destructive">{errors.category_id.message}</p>
+                <p className="text-xs sm:text-sm text-destructive">{errors.category_id.message}</p>
               )}
             </div>
 
@@ -224,9 +224,10 @@ const Transactions = () => {
                 id="description"
                 placeholder="e.g., Client payment, Office supplies"
                 {...register("description")}
+                className="text-sm sm:text-base"
               />
               {errors.description && (
-                <p className="text-sm text-destructive">{errors.description.message}</p>
+                <p className="text-xs sm:text-sm text-destructive">{errors.description.message}</p>
               )}
             </div>
 
@@ -238,9 +239,10 @@ const Transactions = () => {
                 step="0.01"
                 placeholder="0.00"
                 {...register("amount")}
+                className="text-sm sm:text-base"
               />
               {errors.amount && (
-                <p className="text-sm text-destructive">{errors.amount.message}</p>
+                <p className="text-xs sm:text-sm text-destructive">{errors.amount.message}</p>
               )}
             </div>
 

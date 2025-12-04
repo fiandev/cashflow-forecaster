@@ -142,17 +142,17 @@ const BusinessSetup = () => {
 
   return (
     <div className="flex-1 space-y-4 p-4 pt-6">
-      <div className="max-w-3xl mx-auto">
-        <div className="mb-8">
-          <h2 className="text-3xl font-bold mb-2">Business Setup</h2>
-          <p className="text-muted-foreground">
+      <div className="max-w-full sm:max-w-3xl mx-auto">
+        <div className="mb-6 sm:mb-8">
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-2">Business Setup</h2>
+          <p className="text-sm sm:text-muted-foreground">
             Configure your business metrics for accurate AI-powered financial analysis.
           </p>
         </div>
 
-        <Card className="p-6">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            <div className="grid md:grid-cols-2 gap-6">
+        <Card className="p-4 sm:p-6">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 sm:space-y-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               <div className="space-y-2">
                 <Label htmlFor="businessName">Business Name</Label>
                 <Input
@@ -161,7 +161,7 @@ const BusinessSetup = () => {
                   {...register("businessName")}
                 />
                 {errors.businessName && (
-                  <p className="text-sm text-destructive">{errors.businessName.message}</p>
+                  <p className="text-xs sm:text-sm text-destructive">{errors.businessName.message}</p>
                 )}
               </div>
 
@@ -173,12 +173,12 @@ const BusinessSetup = () => {
                   {...register("industry")}
                 />
                 {errors.industry && (
-                  <p className="text-sm text-destructive">{errors.industry.message}</p>
+                  <p className="text-xs sm:text-sm text-destructive">{errors.industry.message}</p>
                 )}
               </div>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               <div className="space-y-2">
                 <Label htmlFor="monthlyRevenue">Average Monthly Revenue ($)</Label>
                 <Input
@@ -189,7 +189,7 @@ const BusinessSetup = () => {
                   {...register("monthlyRevenue")}
                 />
                 {errors.monthlyRevenue && (
-                  <p className="text-sm text-destructive">{errors.monthlyRevenue.message}</p>
+                  <p className="text-xs sm:text-sm text-destructive">{errors.monthlyRevenue.message}</p>
                 )}
               </div>
 
@@ -203,12 +203,12 @@ const BusinessSetup = () => {
                   {...register("monthlyExpenses")}
                 />
                 {errors.monthlyExpenses && (
-                  <p className="text-sm text-destructive">{errors.monthlyExpenses.message}</p>
+                  <p className="text-xs sm:text-sm text-destructive">{errors.monthlyExpenses.message}</p>
                 )}
               </div>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               <div className="space-y-2">
                 <Label htmlFor="currentCash">Current Cash Balance ($)</Label>
                 <Input
@@ -219,7 +219,7 @@ const BusinessSetup = () => {
                   {...register("currentCash")}
                 />
                 {errors.currentCash && (
-                  <p className="text-sm text-destructive">{errors.currentCash.message}</p>
+                  <p className="text-xs sm:text-sm text-destructive">{errors.currentCash.message}</p>
                 )}
               </div>
 
@@ -233,7 +233,7 @@ const BusinessSetup = () => {
                   {...register("outstandingDebt")}
                 />
                 {errors.outstandingDebt && (
-                  <p className="text-sm text-destructive">{errors.outstandingDebt.message}</p>
+                  <p className="text-xs sm:text-sm text-destructive">{errors.outstandingDebt.message}</p>
                 )}
               </div>
             </div>
@@ -247,7 +247,7 @@ const BusinessSetup = () => {
                 {...register("employees")}
               />
               {errors.employees && (
-                <p className="text-sm text-destructive">{errors.employees.message}</p>
+                <p className="text-xs sm:text-sm text-destructive">{errors.employees.message}</p>
               )}
             </div>
 
@@ -260,12 +260,12 @@ const BusinessSetup = () => {
                 {...register("businessGoals")}
               />
               {errors.businessGoals && (
-                <p className="text-sm text-destructive">{errors.businessGoals.message}</p>
+                <p className="text-xs sm:text-sm text-destructive">{errors.businessGoals.message}</p>
               )}
             </div>
 
-            <div className="flex gap-4">
-              <Button type="submit" className="flex-1" disabled={isSubmitting}>
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+              <Button type="submit" className="w-full sm:flex-1" disabled={isSubmitting}>
                 {isSubmitting ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -275,19 +275,19 @@ const BusinessSetup = () => {
                   'Save Business Profile'
                 )}
               </Button>
-              <Button type="button" variant="outline" onClick={() => reset()} disabled={isSubmitting}>
+              <Button type="button" variant="outline" className="w-full sm:w-auto" onClick={() => reset()} disabled={isSubmitting}>
                 Reset
               </Button>
             </div>
           </form>
         </Card>
 
-        <Card className="p-6 mt-6 bg-primary/5 border-primary/20">
+        <Card className="p-4 sm:p-6 mt-4 sm:mt-6 bg-primary/5 border-primary/20">
           <h3 className="font-semibold mb-2 flex items-center gap-2">
-            <span className="text-primary">💡</span> Why we need this information
+            <span className="text-primary text-base">💡</span> Why we need this information
           </h3>
-          <p className="text-sm text-muted-foreground">
-            This data helps our AI analyze your financial health, predict cashflow patterns, 
+          <p className="text-sm sm:text-base text-muted-foreground">
+            This data helps our AI analyze your financial health, predict cashflow patterns,
             and provide personalized risk assessments. All information is encrypted and secure.
           </p>
         </Card>

@@ -93,27 +93,29 @@ export const IncomeChart = () => {
   }
 
   return (
-    <Card className="p-6 animate-slide-up">
+    <Card className="p-4 sm:p-6 animate-slide-up">
       <h3 className="text-lg font-semibold mb-4">Income Stream Breakdown</h3>
       {data.length > 0 ? (
-        <ResponsiveContainer width="100%" height={250}>
-          <BarChart data={data}>
-            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-            <XAxis dataKey="source" stroke="hsl(var(--muted-foreground))" tick={{ fontSize: 12 }} />
-            <YAxis stroke="hsl(var(--muted-foreground))" />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: "hsl(var(--card))",
-                border: "1px solid hsl(var(--border))",
-                borderRadius: "var(--radius)",
-              }}
-              formatter={(value: number) => [`$${value.toLocaleString()}`, ""]}
-            />
-            <Bar dataKey="amount" fill="hsl(var(--chart-2))" radius={[8, 8, 0, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
+        <div className="h-96 lg:h-60">
+          <ResponsiveContainer width="100%" height="100%" className="w-full overflow-x-auto">
+            <BarChart data={data}>
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+              <XAxis dataKey="source" stroke="hsl(var(--muted-foreground))" tick={{ fontSize: 8, textAnchor: 'end', dy: 5 }} />
+              <YAxis stroke="hsl(var(--muted-foreground))" className="text-xs md:text-sm lg:text-base" />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "hsl(var(--card))",
+                  border: "1px solid hsl(var(--border))",
+                  borderRadius: "var(--radius)",
+                }}
+                formatter={(value: number) => [`$${value.toLocaleString()}`, ""]}
+              />
+              <Bar dataKey="amount" fill="hsl(var(--chart-2))" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
       ) : (
-        <div className="h-[250px] flex items-center justify-center text-muted-foreground">
+        <div className="h-96 lg:h-60 flex items-center justify-center text-muted-foreground">
           No income data recorded for this business.
         </div>
       )}

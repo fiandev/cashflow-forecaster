@@ -170,25 +170,26 @@ const Forecast = () => {
 
   return (
     <div className="flex-1 space-y-4 p-4 pt-6">
-      <div className="max-w-4xl mx-auto">
-        <div className="mb-8">
-          <h2 className="text-3xl font-bold mb-2">Cashflow Forecast Input</h2>
-          <p className="text-muted-foreground">
+      <div className="max-w-full sm:max-w-4xl mx-auto">
+        <div className="mb-6 sm:mb-8">
+          <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold mb-2">Cashflow Forecast Input</h2>
+          <p className="text-sm sm:text-base text-muted-foreground">
             Project your expected income and expenses to generate AI-powered cashflow forecasts.
           </p>
         </div>
 
-        <Card className="p-6">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+        <Card className="p-4 sm:p-6">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 sm:space-y-8">
             <div className="space-y-2">
               <Label htmlFor="forecastPeriod">Forecast Period</Label>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
                 {["30", "60", "90", "180"].map((days) => (
                   <Button
                     key={days}
                     type="button"
                     variant={watch("forecastPeriod") === days ? "default" : "outline"}
                     onClick={() => setValue("forecastPeriod", days as any)}
+                    className="text-xs sm:text-sm py-3 sm:py-5"
                   >
                     {days} Days
                   </Button>
@@ -198,13 +199,14 @@ const Forecast = () => {
 
             {/* Expected Inflows */}
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold">Expected Income</h3>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
+                <h3 className="text-base sm:text-lg font-semibold">Expected Income</h3>
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
                   onClick={() => appendInflow({ description: "", amount: "", frequency: "monthly" })}
+                  className="w-full sm:w-auto mt-2 sm:mt-0"
                 >
                   <Plus className="w-4 h-4 mr-2" />
                   Add Income
@@ -212,15 +214,15 @@ const Forecast = () => {
               </div>
 
               {inflowFields.map((field, index) => (
-                <Card key={field.id} className="p-4 bg-success/5 border-success/20">
-                  <div className="grid md:grid-cols-[2fr_1fr_1fr_auto] gap-3">
+                <Card key={field.id} className="p-3 sm:p-4 bg-success/5 border-success/20">
+                  <div className="grid grid-cols-1 sm:grid-cols-[2fr_1fr_1fr_auto] gap-2 sm:gap-3">
                     <div className="space-y-2">
                       <Input
                         placeholder="e.g., Client payments, Product sales"
                         {...register(`expectedInflows.${index}.description`)}
                       />
                       {errors.expectedInflows?.[index]?.description && (
-                        <p className="text-xs text-destructive">
+                        <p className="text-xs sm:text-sm text-destructive">
                           {errors.expectedInflows[index]?.description?.message}
                         </p>
                       )}
@@ -234,7 +236,7 @@ const Forecast = () => {
                         {...register(`expectedInflows.${index}.amount`)}
                       />
                       {errors.expectedInflows?.[index]?.amount && (
-                        <p className="text-xs text-destructive">
+                        <p className="text-xs sm:text-sm text-destructive">
                           {errors.expectedInflows[index]?.amount?.message}
                         </p>
                       )}
@@ -259,6 +261,7 @@ const Forecast = () => {
                       size="icon"
                       onClick={() => removeInflow(index)}
                       disabled={inflowFields.length === 1}
+                      className="mt-2 sm:mt-0"
                     >
                       <Trash2 className="w-4 h-4 text-destructive" />
                     </Button>
@@ -266,19 +269,20 @@ const Forecast = () => {
                 </Card>
               ))}
               {errors.expectedInflows?.root && (
-                <p className="text-sm text-destructive">{errors.expectedInflows.root.message}</p>
+                <p className="text-xs sm:text-sm text-destructive">{errors.expectedInflows.root.message}</p>
               )}
             </div>
 
             {/* Expected Outflows */}
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold">Expected Expenses</h3>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
+                <h3 className="text-base sm:text-lg font-semibold">Expected Expenses</h3>
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
                   onClick={() => appendOutflow({ description: "", amount: "", frequency: "monthly" })}
+                  className="w-full sm:w-auto mt-2 sm:mt-0"
                 >
                   <Plus className="w-4 h-4 mr-2" />
                   Add Expense
@@ -286,15 +290,15 @@ const Forecast = () => {
               </div>
 
               {outflowFields.map((field, index) => (
-                <Card key={field.id} className="p-4 bg-destructive/5 border-destructive/20">
-                  <div className="grid md:grid-cols-[2fr_1fr_1fr_auto] gap-3">
+                <Card key={field.id} className="p-3 sm:p-4 bg-destructive/5 border-destructive/20">
+                  <div className="grid grid-cols-1 sm:grid-cols-[2fr_1fr_1fr_auto] gap-2 sm:gap-3">
                     <div className="space-y-2">
                       <Input
                         placeholder="e.g., Rent, Salaries, Supplies"
                         {...register(`expectedOutflows.${index}.description`)}
                       />
                       {errors.expectedOutflows?.[index]?.description && (
-                        <p className="text-xs text-destructive">
+                        <p className="text-xs sm:text-sm text-destructive">
                           {errors.expectedOutflows[index]?.description?.message}
                         </p>
                       )}
@@ -308,7 +312,7 @@ const Forecast = () => {
                         {...register(`expectedOutflows.${index}.amount`)}
                       />
                       {errors.expectedOutflows?.[index]?.amount && (
-                        <p className="text-xs text-destructive">
+                        <p className="text-xs sm:text-sm text-destructive">
                           {errors.expectedOutflows[index]?.amount?.message}
                         </p>
                       )}
@@ -333,6 +337,7 @@ const Forecast = () => {
                       size="icon"
                       onClick={() => removeOutflow(index)}
                       disabled={outflowFields.length === 1}
+                      className="mt-2 sm:mt-0"
                     >
                       <Trash2 className="w-4 h-4 text-destructive" />
                     </Button>
@@ -340,7 +345,7 @@ const Forecast = () => {
                 </Card>
               ))}
               {errors.expectedOutflows?.root && (
-                <p className="text-sm text-destructive">{errors.expectedOutflows.root.message}</p>
+                <p className="text-xs sm:text-sm text-destructive">{errors.expectedOutflows.root.message}</p>
               )}
             </div>
 

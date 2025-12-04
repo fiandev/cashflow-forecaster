@@ -92,40 +92,43 @@ export const TransactionsTable = () => {
   }
 
   return (
-    <Card className="p-6 animate-slide-up">
+    <Card className="p-4 sm:p-6 animate-slide-up">
       <h3 className="text-lg font-semibold mb-4">Recent Transactions</h3>
-      <div className="rounded-md border">
-        <Table>
+      <div className="rounded-md border overflow-x-auto">
+        <Table className="min-w-full">
           <TableHeader>
             <TableRow>
-              <TableHead>Date</TableHead>
-              <TableHead>Description</TableHead>
-              <TableHead className="text-right">Inflow</TableHead>
-              <TableHead className="text-right">Outflow</TableHead>
-              <TableHead>Category</TableHead>
-              <TableHead>AI Tag</TableHead>
+              <TableHead className="whitespace-nowrap">Date</TableHead>
+              <TableHead className="whitespace-nowrap">Description</TableHead>
+              <TableHead className="text-right whitespace-nowrap">Inflow</TableHead>
+              <TableHead className="text-right whitespace-nowrap">Outflow</TableHead>
+              <TableHead className="whitespace-nowrap hidden md:table-cell">Category</TableHead>
+              <TableHead className="whitespace-nowrap hidden md:table-cell">AI Tag</TableHead>
+              <TableHead className="whitespace-nowrap sm:hidden">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {transactions.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
+                <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
                   No transactions found for this business.
                 </TableCell>
               </TableRow>
             ) : (
               transactions.map((transaction) => (
                 <TableRow key={transaction.id}>
-                  <TableCell className="font-medium">{transaction.date}</TableCell>
-                  <TableCell>{transaction.description}</TableCell>
-                  <TableCell className="text-right text-success font-medium">
+                  <TableCell className="font-medium whitespace-nowrap">{transaction.date}</TableCell>
+                  <TableCell className="max-w-[120px] sm:max-w-[200px] truncate" title={transaction.description}>
+                    {transaction.description}
+                  </TableCell>
+                  <TableCell className="text-right text-success font-medium whitespace-nowrap">
                     {transaction.direction === "inflow" ? `$${transaction.amount.toLocaleString()}` : "-"}
                   </TableCell>
-                  <TableCell className="text-right text-destructive font-medium">
+                  <TableCell className="text-right text-destructive font-medium whitespace-nowrap">
                     {transaction.direction === "outflow" ? `$${transaction.amount.toLocaleString()}` : "-"}
                   </TableCell>
-                  <TableCell>{categories[transaction.category_id] || "Unknown"}</TableCell>
-                  <TableCell>
+                  <TableCell className="hidden md:table-cell whitespace-nowrap">{categories[transaction.category_id] || "Unknown"}</TableCell>
+                  <TableCell className="hidden md:table-cell whitespace-nowrap">
                     {transaction.is_anomalous ? (
                       <Badge variant="destructive">
                         {transaction.ai_tag || "Anomalous"}
@@ -133,6 +136,20 @@ export const TransactionsTable = () => {
                     ) : (
                       <Badge variant="secondary" className="opacity-50">Normal</Badge>
                     )}
+                  </TableCell>
+                  <TableCell className="sm:hidden">
+                    <div className="flex flex-col gap-1">
+                      <div className="text-xs text-muted-foreground">Cat: {categories[transaction.category_id] || "Unknown"}</div>
+                      <div>
+                        {transaction.is_anomalous ? (
+                          <Badge variant="destructive" className="text-xs">
+                            {transaction.ai_tag || "Anomalous"}
+                          </Badge>
+                        ) : (
+                          <Badge variant="secondary" className="opacity-50 text-xs">Normal</Badge>
+                        )}
+                      </div>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))

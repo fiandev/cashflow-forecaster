@@ -110,57 +110,60 @@ export const CashflowChart = () => {
   }
 
   return (
-    <Card className="p-6 animate-slide-up">
-      <div className="flex items-center justify-between mb-6">
+    <Card className="p-4 sm:p-6 animate-slide-up">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 sm:mb-6 gap-2">
         <h3 className="text-lg font-semibold">Cashflow Timeline (Daily)</h3>
       </div>
-      <ResponsiveContainer width="100%" height={300}>
-        <LineChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-          <XAxis dataKey="date" stroke="hsl(var(--muted-foreground))" tick={{ fontSize: 12 }} />
-          <YAxis stroke="hsl(var(--muted-foreground))" tick={{ fontSize: 12 }} />
-          <Tooltip
-            contentStyle={{
-              backgroundColor: "hsl(var(--card))",
-              border: "1px solid hsl(var(--border))",
-              borderRadius: "var(--radius)",
-            }}
-            formatter={(value: number) => [`$${value.toLocaleString()}`, ""]}
-          />
-          <Legend />
-          <Line
-            type="monotone"
-            dataKey="cashIn"
-            stroke="hsl(var(--chart-2))"
-            strokeWidth={2}
-            dot={{ fill: "hsl(var(--chart-2))", r: 4 }}
-            activeDot={{ r: 6 }}
-            name="Cash In"
-          />
-          <Line
-            type="monotone"
-            dataKey="cashOut"
-            stroke="hsl(var(--chart-1))"
-            strokeWidth={2}
-            dot={{ fill: "hsl(var(--chart-1))", r: 4 }}
-            activeDot={{ r: 6 }}
-            name="Cash Out"
-          />
-          {data.map((entry, index) =>
-            entry.anomaly ? (
-              <ReferenceDot
-                key={index}
-                x={entry.date}
-                y={entry.cashOut > entry.cashIn ? entry.cashOut : entry.cashIn}
-                r={6}
-                fill="hsl(var(--destructive))"
-                stroke="none"
-                ifOverflow="extendDomain"
-              />
-            ) : null
-          )}
-        </LineChart>
-      </ResponsiveContainer>
+      <div className="h-60 xs:h-64 sm:h-72 md:h-80">
+        <ResponsiveContainer className="w-full overflow-x-auto">
+          <LineChart data={data}>
+            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+            <XAxis dataKey="date" stroke="hsl(var(--muted-foreground))" tick={{ fontSize: 8, textAnchor: 'end', dy: 5 }} />
+            <YAxis stroke="hsl(var(--muted-foreground))" tick={{ fontSize: 8 }} />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: "hsl(var(--card))",
+                border: "1px solid hsl(var(--border))",
+                borderRadius: "var(--radius)",
+              }}
+              formatter={(value: number) => [`$${value.toLocaleString()}`, ""]}
+              wrapperStyle={{ zIndex: 100 }}
+            />
+            <Legend />
+            <Line
+              type="monotone"
+              dataKey="cashIn"
+              stroke="hsl(var(--chart-2))"
+              strokeWidth={2}
+              dot={{ fill: "hsl(var(--chart-2))", r: 2, strokeWidth: 0 }}
+              activeDot={{ r: 4 }}
+              name="Cash In"
+            />
+            <Line
+              type="monotone"
+              dataKey="cashOut"
+              stroke="hsl(var(--chart-1))"
+              strokeWidth={2}
+              dot={{ fill: "hsl(var(--chart-1))", r: 2, strokeWidth: 0 }}
+              activeDot={{ r: 4 }}
+              name="Cash Out"
+            />
+            {data.map((entry, index) =>
+              entry.anomaly ? (
+                <ReferenceDot
+                  key={index}
+                  x={entry.date}
+                  y={entry.cashOut > entry.cashIn ? entry.cashOut : entry.cashIn}
+                  r={4}
+                  fill="hsl(var(--destructive))"
+                  stroke="none"
+                  ifOverflow="extendDomain"
+                />
+              ) : null
+            )}
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
       {data.length === 0 && (
         <div className="text-center text-muted-foreground mt-4">
           No transaction data available to display for this business.

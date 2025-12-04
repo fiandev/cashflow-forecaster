@@ -34,53 +34,57 @@ const App = () => (
           <AppSidebar />
           <SidebarInset>
             <Header />
-            <Routes>
-              {/* Auth Routes */}
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/register-business" element={<RegisterBusiness />} />
-              <Route path="/reset-password" element={<ResetPassword />} />
 
-              {/* Protected Routes */}
-              <Route path="/" element={
-                <ProtectedRoute>
-                  <Index />
-                </ProtectedRoute>
-              } />
-              <Route path="/transactions" element={
-                <ProtectedRoute>
-                  <Transactions />
-                </ProtectedRoute>
-              } />
-              <Route path="/business-setup" element={
-                <ProtectedRoute>
-                  <BusinessSetup />
-                </ProtectedRoute>
-              } />
-              <Route path="/create-business" element={
-                <ProtectedRoute>
-                  <CreateBusiness />
-                </ProtectedRoute>
-              } />
-              <Route path="/forecast" element={
-                <ProtectedRoute>
-                  <Forecast />
-                </ProtectedRoute>
-              } />
-              <Route path="/forecast/results" element={
-                <ProtectedRoute>
-                  <ForecastResults />
-                </ProtectedRoute>
-              } />
-              <Route path="/profile" element={
-                <ProtectedRoute>
-                  <Profile />
-                </ProtectedRoute>
-              } />
+            <div className="max-w-screen overflow-x-scroll mt-16">
+              <Routes>
+                {/* Auth Routes */}
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/register-business" element={<RegisterBusiness />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
 
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
+                {/* Protected Routes */}
+                <Route path="/" element={
+                  <ProtectedRoute>
+                    <Index />
+                  </ProtectedRoute>
+                } />
+                <Route path="/transactions" element={
+                  <ProtectedRoute>
+                    <Transactions />
+                  </ProtectedRoute>
+                } />
+                <Route path="/business-setup" element={
+                  <ProtectedRoute>
+                    <BusinessSetup />
+                  </ProtectedRoute>
+                } />
+                <Route path="/create-business" element={
+                  <ProtectedRoute>
+                    <CreateBusiness />
+                  </ProtectedRoute>
+                } />
+                <Route path="/forecast" element={
+                  <ProtectedRoute>
+                    <Forecast />
+                  </ProtectedRoute>
+                } />
+                <Route path="/forecast/results" element={
+                  <ProtectedRoute>
+                    <ForecastResults />
+                  </ProtectedRoute>
+                } />
+                <Route path="/profile" element={
+                  <ProtectedRoute>
+                    <Profile />
+                  </ProtectedRoute>
+                } />
+
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </div>
+
           </SidebarInset>
         </SidebarProvider>
       </BrowserRouter>

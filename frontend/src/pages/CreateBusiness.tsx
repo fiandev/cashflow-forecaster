@@ -124,17 +124,17 @@ const CreateBusiness = () => {
 
   return (
     <div className="flex-1 space-y-4 p-4 pt-6">
-      <div className="max-w-3xl mx-auto">
-        <div className="mb-8">
-          <h2 className="text-3xl font-bold mb-2">Create New Business</h2>
-          <p className="text-muted-foreground">
+      <div className="max-w-full sm:max-w-3xl mx-auto">
+        <div className="mb-6 sm:mb-8">
+          <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold mb-2">Create New Business</h2>
+          <p className="text-sm sm:text-base text-muted-foreground">
             Add a new business to your account for separate cashflow tracking and analysis.
           </p>
         </div>
 
-        <Card className="p-6">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            <div className="grid md:grid-cols-2 gap-6">
+        <Card className="p-4 sm:p-6">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 sm:space-y-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               <div className="space-y-2">
                 <Label htmlFor="businessName">Business Name</Label>
                 <Input
@@ -143,7 +143,7 @@ const CreateBusiness = () => {
                   {...register("businessName")}
                 />
                 {errors.businessName && (
-                  <p className="text-sm text-destructive">{errors.businessName.message}</p>
+                  <p className="text-xs sm:text-sm text-destructive">{errors.businessName.message}</p>
                 )}
               </div>
 
@@ -155,12 +155,12 @@ const CreateBusiness = () => {
                   {...register("industry")}
                 />
                 {errors.industry && (
-                  <p className="text-sm text-destructive">{errors.industry.message}</p>
+                  <p className="text-xs sm:text-sm text-destructive">{errors.industry.message}</p>
                 )}
               </div>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               <div className="space-y-2">
                 <Label htmlFor="currency">Currency</Label>
                 <Input
@@ -169,7 +169,7 @@ const CreateBusiness = () => {
                   {...register("currency")}
                 />
                 {errors.currency && (
-                  <p className="text-sm text-destructive">{errors.currency.message}</p>
+                  <p className="text-xs sm:text-sm text-destructive">{errors.currency.message}</p>
                 )}
               </div>
 
@@ -181,12 +181,12 @@ const CreateBusiness = () => {
                   {...register("country")}
                 />
                 {errors.country && (
-                  <p className="text-sm text-destructive">{errors.country.message}</p>
+                  <p className="text-xs sm:text-sm text-destructive">{errors.country.message}</p>
                 )}
               </div>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               <div className="space-y-2">
                 <Label htmlFor="monthlyRevenue">Average Monthly Revenue ($)</Label>
                 <Input
@@ -197,7 +197,7 @@ const CreateBusiness = () => {
                   {...register("monthlyRevenue")}
                 />
                 {errors.monthlyRevenue && (
-                  <p className="text-sm text-destructive">{errors.monthlyRevenue.message}</p>
+                  <p className="text-xs sm:text-sm text-destructive">{errors.monthlyRevenue.message}</p>
                 )}
               </div>
 
@@ -211,12 +211,12 @@ const CreateBusiness = () => {
                   {...register("monthlyExpenses")}
                 />
                 {errors.monthlyExpenses && (
-                  <p className="text-sm text-destructive">{errors.monthlyExpenses.message}</p>
+                  <p className="text-xs sm:text-sm text-destructive">{errors.monthlyExpenses.message}</p>
                 )}
               </div>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               <div className="space-y-2">
                 <Label htmlFor="currentCash">Current Cash Balance ($)</Label>
                 <Input
@@ -227,7 +227,7 @@ const CreateBusiness = () => {
                   {...register("currentCash")}
                 />
                 {errors.currentCash && (
-                  <p className="text-sm text-destructive">{errors.currentCash.message}</p>
+                  <p className="text-xs sm:text-sm text-destructive">{errors.currentCash.message}</p>
                 )}
               </div>
 
@@ -241,7 +241,7 @@ const CreateBusiness = () => {
                   {...register("outstandingDebt")}
                 />
                 {errors.outstandingDebt && (
-                  <p className="text-sm text-destructive">{errors.outstandingDebt.message}</p>
+                  <p className="text-xs sm:text-sm text-destructive">{errors.outstandingDebt.message}</p>
                 )}
               </div>
             </div>
@@ -255,7 +255,7 @@ const CreateBusiness = () => {
                 {...register("employees")}
               />
               {errors.employees && (
-                <p className="text-sm text-destructive">{errors.employees.message}</p>
+                <p className="text-xs sm:text-sm text-destructive">{errors.employees.message}</p>
               )}
             </div>
 
@@ -268,12 +268,12 @@ const CreateBusiness = () => {
                 {...register("businessGoals")}
               />
               {errors.businessGoals && (
-                <p className="text-sm text-destructive">{errors.businessGoals.message}</p>
+                <p className="text-xs sm:text-sm text-destructive">{errors.businessGoals.message}</p>
               )}
             </div>
 
-            <div className="flex gap-4">
-              <Button type="submit" className="flex-1" disabled={isSubmitting}>
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+              <Button type="submit" className="w-full sm:flex-1" disabled={isSubmitting}>
                 {isSubmitting ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -283,18 +283,18 @@ const CreateBusiness = () => {
                   'Create Business'
                 )}
               </Button>
-              <Button type="button" variant="outline" onClick={() => reset()} disabled={isSubmitting}>
+              <Button type="button" variant="outline" className="w-full sm:w-auto" onClick={() => reset()} disabled={isSubmitting}>
                 Reset
               </Button>
             </div>
           </form>
         </Card>
 
-        <Card className="p-6 mt-6 bg-primary/5 border-primary/20">
+        <Card className="p-4 sm:p-6 mt-4 sm:mt-6 bg-primary/5 border-primary/20">
           <h3 className="font-semibold mb-2 flex items-center gap-2">
-            <span className="text-primary">💡</span> Business Information
+            <span className="text-primary text-base">💡</span> Business Information
           </h3>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm sm:text-base text-muted-foreground">
             Creating a new business allows you to track its finances separately from your other businesses.
             All information is encrypted and secure.
           </p>

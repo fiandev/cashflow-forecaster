@@ -110,9 +110,9 @@ const Index = () => {
   };
 
   return (
-    <div className="flex-1 space-y-4 p-4 pt-6">
+    <div className="flex-1 w-screen lg:w-fit space-y-4 p-4 pt-6">
       {/* Top Metric Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         <MetricCard
           title="Net Cashflow"
           value={`$${metrics.net_cashflow.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
@@ -122,8 +122,8 @@ const Index = () => {
             metrics.net_cashflow_trend === "down" && metrics.net_cashflow_percentage_change < -10
               ? "critical"
               : metrics.net_cashflow_trend === "down"
-              ? "high"
-              : "low"
+                ? "high"
+                : "low"
           }
         />
         <MetricCard
@@ -139,8 +139,8 @@ const Index = () => {
             metrics.liquidity_score < 50
               ? "critical"
               : metrics.liquidity_score < 75
-              ? "medium"
-              : "low"
+                ? "medium"
+                : "low"
           }
         />
         <MetricCard
@@ -156,8 +156,8 @@ const Index = () => {
             metrics.cashflow_volatility > 20
               ? "high"
               : metrics.cashflow_volatility > 10
-              ? "medium"
-              : "low"
+                ? "medium"
+                : "low"
           }
         />
         <MetricCard
@@ -174,24 +174,26 @@ const Index = () => {
       </div>
 
       {/* Main Panels Grid */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <div className="md:col-span-2">
+      <div className="grid gap-4 grid-cols-1 lg:grid-cols-3">
+        <div className="lg:col-span-2">
           <CashflowChart />
         </div>
-        <div>
+        <div className="h-full">
           <RiskForecastPanel riskData={metrics.risk_breakdown} />
         </div>
       </div>
 
       {/* Secondary Panels */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
         <ExpenseChart />
         <IncomeChart />
         <AIAlertsPanel />
       </div>
 
       {/* Transactions Table */}
-      <TransactionsTable />
+      <div className="w-full overflow-x-auto">
+        <TransactionsTable />
+      </div>
     </div>
   );
 };

@@ -101,38 +101,41 @@ export const ExpenseChart = () => {
   }
 
   return (
-    <Card className="p-6 animate-slide-up">
+    <Card className="p-4 sm:p-6 animate-slide-up">
       <h3 className="text-lg font-semibold mb-4">Expense Composition</h3>
       {data.length > 0 ? (
-        <ResponsiveContainer width="100%" height={250}>
-          <PieChart>
-            <Pie
-              data={data}
-              cx="50%"
-              cy="50%"
-              innerRadius={60}
-              outerRadius={90}
-              fill="#8884d8"
-              paddingAngle={5}
-              dataKey="value"
-            >
-              {data.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-              ))}
-            </Pie>
-            <Tooltip
-              contentStyle={{
-                backgroundColor: "hsl(var(--card))",
-                border: "1px solid hsl(var(--border))",
-                borderRadius: "var(--radius)",
-              }}
-              formatter={(value: number) => [`$${value.toLocaleString()}`, ""]}
-            />
-            <Legend />
-          </PieChart>
-        </ResponsiveContainer>
+        <div className="h-60 xs:h-64 sm:h-72">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                data={data}
+                cx="50%"
+                cy="50%"
+                innerRadius={30}
+                outerRadius={60}
+                fill="#8884d8"
+                paddingAngle={2}
+                dataKey="value"
+              >
+                {data.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "hsl(var(--card))",
+                  border: "1px solid hsl(var(--border))",
+                  borderRadius: "var(--radius)",
+                }}
+                formatter={(value: number) => [`$${value.toLocaleString()}`, ""]}
+              />
+              <Legend layout="vertical" verticalAlign="middle" align="right" className="hidden sm:block" />
+              <Legend layout="horizontal" verticalAlign="bottom" align="center" className="sm:hidden" />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
       ) : (
-        <div className="h-[250px] flex items-center justify-center text-muted-foreground">
+        <div className="h-60 xs:h-64 sm:h-72 flex items-center justify-center text-muted-foreground">
           No expense data recorded for this business.
         </div>
       )}

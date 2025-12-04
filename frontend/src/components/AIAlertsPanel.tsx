@@ -101,7 +101,7 @@ export const AIAlertsPanel = () => {
   }
 
   return (
-    <Card className="p-6 animate-slide-up">
+    <Card className="p-4 sm:p-6 animate-slide-up">
       <h3 className="text-lg font-semibold mb-4">AI Insights & Alerts</h3>
       <div className="space-y-3">
         {alerts.length === 0 ? (
@@ -113,21 +113,26 @@ export const AIAlertsPanel = () => {
           alerts.map((alert) => (
             <div
               key={alert.id}
-              className="flex gap-3 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors"
+              className="flex flex-col sm:flex-row gap-3 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors"
             >
               <div className={
-                alert.level === "critical" ? "text-destructive" : 
+                alert.level === "critical" ? "text-destructive" :
                 alert.level === "warning" ? "text-warning" : "text-primary"
               }>
                 {getIcon(alert.level)}
               </div>
-              <div className="flex-1 space-y-1">
+              <div className="flex-1 space-y-1 sm:space-y-0">
                 <p className="text-sm font-medium">{alert.message}</p>
-                <p className="text-xs text-muted-foreground">{formatTime(alert.created_at)}</p>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-0">
+                  <p className="text-xs text-muted-foreground">{formatTime(alert.created_at)}</p>
+                  <Badge
+                    variant={getBadgeVariant(alert.level)}
+                    className="h-fit capitalize self-start sm:self-auto w-fit"
+                  >
+                    {alert.level}
+                  </Badge>
+                </div>
               </div>
-              <Badge variant={getBadgeVariant(alert.level)} className="h-fit capitalize">
-                {alert.level}
-              </Badge>
             </div>
           ))
         )}

@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Steps, Step } from '@/components/ui/steps';
 import { useAuthStore } from '@/stores/auth-store';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
 
@@ -122,10 +123,10 @@ const MultiStepRegistration: React.FC = () => {
 
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
-          <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
+          <h2 className="mt-6 text-2xl sm:text-3xl font-extrabold text-gray-900">
             Create your account
           </h2>
           <p className="mt-2 text-sm text-gray-600">
@@ -138,17 +139,17 @@ const MultiStepRegistration: React.FC = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-2xl font-bold text-center">
+            <CardTitle className="text-xl sm:text-2xl font-bold text-center">
               User Registration
             </CardTitle>
-            <CardDescription className="text-center">
+            <CardDescription className="text-center text-sm sm:text-base">
               Fill in your personal information to get started
             </CardDescription>
           </CardHeader>
 
           <CardContent>
             <Steps currentStep={currentStep} totalSteps={totalSteps} className="mb-6" />
-            
+
             {(error || Object.keys(errors).length > 0) && (
               <Alert variant="destructive" className="mb-4">
                 <AlertDescription>
@@ -176,7 +177,7 @@ const MultiStepRegistration: React.FC = () => {
                     className={errors.name ? 'border-red-500' : ''}
                   />
                   {errors.name && (
-                    <p className="text-sm text-destructive">{errors.name}</p>
+                    <p className="text-xs sm:text-sm text-destructive">{errors.name}</p>
                   )}
                 </div>
 
@@ -194,7 +195,7 @@ const MultiStepRegistration: React.FC = () => {
                     className={errors.email ? 'border-red-500' : ''}
                   />
                   {errors.email && (
-                    <p className="text-sm text-destructive">{errors.email}</p>
+                    <p className="text-xs sm:text-sm text-destructive">{errors.email}</p>
                   )}
                 </div>
 
@@ -227,7 +228,7 @@ const MultiStepRegistration: React.FC = () => {
                     </Button>
                   </div>
                   {errors.password && (
-                    <p className="text-sm text-destructive">{errors.password}</p>
+                    <p className="text-xs sm:text-sm text-destructive">{errors.password}</p>
                   )}
                 </div>
 
@@ -260,11 +261,11 @@ const MultiStepRegistration: React.FC = () => {
                     </Button>
                   </div>
                   {errors.confirmPassword && (
-                    <p className="text-sm text-destructive">{errors.confirmPassword}</p>
+                    <p className="text-xs sm:text-sm text-destructive">{errors.confirmPassword}</p>
                   )}
                 </div>
 
-                <div className="flex items-start space-x-2">
+                <div className="flex flex-col sm:flex-row sm:items-start space-y-2 sm:space-y-0 space-x-0 sm:space-x-2">
                   <Checkbox
                     id="agreeToTerms"
                     name="agreeToTerms"
@@ -286,8 +287,7 @@ const MultiStepRegistration: React.FC = () => {
                 </div>
               </CardContent>
 
-              <CardFooter className="flex justify-between">
-                <div></div> {/* Empty div to push next button to the right */}
+              <CardFooter className="flex flex-col space-y-4">
                 <Button
                   type="submit"
                   className="w-full"

@@ -125,24 +125,24 @@ const ResetPassword: React.FC = () => {
 
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 py-8 px-4 sm:px-6">
         <div className="max-w-md w-full">
           <Card>
             <CardContent className="pt-6">
               <div className="text-center">
-                <CheckCircle className="mx-auto h-12 w-12 text-green-500 mb-4" />
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                <CheckCircle className="mx-auto h-10 w-10 sm:h-12 sm:w-12 text-green-500 mb-3" />
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
                   {token ? 'Password Reset Successful' : 'Reset Email Sent'}
                 </h2>
-                <p className="text-gray-600 mb-6">
-                  {token 
+                <p className="text-sm sm:text-base text-gray-600 mb-4">
+                  {token
                     ? 'Your password has been successfully reset. You will be redirected to the login page.'
                     : 'We have sent a password reset link to your email address. Please check your inbox.'
                   }
                 </p>
-                <Button 
-                  onClick={() => navigate('/login')} 
-                  className="w-full"
+                <Button
+                  onClick={() => navigate('/login')}
+                  className="w-full sm:w-auto"
                 >
                   Go to Login
                 </Button>
@@ -155,18 +155,18 @@ const ResetPassword: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-8 px-4 sm:px-6">
+      <div className="max-w-md w-full space-y-6">
         <div className="text-center">
-          <Link to="/login" className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 mb-4">
-            <ArrowLeft className="mr-2 h-4 w-4" />
+          <Link to="/login" className="inline-flex items-center text-xs sm:text-sm text-gray-600 hover:text-gray-900 mb-4">
+            <ArrowLeft className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
             Back to Login
           </Link>
-          <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
+          <h2 className="mt-4 text-xl sm:mt-6 sm:text-2xl md:text-3xl font-extrabold text-gray-900">
             {token ? 'Reset Your Password' : 'Forgot Password?'}
           </h2>
-          <p className="mt-2 text-sm text-gray-600">
-            {token 
+          <p className="mt-2 text-xs sm:text-sm text-gray-600">
+            {token
               ? 'Enter your new password below'
               : 'Enter your email address and we\'ll send you a link to reset your password'
             }
@@ -175,29 +175,29 @@ const ResetPassword: React.FC = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-2xl font-bold text-center flex items-center justify-center gap-2">
-              <Mail className="h-6 w-6" />
+            <CardTitle className="text-xl sm:text-2xl font-bold text-center flex items-center justify-center gap-2">
+              <Mail className="h-5 w-5 sm:h-6 sm:w-6" />
               {token ? 'New Password' : 'Reset Email'}
             </CardTitle>
-            <CardDescription className="text-center">
-              {token 
+            <CardDescription className="text-center text-xs sm:text-sm">
+              {token
                 ? 'Create a new secure password'
                 : 'We\'ll send reset instructions to your email'
               }
             </CardDescription>
           </CardHeader>
-          
+
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-4">
               {error && (
                 <Alert variant="destructive">
-                  <AlertDescription>{error}</AlertDescription>
+                  <AlertDescription className="text-xs sm:text-sm">{error}</AlertDescription>
                 </Alert>
               )}
-              
+
               {!token && (
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email address</Label>
+                  <Label htmlFor="email" className="text-xs sm:text-sm">Email address</Label>
                   <Input
                     id="email"
                     name="email"
@@ -207,7 +207,7 @@ const ResetPassword: React.FC = () => {
                     value={formData.email}
                     onChange={handleChange}
                     placeholder="Enter your email"
-                    className={errors.email ? 'border-red-500' : ''}
+                    className={errors.email ? 'border-red-500 text-sm' : 'text-sm'}
                   />
                 </div>
               )}
@@ -215,7 +215,7 @@ const ResetPassword: React.FC = () => {
               {token && (
                 <>
                   <div className="space-y-2">
-                    <Label htmlFor="newPassword">New Password</Label>
+                    <Label htmlFor="newPassword" className="text-xs sm:text-sm">New Password</Label>
                     <Input
                       id="newPassword"
                       name="newPassword"
@@ -225,12 +225,12 @@ const ResetPassword: React.FC = () => {
                       value={formData.newPassword}
                       onChange={handleChange}
                       placeholder="Enter new password"
-                      className={errors.newPassword ? 'border-red-500' : ''}
+                      className={errors.newPassword ? 'border-red-500 text-sm' : 'text-sm'}
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                    <Label htmlFor="confirmPassword" className="text-xs sm:text-sm">Confirm New Password</Label>
                     <Input
                       id="confirmPassword"
                       name="confirmPassword"
@@ -240,7 +240,7 @@ const ResetPassword: React.FC = () => {
                       value={formData.confirmPassword}
                       onChange={handleChange}
                       placeholder="Confirm new password"
-                      className={errors.confirmPassword ? 'border-red-500' : ''}
+                      className={errors.confirmPassword ? 'border-red-500 text-sm' : 'text-sm'}
                     />
                   </div>
                 </>
@@ -248,9 +248,9 @@ const ResetPassword: React.FC = () => {
             </CardContent>
 
             <CardFooter>
-              <Button 
-                type="submit" 
-                className="w-full" 
+              <Button
+                type="submit"
+                className="w-full"
                 disabled={isLoading}
               >
                 {isLoading ? (

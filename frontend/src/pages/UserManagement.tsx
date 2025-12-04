@@ -191,9 +191,9 @@ const UserManagement: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">User Management</h1>
+    <div className="container mx-auto p-4 sm:p-6 space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <h1 className="text-2xl sm:text-3xl font-bold">User Management</h1>
         <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
           <DialogTrigger asChild>
             <Button onClick={resetForm}>
@@ -201,7 +201,7 @@ const UserManagement: React.FC = () => {
               Add User
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="max-w-[95vw] sm:max-w-[500px]">
             <DialogHeader>
               <DialogTitle>Create New User</DialogTitle>
               <DialogDescription>
@@ -219,6 +219,7 @@ const UserManagement: React.FC = () => {
                   onChange={handleInputChange}
                   placeholder="Enter email"
                   required
+                  className="text-sm sm:text-base"
                 />
               </div>
               <div>
@@ -229,12 +230,13 @@ const UserManagement: React.FC = () => {
                   value={formData.name}
                   onChange={handleInputChange}
                   placeholder="Enter name"
+                  className="text-sm sm:text-base"
                 />
               </div>
               <div>
                 <Label htmlFor="role">Role</Label>
                 <Select value={formData.role} onValueChange={handleRoleChange}>
-                  <SelectTrigger>
+                  <SelectTrigger className="text-sm sm:text-base">
                     <SelectValue placeholder="Select role" />
                   </SelectTrigger>
                   <SelectContent>
@@ -254,11 +256,12 @@ const UserManagement: React.FC = () => {
                   onChange={handleInputChange}
                   placeholder="Enter password"
                   required
+                  className="text-sm sm:text-base"
                 />
               </div>
             </div>
             <DialogFooter>
-              <Button onClick={handleCreateUser}>Create User</Button>
+              <Button onClick={handleCreateUser} className="w-full sm:w-auto">Create User</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -269,47 +272,51 @@ const UserManagement: React.FC = () => {
           <CardTitle>Users</CardTitle>
           <CardDescription>Manage system users and their roles</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Role</TableHead>
-                <TableHead>Created</TableHead>
-                <TableHead>Last Login</TableHead>
-                <TableHead>Actions</TableHead>
+                <TableHead className="whitespace-nowrap">Name</TableHead>
+                <TableHead className="whitespace-nowrap">Email</TableHead>
+                <TableHead className="whitespace-nowrap">Role</TableHead>
+                <TableHead className="whitespace-nowrap">Created</TableHead>
+                <TableHead className="whitespace-nowrap">Last Login</TableHead>
+                <TableHead className="whitespace-nowrap">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {users.map((user) => (
                 <TableRow key={user.id}>
-                  <TableCell>{user.name || 'N/A'}</TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>
-                    <Badge variant="secondary">{user.role || 'user'}</Badge>
+                  <TableCell className="whitespace-nowrap">{user.name || 'N/A'}</TableCell>
+                  <TableCell className="whitespace-nowrap">{user.email}</TableCell>
+                  <TableCell className="whitespace-nowrap">
+                    <Badge variant="secondary" className="text-xs">{user.role || 'user'}</Badge>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="whitespace-nowrap">
                     {new Date(user.created_at).toLocaleDateString()}
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="whitespace-nowrap">
                     {user.last_login ? new Date(user.last_login).toLocaleDateString() : 'Never'}
                   </TableCell>
                   <TableCell>
-                    <div className="flex gap-2">
+                    <div className="flex flex-col sm:flex-row gap-2">
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => openEditDialog(user)}
+                        className="w-full sm:w-auto"
                       >
                         <Pencil className="h-4 w-4" />
+                        <span className="sr-only sm:not-sr-only sm:ml-2">Edit</span>
                       </Button>
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => handleDeleteUser(user.id)}
+                        className="w-full sm:w-auto"
                       >
                         <Trash2 className="h-4 w-4" />
+                        <span className="sr-only sm:not-sr-only sm:ml-2">Delete</span>
                       </Button>
                     </div>
                   </TableCell>
@@ -321,7 +328,7 @@ const UserManagement: React.FC = () => {
       </Card>
 
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent>
+        <DialogContent className="max-w-[95vw] sm:max-w-[500px]">
           <DialogHeader>
             <DialogTitle>Edit User</DialogTitle>
             <DialogDescription>
@@ -338,6 +345,7 @@ const UserManagement: React.FC = () => {
                 value={formData.email}
                 onChange={handleInputChange}
                 placeholder="Enter email"
+                className="text-sm sm:text-base"
               />
             </div>
             <div>
@@ -348,12 +356,13 @@ const UserManagement: React.FC = () => {
                 value={formData.name}
                 onChange={handleInputChange}
                 placeholder="Enter name"
+                className="text-sm sm:text-base"
               />
             </div>
             <div>
               <Label htmlFor="edit-role">Role</Label>
               <Select value={formData.role} onValueChange={handleRoleChange}>
-                <SelectTrigger>
+                <SelectTrigger className="text-sm sm:text-base">
                   <SelectValue placeholder="Select role" />
                 </SelectTrigger>
                 <SelectContent>
@@ -372,11 +381,12 @@ const UserManagement: React.FC = () => {
                 value={formData.password}
                 onChange={handleInputChange}
                 placeholder="Leave blank to keep current password"
+                className="text-sm sm:text-base"
               />
             </div>
           </div>
           <DialogFooter>
-            <Button onClick={handleUpdateUser}>Update User</Button>
+            <Button onClick={handleUpdateUser} className="w-full sm:w-auto">Update User</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
