@@ -29,7 +29,7 @@ jobs:
             # Melakukan rsync dari local runner ke remote path
             # Perhatikan bahwa ini akan menjalankan rsync di remote server,
             # menarik file dari runner (local) ke server (remote).
-            rsync -avz --delete --exclude=node_modules --exclude=.git ./ /root/ai-cashflow-forecaster/
+            rsync -avz --exclude=node_modules --exclude=.git ./ /root/ai-cashflow-forecaster/
             
       - name: Run docker.sh on VPS
         uses: appleboy/ssh-action@v1.0.3
