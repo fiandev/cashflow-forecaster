@@ -70,7 +70,7 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      # --- Set deployment tags (New step for robust deployment) ---
+      # --- New step for setting tags (Kept from previous revision) ---
       - name: Set deployment tags
         id: deploy_tags
         run: |
@@ -89,7 +89,7 @@ jobs:
             BACKEND_IMAGE_TAG=$(echo "${{ steps.deploy_tags.outputs.BACKEND_TAG }}" | awk -F',' '{print $2}')
             FRONTEND_IMAGE_TAG=$(echo "${{ steps.deploy_tags.outputs.FRONTEND_TAG }}" | awk -F',' '{print $2}')
 
-            # Fallback to 'latest' if SHA is empty (though unlikely after metadata action)
+            # Fallback to 'latest' if SHA is empty 
             if [ -z "$BACKEND_IMAGE_TAG" ]; then BACKEND_IMAGE_TAG="latest"; fi
             if [ -z "$FRONTEND_IMAGE_TAG" ]; then FRONTEND_IMAGE_TAG="latest"; fi
             
@@ -104,15 +104,15 @@ jobs:
             # otherwise use a default value
             export JWT_SECRET_KEY=${JWT_SECRET_KEY:-$(openssl rand -hex 32)}
 
-            # Create/update docker-compose.prod.yml with specific image tags (SHA or latest)
-            # --- FIX: Removed quotes around EOL to allow variable substitution ---
-            cat > docker-compose.prod.yml << EOL
+            # Create/update docker-compose.prod.yml using a quoted heredoc ('EOT') 
+            # to avoid YAML errors on dynamic variable replacement.
+            cat > docker-compose.prod.yml << 'EOT'
 version: '3.8'
 
 services:
   backend:
-    # Use the precise image tag
-    image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-backend:\${BACKEND_IMAGE_TAG}
+    # Use a placeholder that will be replaced by sed
+    image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-backend:__BACKEND_TAG_PLACEHOLDER__
     container_name: ai_cashflow_backend
     environment:
       - DB_TYPE=sqlite  
@@ -123,8 +123,8 @@ services:
     restart: unless-stopped
 
   frontend:
-    # Use the precise image tag
-    image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-frontend:\${FRONTEND_IMAGE_TAG}
+    # Use a placeholder that will be replaced by sed
+    image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-frontend:__FRONTEND_TAG_PLACEHOLDER__
     container_name: ai_cashflow_frontend
     ports:
       - "80:80"
@@ -134,7 +134,10 @@ services:
 
 volumes:
   database_volume:
-EOL
+EOT
+            # Replace the placeholders with the actual image tags using sed (This runs on the VPS)
+            sed -i "s|__BACKEND_TAG_PLACEHOLDER__|${BACKEND_IMAGE_TAG}|g" docker-compose.prod.yml
+            sed -i "s|__FRONTEND_TAG_PLACEHOLDER__|${FRONTEND_IMAGE_TAG}|g" docker-compose.prod.yml
 
             # Pull the latest images
             docker compose -f docker-compose.prod.yml pull
@@ -145,4 +148,4 @@ EOL
             # Start the new containers
             docker compose -f docker-compose.prod.yml up -d
 
-            echo "Deployment completed successfully!" 
+            echo "Deployment completed successfully!"
