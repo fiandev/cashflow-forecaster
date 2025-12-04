@@ -14,7 +14,7 @@ services:
       - SECRET_KEY=${JWT_SECRET_KEY}
       - KOLOSAL_API_KEY=${KOLOSAL_API_KEY}
       - KOLOSAL_BASE_URL=${KOLOSAL_BASE_URL}
-      - FRONTEND_ORIGIN=http://localhost
+      - FRONTEND_ORIGIN=http://localhost:8888
     volumes:
       - database_volume:/app/database
     command: >
@@ -31,6 +31,8 @@ services:
         - CACHE_BUST=${CACHE_BUST:-1}
       dockerfile: Dockerfile.frontend.prod
     container_name: ai_cashflow_frontend
+    environment:
+      - VITE_API_BASE_URL=http://127.0.0.1:5000
     ports:
       - "8888:8888"
     depends_on:

@@ -49,6 +49,7 @@ jobs:
             systemctl enable docker --now
             chmod +x docker.sh
 
+            FRONTEND_ORIGIN="http://localhost:8888"
             JWT_SECRET_KEY="${{ secrets.JWT_SECRET_KEY }}" \
             KOLOSAL_API_KEY="${{ secrets.KOLOSAL_API_KEY }}" \
             KOLOSAL_BASE_URL="${{ secrets.KOLOSAL_BASE_URL }}" \
