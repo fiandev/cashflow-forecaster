@@ -2,7 +2,9 @@ version: '3.8'
 
 services:
   backend:
-    build: .
+    # Placeholder that will be replaced by sed during deployment
+    # build: .
+    image: ghcr.io/${{ github.repository }}-backend:__BACKEND_TAG_PLACEHOLDER__
     container_name: ai_cashflow_backend
     environment:
       - APP_ENV=production
@@ -21,9 +23,11 @@ services:
     restart: unless-stopped
 
   frontend:
-    build:
-      context: .
-      dockerfile: Dockerfile.frontend.prod
+    # Placeholder that will be replaced by sed during deployment
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile.frontend.prod
+    image: ghcr.io/${{ github.repository }}-frontend:__FRONTEND_TAG_PLACEHOLDER__
     container_name: ai_cashflow_frontend
     ports:
       - "80:80"

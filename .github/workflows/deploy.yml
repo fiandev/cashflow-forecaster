@@ -89,55 +89,26 @@ jobs:
             BACKEND_IMAGE_TAG=$(echo "${{ steps.deploy_tags.outputs.BACKEND_TAG }}" | awk -F',' '{print $2}')
             FRONTEND_IMAGE_TAG=$(echo "${{ steps.deploy_tags.outputs.FRONTEND_TAG }}" | awk -F',' '{print $2}')
 
-            # Fallback to 'latest' if SHA is empty 
+            # Fallback to 'latest' if SHA is empty
             if [ -z "$BACKEND_IMAGE_TAG" ]; then BACKEND_IMAGE_TAG="latest"; fi
             if [ -z "$FRONTEND_IMAGE_TAG" ]; then FRONTEND_IMAGE_TAG="latest"; fi
-            
+
             echo "Deploying Backend image: ${BACKEND_IMAGE_TAG}"
             echo "Deploying Frontend image: ${FRONTEND_IMAGE_TAG}"
 
             # Create project directory
-            mkdir -p /var/www/ai-cashflow-forecaster
-            cd /var/www/ai-cashflow-forecaster
+            mkdir -p /root/ai-cashflow-forecaster
+            cd /root/ai-cashflow-forecaster
 
-            # The VPS should have JWT_SECRET_KEY environment variable set,
-            # otherwise use a default value
-            export JWT_SECRET_KEY=${JWT_SECRET_KEY:-$(openssl rand -hex 32)}
+            # Download the production docker-compose file from the repository
+            curl -s -o docker-compose.prod.yml https://raw.githubusercontent.com/${{ github.repository }}/master/docker-compose.prod.yml
 
-            # Create/update docker-compose.prod.yml using a quoted heredoc ('EOT') 
-            # to avoid YAML errors on dynamic variable replacement.
-            cat > docker-compose.prod.yml << 'EOT'
-version: '3.8'
-
-services:
-  backend:
-    # Use a placeholder that will be replaced by sed
-    image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-backend:__BACKEND_TAG_PLACEHOLDER__
-    container_name: ai_cashflow_backend
-    environment:
-      - DB_TYPE=sqlite  
-      - DB_PATH=/app/database/database.db
-      - SECRET_KEY=\${JWT_SECRET_KEY}
-    volumes:
-      - database_volume:/app/database
-    restart: unless-stopped
-
-  frontend:
-    # Use a placeholder that will be replaced by sed
-    image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-frontend:__FRONTEND_TAG_PLACEHOLDER__
-    container_name: ai_cashflow_frontend
-    ports:
-      - "80:80"
-    depends_on:
-      - backend
-    restart: unless-stopped
-
-volumes:
-  database_volume:
-EOT
-            # Replace the placeholders with the actual image tags using sed (This runs on the VPS)
+            # Replace placeholders with actual image tags
             sed -i "s|__BACKEND_TAG_PLACEHOLDER__|${BACKEND_IMAGE_TAG}|g" docker-compose.prod.yml
             sed -i "s|__FRONTEND_TAG_PLACEHOLDER__|${FRONTEND_IMAGE_TAG}|g" docker-compose.prod.yml
+
+            # Export the JWT_SECRET_KEY if not set
+            export JWT_SECRET_KEY=${JWT_SECRET_KEY:-$(openssl rand -hex 32)}
 
             # Pull the latest images
             docker compose -f docker-compose.prod.yml pull
