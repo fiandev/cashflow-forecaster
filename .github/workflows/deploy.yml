@@ -13,12 +13,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 1. Archive project
       - name: Archive project
         run: |
           tar --exclude='node_modules' --exclude='.bun' --ignore-failed-read -czf deploy.tar.gz .
 
-      # 2. Upload file via SCP
       - name: Upload file via SCP
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -27,10 +25,8 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           source: "deploy.tar.gz"
-          # Target tetap di /root
           target: "/root"
 
-      # 3. Execute remote commands via SSH (Melakukan Ekstrak Langsung ke Tujuan)
       - name: Execute remote commands via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -41,26 +37,19 @@ jobs:
           script: |
             TARGET_PATH="/root/ai-cashflow-forecaster"
 
-            # Pindah ke direktori /root di mana deploy.tar.gz berada
             cd /root
 
-            # Hapus dan buat ulang direktori proyek (Cleanup)
             rm -rf $TARGET_PATH
             mkdir -p $TARGET_PATH
 
-            # EKSTRAKSI LANGSUNG menggunakan switch -C ke TARGET_PATH
             tar -xzf deploy.tar.gz -C $TARGET_PATH
-
-            # Cleanup file tar di /root
             rm deploy.tar.gz
-
-            # Masuk ke direktori proyek untuk eksekusi Docker
             cd $TARGET_PATH
 
-            # Eksekusi Docker
-            export JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}
-            export KOLOSAL_API_KEY=${{ secrets.KOLOSAL_API_KEY }}
-            export KOLOSAL_BASE_URL=${{ secrets.KOLOSAL_BASE_URL }}
-
+            systemctl enable docker --now
             chmod +x docker.sh
+
+            JWT_SECRET_KEY="${{ secrets.JWT_SECRET_KEY }}" \
+            KOLOSAL_API_KEY="${{ secrets.KOLOSAL_API_KEY }}" \
+            KOLOSAL_BASE_URL="${{ secrets.KOLOSAL_BASE_URL }}" \
             ./docker.sh up
