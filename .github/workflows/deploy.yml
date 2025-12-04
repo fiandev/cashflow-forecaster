@@ -8,33 +8,31 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Deploy to VPS
+      - name: Deploy with rsync
+        uses: burnett01/rsync-deployments@v6
+        with:
+          switches: -avz --delete --exclude=node_modules --exclude=.git
+          path: ./
+          remote_path: /root/ai-cashflow-forecaster
+          remote_host: ${{ secrets.VPS_HOST }}
+          remote_user: ${{ secrets.VPS_USER }}
+          remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Run Docker on VPS
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: 22
           script: |
-            # Create project directory
-            mkdir -p /root/ai-cashflow-forecaster
             cd /root/ai-cashflow-forecaster
-
-            # Copy entire project
-            rsync -av --delete --exclude 'node_modules' --exclude '.git' $GITHUB_WORKSPACE/ /root/ai-cashflow-forecaster/
-
-            # Export required environment variables
             export JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}
             export KOLOSAL_API_KEY=${{ secrets.KOLOSAL_API_KEY }}
             export KOLOSAL_BASE_URL=${{ secrets.KOLOSAL_BASE_URL }}
-
-            # Make docker.sh executable and run it
-            chmod +x ./docker.sh
-            ./docker.sh up
+            docker compose down
+            docker compose build
+            docker compose up -d
