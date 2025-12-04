@@ -13,6 +13,7 @@ services:
       - SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}
       - KOLOSAL_API_KEY=${{ secrets.KOLOSAL_API_KEY }}
       - KOLOSAL_BASE_URL=${{ secrets.KOLOSAL_BASE_URL }}
+      - FRONTEND_ORIGIN=http://localhost
     volumes:
       - database_volume:/app/database
     command: >

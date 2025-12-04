@@ -10,6 +10,7 @@ services:
       - DB_TYPE=sqlite
       - DB_PATH=/app/database/database.db
       - SECRET_KEY=your-secret-key-change-in-production
+      - FRONTEND_ORIGIN=http://localhost:3001
     volumes:
       - database_volume:/app/database
       - ./backend:/app  # Mount the backend for development
@@ -27,12 +28,13 @@ services:
       dockerfile: Dockerfile.frontend
     container_name: ai_cashflow_frontend
     ports:
-      - "3000:3000"
+      - "3001:3000"
     volumes:
       - ./frontend:/app
       - /app/node_modules  # anonymous volume to persist node_modules
     environment:
       - NODE_ENV=development
+      - VITE_API_BASE_URL=http://backend:5000
     depends_on:
       - backend
     restart: unless-stopped
