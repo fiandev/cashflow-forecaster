@@ -5,8 +5,10 @@ WORKDIR /app
 # Copy package files
 COPY ./frontend/package*.json ./
 
-# Install dependencies
-RUN bun install
+# Add cache-busting argument
+ARG CACHE_BUST=1
+# Install dependencies with cache clearing
+RUN bun install --force
 
 # Copy frontend source code
 COPY ./frontend/ .

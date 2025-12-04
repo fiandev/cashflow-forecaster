@@ -2,7 +2,10 @@ version: "3.8"
 
 services:
   backend:
-    build: .
+    build:
+      context: .
+      args:
+        - CACHE_BUST=${CACHE_BUST:-1}
     container_name: ai_cashflow_backend
     environment:
       - APP_ENV=production
@@ -24,6 +27,8 @@ services:
   frontend:
     build:
       context: .
+      args:
+        - CACHE_BUST=${CACHE_BUST:-1}
       dockerfile: Dockerfile.frontend.prod
     container_name: ai_cashflow_frontend
     ports:

@@ -7,7 +7,9 @@ RUN apt-get update && apt-get install -y \
     gcc \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy backend requirements and install dependencies first for better caching
+# Copy backend requirements and install dependencies
+# Use --no-cache-dir and a cache-busting argument to force reinstallation
+ARG CACHE_BUST=1
 COPY ./backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
@@ -17,11 +19,8 @@ COPY ./backend/ .
 # Create directory for SQLite database
 RUN mkdir -p database
 
-# Run initialization and seeding during build
-RUN python create_tables.py && echo "yes" | python seed.py || true
-
 # Expose port
 EXPOSE 5000
 
-# Run the application with multiple workers for production
+# Run the application with gunicorn
 CMD ["bash", "-c", "python init_db.py && gunicorn --bind 0.0.0.0:5000 --workers 4 app:app"]

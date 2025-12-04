@@ -52,4 +52,6 @@ jobs:
             JWT_SECRET_KEY="${{ secrets.JWT_SECRET_KEY }}" \
             KOLOSAL_API_KEY="${{ secrets.KOLOSAL_API_KEY }}" \
             KOLOSAL_BASE_URL="${{ secrets.KOLOSAL_BASE_URL }}" \
+
+            docker-compose down -v
             ./docker.sh prod-up

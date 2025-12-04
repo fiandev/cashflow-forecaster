@@ -2,7 +2,11 @@ version: '3.8'
 
 services:
   backend:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - CACHE_BUST=${CACHE_BUST:-1}
     container_name: ai_cashflow_backend
     ports:
       - "5000:5000"
@@ -14,11 +18,10 @@ services:
     volumes:
       - database_volume:/app/database
       - ./backend:/app  # Mount the backend for development
-    # SQLite is file-based, so the db service isn't needed
     command: >
       bash -c "
         python init_db.py &&
-        python app.py
+        gunicorn --bind 0.0.0.0:5000 --workers 4 app:app
       "
     restart: unless-stopped
 
@@ -26,6 +29,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.frontend
+      args:
+        - CACHE_BUST=${CACHE_BUST:-1}
     container_name: ai_cashflow_frontend
     ports:
       - "3001:3000"
