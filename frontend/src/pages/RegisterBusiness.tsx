@@ -3,10 +3,10 @@ import { useNavigate } from 'react-router-dom';
 
 const RegisterBusiness: React.FC = () => {
   const navigate = useNavigate();
-  
-  // Redirect to register page since business registration is now part of the multi-step form
+
+  // Redirect to the new create business page
   useEffect(() => {
-    navigate('/register');
+    navigate('/create-business');
   }, [navigate]);
 
   return null;

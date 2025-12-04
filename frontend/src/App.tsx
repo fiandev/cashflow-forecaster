@@ -8,7 +8,7 @@ import { AppSidebar } from "@/components/AppSidebar";
 import { Header } from "@/components/Header";
 import { AuthInitializer } from "@/components/AuthInitializer";
 import ProtectedRoute from "@/components/ProtectedRoute";
-import Index from "./pages/Index";
+import Index from "@/pages/Index";
 import Transactions from "./pages/Transactions";
 import BusinessSetup from "./pages/BusinessSetup";
 import Forecast from "./pages/Forecast";
@@ -17,6 +17,7 @@ import Profile from "./pages/Profile";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import RegisterBusiness from "./pages/RegisterBusiness";
+import CreateBusiness from "./pages/CreateBusiness";
 import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 
@@ -54,6 +55,11 @@ const App = () => (
               <Route path="/business-setup" element={
                 <ProtectedRoute>
                   <BusinessSetup />
+                </ProtectedRoute>
+              } />
+              <Route path="/create-business" element={
+                <ProtectedRoute>
+                  <CreateBusiness />
                 </ProtectedRoute>
               } />
               <Route path="/forecast" element={

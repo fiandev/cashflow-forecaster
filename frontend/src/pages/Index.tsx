@@ -9,6 +9,7 @@ import { TransactionsTable } from "@/components/TransactionsTable";
 import { authenticatedRequest, API_ENDPOINTS } from "@/lib/api";
 import { Loader2, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useBusinessStore } from "@/stores/business-store";
 
 interface DashboardMetrics {
   net_cashflow: number;
@@ -31,11 +32,19 @@ const Index = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const { currentBusiness } = useBusinessStore();
+
   const fetchMetrics = async () => {
+    if (!currentBusiness) {
+      setDashboardMetrics(null);
+      setIsLoading(false);
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
     try {
-      const response = await authenticatedRequest(API_ENDPOINTS.dashboardMetrics);
+      const response = await authenticatedRequest(`${API_ENDPOINTS.dashboardMetrics}?business_id=${currentBusiness.id}`);
       if (!response.ok) {
         throw new Error(`Status: ${response.status}`);
       }
@@ -52,7 +61,17 @@ const Index = () => {
 
   useEffect(() => {
     fetchMetrics();
-  }, []);
+  }, [currentBusiness]);
+
+  if (!currentBusiness) {
+    return (
+      <div className="flex-1 space-y-4 p-4 pt-6 flex items-center justify-center min-h-[calc(100vh-64px)]">
+        <div className="text-center">
+          <p className="text-muted-foreground">Please select a business first or create one</p>
+        </div>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (

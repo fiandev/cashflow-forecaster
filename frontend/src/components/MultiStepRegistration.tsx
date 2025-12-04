@@ -5,11 +5,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useAuthStore } from '@/stores/auth-store';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
-import { Steps, Step } from '@/components/ui/steps';
 
 const MultiStepRegistration: React.FC = () => {
   // Step 1: User registration form data
@@ -21,14 +19,8 @@ const MultiStepRegistration: React.FC = () => {
     agreeToTerms: false
   });
 
-  // Step 2: Business registration form data
-  const [businessFormData, setBusinessFormData] = useState({
-    name: '',
-    currency: 'IDR', // Default to Indonesian Rupiah
-  });
-
   const [currentStep, setCurrentStep] = useState(1);
-  const totalSteps = 2;
+  const totalSteps = 1;
   
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -40,10 +32,10 @@ const MultiStepRegistration: React.FC = () => {
   // Check authentication status on component mount
   React.useEffect(() => {
     if (isAuthenticated) {
-      // If already authenticated, skip to business registration step
-      setCurrentStep(2);
+      // If already authenticated, redirect to create business page
+      navigate('/create-business');
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, navigate]);
 
   // Handle user form errors
   const validateUserForm = () => {
@@ -79,21 +71,6 @@ const MultiStepRegistration: React.FC = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  // Handle business form errors
-  const validateBusinessForm = () => {
-    const newErrors: Record<string, string> = {};
-
-    if (!businessFormData.name) {
-      newErrors.businessName = 'Business name is required';
-    }
-
-    if (!businessFormData.currency) {
-      newErrors.currency = 'Currency is required';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
 
   // Handle user registration
   const handleUserSubmit = async (e: React.FormEvent) => {
@@ -119,7 +96,8 @@ const MultiStepRegistration: React.FC = () => {
       const { error: currentError, isAuthenticated } = useAuthStore.getState();
 
       if (!currentError && isAuthenticated) {
-        setCurrentStep(2);
+        // Instead of going to step 2, redirect to create business page
+        navigate('/create-business');
       }
     } catch (err) {
       console.error("Registration error:", err);
@@ -127,29 +105,6 @@ const MultiStepRegistration: React.FC = () => {
     }
   };
 
-  // Handle business registration
-  const handleBusinessSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!validateBusinessForm()) {
-      return;
-    }
-
-    try {
-      // Register the business using the authenticated user's ID
-      await registerBusiness({
-        name: businessFormData.name,
-        currency: businessFormData.currency,
-      });
-
-      // After successful business registration, navigate to login
-      // This follows the required flow: register user -> register business -> login -> save token to cookie
-      navigate('/login');
-    } catch (error) {
-      console.error('Business registration error:', error);
-      setErrors({ businessName: error instanceof Error ? error.message : 'Business registration failed' });
-    }
-  };
 
   // Handle user form changes
   const handleUserChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -165,30 +120,6 @@ const MultiStepRegistration: React.FC = () => {
     }
   };
 
-  // Handle business form changes
-  const handleBusinessChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setBusinessFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-
-    // Clear error for this field when user starts typing
-    if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
-    }
-  };
-
-  const handleCurrencyChange = (value: string) => {
-    setBusinessFormData(prev => ({ ...prev, currency: value }));
-  };
-
-  // Previous step
-  const goToPreviousStep = () => {
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
-    }
-  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -208,12 +139,10 @@ const MultiStepRegistration: React.FC = () => {
         <Card>
           <CardHeader>
             <CardTitle className="text-2xl font-bold text-center">
-              {currentStep === 1 ? 'User Registration' : 'Business Registration'}
+              User Registration
             </CardTitle>
             <CardDescription className="text-center">
-              {currentStep === 1 
-                ? 'Fill in your personal information to get started' 
-                : 'Add your business details'}
+              Fill in your personal information to get started
             </CardDescription>
           </CardHeader>
 
@@ -370,73 +299,7 @@ const MultiStepRegistration: React.FC = () => {
                       Creating account...
                     </>
                   ) : (
-                    'Continue to Business'
-                  )}
-                </Button>
-              </CardFooter>
-            </form>
-          </Step>
-
-          {/* Step 2: Business Registration */}
-          <Step step={2} currentStep={currentStep}>
-            <form onSubmit={handleBusinessSubmit}>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="businessName">Business Name</Label>
-                  <Input
-                    id="businessName"
-                    name="name"
-                    type="text"
-                    value={businessFormData.name}
-                    onChange={handleBusinessChange}
-                    placeholder="Enter your business name"
-                    className={errors.businessName ? 'border-red-500' : ''}
-                  />
-                  {errors.businessName && (
-                    <p className="text-sm text-destructive">{errors.businessName}</p>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="currency">Currency</Label>
-                  <Select value={businessFormData.currency} onValueChange={handleCurrencyChange}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select currency" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="IDR">Indonesian Rupiah (IDR)</SelectItem>
-                      <SelectItem value="USD">US Dollar (USD)</SelectItem>
-                      <SelectItem value="EUR">Euro (EUR)</SelectItem>
-                      <SelectItem value="GBP">British Pound (GBP)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  {errors.currency && (
-                    <p className="text-sm text-destructive">{errors.currency}</p>
-                  )}
-                </div>
-              </CardContent>
-
-              <CardFooter className="flex justify-between">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={goToPreviousStep}
-                  disabled={isLoading}
-                >
-                  Back
-                </Button>
-                <Button
-                  type="submit"
-                  className="w-1/2"
-                  disabled={isLoading}
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Creating business...
-                    </>
-                  ) : (
-                    'Register Business'
+                    'Create Account'
                   )}
                 </Button>
               </CardFooter>

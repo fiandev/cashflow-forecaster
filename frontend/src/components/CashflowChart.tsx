@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { authenticatedRequest, API_ENDPOINTS } from "@/lib/api";
 import { Loader2 } from "lucide-react";
 import { format, parseISO } from "date-fns";
+import { useBusinessStore } from "@/stores/business-store";
 
 interface Transaction {
   date: string;
@@ -23,10 +24,21 @@ export const CashflowChart = () => {
   const [data, setData] = useState<ChartData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  const { currentBusiness } = useBusinessStore();
+
   useEffect(() => {
+    if (!currentBusiness) {
+      // No business selected, clear data and show message
+      setData([]);
+      setIsLoading(false);
+      return;
+    }
+
     const fetchData = async () => {
       try {
-        const response = await authenticatedRequest(API_ENDPOINTS.transactions);
+        setIsLoading(true);
+        // Include the business ID in the API call when a business is selected
+        const response = await authenticatedRequest(`${API_ENDPOINTS.transactions}?business_id=${currentBusiness.id}`);
         const transactions: Transaction[] = await response.json();
 
         // Process transactions into daily chart data
@@ -34,8 +46,8 @@ export const CashflowChart = () => {
 
         transactions.forEach((t) => {
           // Normalize date string just in case
-          const dateStr = t.date.split('T')[0]; 
-          
+          const dateStr = t.date.split('T')[0];
+
           if (!groupedData[dateStr]) {
             groupedData[dateStr] = {
               date: dateStr,
@@ -57,7 +69,7 @@ export const CashflowChart = () => {
         });
 
         // Convert to array and sort by date
-        const chartData = Object.values(groupedData).sort((a, b) => 
+        const chartData = Object.values(groupedData).sort((a, b) =>
           new Date(a.date).getTime() - new Date(b.date).getTime()
         );
 
@@ -77,7 +89,17 @@ export const CashflowChart = () => {
     };
 
     fetchData();
-  }, []);
+  }, [currentBusiness]);
+
+  if (!currentBusiness) {
+    return (
+      <Card className="p-6 animate-slide-up min-h-[300px] flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-muted-foreground">Please select a business first or create one</p>
+        </div>
+      </Card>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -141,7 +163,7 @@ export const CashflowChart = () => {
       </ResponsiveContainer>
       {data.length === 0 && (
         <div className="text-center text-muted-foreground mt-4">
-          No transaction data available to display.
+          No transaction data available to display for this business.
         </div>
       )}
     </Card>

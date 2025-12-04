@@ -13,6 +13,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { CalendarIcon, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { authenticatedRequest, API_ENDPOINTS } from "@/lib/api";
+import { useBusinessStore } from "@/stores/business-store";
 
 const transactionSchema = z.object({
   date: z.date({ required_error: "Date is required" }),
@@ -44,6 +45,8 @@ const Transactions = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const { currentBusiness } = useBusinessStore();
+
   const {
     register,
     handleSubmit,
@@ -58,10 +61,15 @@ const Transactions = () => {
   const selectedType = watch("type");
 
   useEffect(() => {
+    if (!currentBusiness) {
+      setCategories([]);
+      return;
+    }
+
     const fetchCategories = async () => {
       setIsLoading(true);
       try {
-        const response = await authenticatedRequest(API_ENDPOINTS.categories);
+        const response = await authenticatedRequest(`${API_ENDPOINTS.categories}?business_id=${currentBusiness.id}`);
         const data = await response.json();
         setCategories(data);
       } catch (error) {
@@ -73,7 +81,7 @@ const Transactions = () => {
     };
 
     fetchCategories();
-  }, []);
+  }, [currentBusiness]);
 
   const filteredCategories = categories.filter(cat => {
     if (!selectedType) return true;
@@ -94,18 +102,18 @@ const Transactions = () => {
         amount: Number(data.amount),
         direction: data.type,
         category_id: Number(data.category_id),
-        // business_id will be auto-assigned by the backend based on the authenticated user
+        business_id: currentBusiness?.id,
       };
 
       await authenticatedRequest(API_ENDPOINTS.transactions, {
         method: 'POST',
         body: JSON.stringify(payload),
       });
-      
+
       toast.success("Transaction added successfully!", {
         description: `${data.type === "inflow" ? "Income" : "Expense"} of $${Number(data.amount).toLocaleString()} recorded.`,
       });
-      
+
       reset();
       setDate(undefined);
       setValue("category_id", ""); // Reset select
@@ -116,6 +124,20 @@ const Transactions = () => {
       setIsSubmitting(false);
     }
   };
+
+  if (!currentBusiness) {
+    return (
+      <div className="flex-1 space-y-4 p-4 pt-6">
+        <div className="max-w-2xl mx-auto">
+          <Card className="p-6 animate-slide-up min-h-[300px] flex items-center justify-center">
+            <div className="text-center">
+              <p className="text-muted-foreground">Please select a business first or create one</p>
+            </div>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 space-y-4 p-4 pt-6">

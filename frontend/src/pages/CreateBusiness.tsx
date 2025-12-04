@@ -1,4 +1,4 @@
-import { useState, useEffect as ReactUseEffect } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -24,6 +24,16 @@ const businessSchema = z.object({
     .trim()
     .min(1, "Industry is required")
     .max(50, "Industry must be less than 50 characters"),
+  currency: z
+    .string()
+    .trim()
+    .min(1, "Currency is required")
+    .max(10, "Currency must be less than 10 characters"),
+  country: z
+    .string()
+    .trim()
+    .min(1, "Country is required")
+    .max(50, "Country must be less than 50 characters"),
   monthlyRevenue: z
     .string()
     .trim()
@@ -58,60 +68,28 @@ const businessSchema = z.object({
 
 type BusinessForm = z.infer<typeof businessSchema>;
 
-const BusinessSetup = () => {
+const CreateBusiness = () => {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const { currentBusiness, updateBusiness } = useBusinessStore();
+  
+  const { createBusiness, fetchBusinesses } = useBusinessStore();
 
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
-    setValue, // Add setValue to update form fields
   } = useForm<BusinessForm>({
     resolver: zodResolver(businessSchema),
   });
 
-  // Pre-populate form with current business data
-  ReactUseEffect(() => {
-    if (currentBusiness) {
-      setValue('businessName', currentBusiness.name || '');
-      if (currentBusiness.settings) {
-        setValue('industry', currentBusiness.settings.industry || '');
-        setValue('monthlyRevenue', currentBusiness.settings.monthly_revenue ? currentBusiness.settings.monthly_revenue.toString() : '');
-        setValue('monthlyExpenses', currentBusiness.settings.monthly_expenses ? currentBusiness.settings.monthly_expenses.toString() : '');
-        setValue('currentCash', currentBusiness.settings.current_cash ? currentBusiness.settings.current_cash.toString() : '');
-        setValue('outstandingDebt', currentBusiness.settings.outstanding_debt ? currentBusiness.settings.outstanding_debt.toString() : '');
-        setValue('employees', currentBusiness.settings.employees ? currentBusiness.settings.employees.toString() : '');
-        setValue('businessGoals', currentBusiness.settings.goals || '');
-      }
-    }
-  }, [currentBusiness, setValue]);
-
-  if (!currentBusiness) {
-    return (
-      <div className="flex-1 space-y-4 p-4 pt-6">
-        <div className="max-w-3xl mx-auto">
-          <Card className="p-6 animate-slide-up min-h-[300px] flex items-center justify-center">
-            <div className="text-center">
-              <p className="text-muted-foreground">Please select a business first or create one</p>
-            </div>
-          </Card>
-        </div>
-      </div>
-    );
-  }
-
   const onSubmit = async (data: BusinessForm) => {
     setIsSubmitting(true);
     try {
-      // Update the existing business with new settings
       const payload = {
         name: data.businessName,
-        currency: currentBusiness?.currency || "USD", // Keep existing currency or default
-        country: currentBusiness?.country || "USA", // Keep existing country or default
+        currency: data.currency,
+        country: data.country,
         settings: {
           industry: data.industry,
           monthly_revenue: Number(data.monthlyRevenue),
@@ -123,16 +101,20 @@ const BusinessSetup = () => {
         }
       };
 
-      await updateBusiness(currentBusiness.id, payload);
-
-      toast.success("Business profile saved!", {
-        description: "Your business metrics have been updated successfully.",
+      await createBusiness(payload);
+      
+      // Fetch updated list of businesses
+      await fetchBusinesses();
+      
+      toast.success("Business created successfully!", {
+        description: "Your new business has been added to your account.",
       });
 
-      navigate("/"); // Redirect to dashboard
+      // Navigate to the business setup page for this new business
+      navigate("/business-setup");
     } catch (error) {
-      console.error("Business setup failed:", error);
-      toast.error("Failed to save business profile", {
+      console.error("Business creation failed:", error);
+      toast.error("Failed to create business", {
         description: "Please try again later.",
       });
     } finally {
@@ -144,9 +126,9 @@ const BusinessSetup = () => {
     <div className="flex-1 space-y-4 p-4 pt-6">
       <div className="max-w-3xl mx-auto">
         <div className="mb-8">
-          <h2 className="text-3xl font-bold mb-2">Business Setup</h2>
+          <h2 className="text-3xl font-bold mb-2">Create New Business</h2>
           <p className="text-muted-foreground">
-            Configure your business metrics for accurate AI-powered financial analysis.
+            Add a new business to your account for separate cashflow tracking and analysis.
           </p>
         </div>
 
@@ -174,6 +156,32 @@ const BusinessSetup = () => {
                 />
                 {errors.industry && (
                   <p className="text-sm text-destructive">{errors.industry.message}</p>
+                )}
+              </div>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Label htmlFor="currency">Currency</Label>
+                <Input
+                  id="currency"
+                  placeholder="e.g., USD, EUR, GBP"
+                  {...register("currency")}
+                />
+                {errors.currency && (
+                  <p className="text-sm text-destructive">{errors.currency.message}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="country">Country</Label>
+                <Input
+                  id="country"
+                  placeholder="e.g., USA, UK, Canada"
+                  {...register("country")}
+                />
+                {errors.country && (
+                  <p className="text-sm text-destructive">{errors.country.message}</p>
                 )}
               </div>
             </div>
@@ -269,10 +277,10 @@ const BusinessSetup = () => {
                 {isSubmitting ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Saving...
+                    Creating Business...
                   </>
                 ) : (
-                  'Save Business Profile'
+                  'Create Business'
                 )}
               </Button>
               <Button type="button" variant="outline" onClick={() => reset()} disabled={isSubmitting}>
@@ -284,11 +292,11 @@ const BusinessSetup = () => {
 
         <Card className="p-6 mt-6 bg-primary/5 border-primary/20">
           <h3 className="font-semibold mb-2 flex items-center gap-2">
-            <span className="text-primary">💡</span> Why we need this information
+            <span className="text-primary">💡</span> Business Information
           </h3>
           <p className="text-sm text-muted-foreground">
-            This data helps our AI analyze your financial health, predict cashflow patterns, 
-            and provide personalized risk assessments. All information is encrypted and secure.
+            Creating a new business allows you to track its finances separately from your other businesses.
+            All information is encrypted and secure.
           </p>
         </Card>
       </div>
@@ -296,4 +304,4 @@ const BusinessSetup = () => {
   );
 };
 
-export default BusinessSetup;
+export default CreateBusiness;

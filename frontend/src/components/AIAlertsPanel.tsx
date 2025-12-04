@@ -3,12 +3,14 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { AlertTriangle, TrendingDown, AlertCircle, Info, Loader2 } from "lucide-react";
 import { authenticatedRequest, API_ENDPOINTS } from "@/lib/api";
+import { useBusinessStore } from "@/stores/business-store";
 
 interface Alert {
   id: number;
   level: "warning" | "critical" | "info" | "error";
   message: string;
   created_at: string;
+  business_id: number;
 }
 
 export const AIAlertsPanel = () => {
@@ -16,16 +18,24 @@ export const AIAlertsPanel = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const { currentBusiness } = useBusinessStore();
+
   useEffect(() => {
+    if (!currentBusiness) {
+      setAlerts([]);
+      setIsLoading(false);
+      return;
+    }
+
     const fetchAlerts = async () => {
       try {
-        const response = await authenticatedRequest(API_ENDPOINTS.alerts);
+        const response = await authenticatedRequest(`${API_ENDPOINTS.alerts}?business_id=${currentBusiness.id}`);
         const data = await response.json();
         // Sort by newest first and take top 5
-        const sortedAlerts = data.sort((a: Alert, b: Alert) => 
+        const sortedAlerts = data.sort((a: Alert, b: Alert) =>
           new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
         ).slice(0, 5);
-        
+
         setAlerts(sortedAlerts);
       } catch (err) {
         console.error("Failed to fetch alerts:", err);
@@ -36,7 +46,7 @@ export const AIAlertsPanel = () => {
     };
 
     fetchAlerts();
-  }, []);
+  }, [currentBusiness]);
 
   const getIcon = (type: string) => {
     switch (type.toLowerCase()) {
@@ -71,6 +81,16 @@ export const AIAlertsPanel = () => {
     if (diffInHours < 24) return `${diffInHours} hours ago`;
     return `${Math.floor(diffInHours / 24)} days ago`;
   };
+
+  if (!currentBusiness) {
+    return (
+      <Card className="p-6 animate-slide-up min-h-[200px] flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-muted-foreground">Please select a business first or create one</p>
+        </div>
+      </Card>
+    );
+  }
 
   if (isLoading) {
     return (

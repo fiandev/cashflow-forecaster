@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { Plus, Trash2, Loader2 } from "lucide-react";
 import { authenticatedRequest, API_ENDPOINTS } from "@/lib/api";
 import { useState } from "react";
+import { useBusinessStore } from "@/stores/business-store";
 
 const forecastItemSchema = z.object({
   description: z
@@ -84,17 +85,40 @@ const Forecast = () => {
     }, 0);
   };
 
+  const { currentBusiness } = useBusinessStore();
+
+  if (!currentBusiness) {
+    return (
+      <div className="flex-1 space-y-4 p-4 pt-6">
+        <div className="max-w-3xl mx-auto">
+          <Card className="p-6 animate-slide-up min-h-[300px] flex items-center justify-center">
+            <div className="text-center">
+              <p className="text-muted-foreground">Please select a business first or create one</p>
+            </div>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
   const onSubmit = async (data: ForecastForm) => {
+    if (!currentBusiness) {
+      toast.error("No business selected", {
+        description: "Please select a business first or create one.",
+      });
+      return;
+    }
+
     setIsLoading(true);
     try {
       // Calculate metrics for the API
       const monthlyInflow = calculateMonthlyTotal(data.expectedInflows);
       const monthlyOutflow = calculateMonthlyTotal(data.expectedOutflows);
       const netMonthly = monthlyInflow - monthlyOutflow;
-      
+
       const months = Number(data.forecastPeriod) / 30;
       const predictedValue = netMonthly * months;
-      
+
       // Simple variance for bounds
       const variance = Math.abs(predictedValue * 0.2); // 20% variance
 
@@ -103,7 +127,7 @@ const Forecast = () => {
       endDate.setDate(endDate.getDate() + Number(data.forecastPeriod));
 
       const payload = {
-        business_id: 1, // TODO: Fetch from user profile/context
+        business_id: currentBusiness.id,
         granularity: "monthly",
         period_start: startDate.toISOString().split('T')[0],
         period_end: endDate.toISOString().split('T')[0],

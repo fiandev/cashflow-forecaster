@@ -3,28 +3,42 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { Card } from "@/components/ui/card";
 import { authenticatedRequest, API_ENDPOINTS } from "@/lib/api";
 import { Loader2 } from "lucide-react";
+import { useBusinessStore } from "@/stores/business-store";
 
 interface Transaction {
   amount: number;
   direction: "inflow" | "outflow";
   category_id: number;
+  business_id: number;
 }
 
 interface Category {
   id: number;
   name: string;
+  business_id: number;
 }
 
 export const IncomeChart = () => {
   const [data, setData] = useState<{ source: string; amount: number }[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  const { currentBusiness } = useBusinessStore();
+
   useEffect(() => {
+    if (!currentBusiness) {
+      // No business selected, clear data and show message
+      setData([]);
+      setIsLoading(false);
+      return;
+    }
+
     const fetchData = async () => {
       try {
+        setIsLoading(true);
+
         const [transactionsRes, categoriesRes] = await Promise.all([
-          authenticatedRequest(API_ENDPOINTS.transactions),
-          authenticatedRequest(API_ENDPOINTS.categories),
+          authenticatedRequest(`${API_ENDPOINTS.transactions}?business_id=${currentBusiness.id}`),
+          authenticatedRequest(`${API_ENDPOINTS.categories}?business_id=${currentBusiness.id}`),
         ]);
 
         const transactions: Transaction[] = await transactionsRes.json();
@@ -58,7 +72,17 @@ export const IncomeChart = () => {
     };
 
     fetchData();
-  }, []);
+  }, [currentBusiness]);
+
+  if (!currentBusiness) {
+    return (
+      <Card className="p-6 animate-slide-up min-h-[250px] flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-muted-foreground">Please select a business first or create one</p>
+        </div>
+      </Card>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -90,7 +114,7 @@ export const IncomeChart = () => {
         </ResponsiveContainer>
       ) : (
         <div className="h-[250px] flex items-center justify-center text-muted-foreground">
-          No income data recorded.
+          No income data recorded for this business.
         </div>
       )}
     </Card>
