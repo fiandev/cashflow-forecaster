@@ -38,7 +38,7 @@ jobs:
           tags: |
             type=raw,value=latest
             type=sha,prefix=
-
+            
       - name: Extract metadata for frontend image
         id: frontend-metadata
         uses: docker/metadata-action@v5
@@ -70,6 +70,13 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      # --- Set deployment tags (New step for robust deployment) ---
+      - name: Set deployment tags
+        id: deploy_tags
+        run: |
+          echo "BACKEND_TAG=${{ steps.backend-metadata.outputs.tags }}" >> $GITHUB_OUTPUT
+          echo "FRONTEND_TAG=${{ steps.frontend-metadata.outputs.tags }}" >> $GITHUB_OUTPUT
+
       - name: Deploy to VPS with Docker Compose
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -78,24 +85,37 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
+            # Set the exact image tags using the short SHA from the job outputs
+            BACKEND_IMAGE_TAG=$(echo "${{ steps.deploy_tags.outputs.BACKEND_TAG }}" | awk -F',' '{print $2}')
+            FRONTEND_IMAGE_TAG=$(echo "${{ steps.deploy_tags.outputs.FRONTEND_TAG }}" | awk -F',' '{print $2}')
+
+            # Fallback to 'latest' if SHA is empty (though unlikely after metadata action)
+            if [ -z "$BACKEND_IMAGE_TAG" ]; then BACKEND_IMAGE_TAG="latest"; fi
+            if [ -z "$FRONTEND_IMAGE_TAG" ]; then FRONTEND_IMAGE_TAG="latest"; fi
+            
+            echo "Deploying Backend image: ${BACKEND_IMAGE_TAG}"
+            echo "Deploying Frontend image: ${FRONTEND_IMAGE_TAG}"
+
             # Create project directory
             mkdir -p /var/www/ai-cashflow-forecaster
             cd /var/www/ai-cashflow-forecaster
 
-            # Create/update docker-compose.prod.yml with latest image tags
             # The VPS should have JWT_SECRET_KEY environment variable set,
             # otherwise use a default value
             export JWT_SECRET_KEY=${JWT_SECRET_KEY:-$(openssl rand -hex 32)}
 
+            # Create/update docker-compose.prod.yml with specific image tags (SHA or latest)
+            # --- FIX: Removed quotes around EOL to allow variable substitution ---
             cat > docker-compose.prod.yml << EOL
 version: '3.8'
 
 services:
   backend:
-    image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-backend:latest
+    # Use the precise image tag
+    image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-backend:\${BACKEND_IMAGE_TAG}
     container_name: ai_cashflow_backend
     environment:
-      - DB_TYPE=sqlite
+      - DB_TYPE=sqlite  
       - DB_PATH=/app/database/database.db
       - SECRET_KEY=\${JWT_SECRET_KEY}
     volumes:
@@ -103,7 +123,8 @@ services:
     restart: unless-stopped
 
   frontend:
-    image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-frontend:latest
+    # Use the precise image tag
+    image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-frontend:\${FRONTEND_IMAGE_TAG}
     container_name: ai_cashflow_frontend
     ports:
       - "80:80"
@@ -124,4 +145,4 @@ EOL
             # Start the new containers
             docker compose -f docker-compose.prod.yml up -d
 
-            echo "Deployment completed successfully!"
+            echo "Deployment completed successfully!" 
