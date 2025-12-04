@@ -13,16 +13,24 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Deploy with rsync
-        uses: Burnett01/rsync-deployments@v7
+      - name: Deploy with rsync (via SSH)
+        uses: appleboy/ssh-action@v1.0.3
         with:
-          switches: -avz --delete --exclude=node_modules --exclude=.git
-          path: ./
-          remote_path: /root/ai-cashflow-forecaster
-          remote_host: ${{ secrets.VPS_HOST }}
-          remote_user: ${{ secrets.VPS_USER }}
-          remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
-          
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            # Pastikan rsync terinstal di server tujuan (jika belum)
+            if ! command -v rsync &> /dev/null; then
+              sudo apt update
+              sudo apt install -y rsync
+            fi
+            
+            # Melakukan rsync dari local runner ke remote path
+            # Perhatikan bahwa ini akan menjalankan rsync di remote server,
+            # menarik file dari runner (local) ke server (remote).
+            rsync -avz --delete --exclude=node_modules --exclude=.git ./ /root/ai-cashflow-forecaster/
+            
       - name: Run docker.sh on VPS
         uses: appleboy/ssh-action@v1.0.3
         with:
