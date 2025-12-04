@@ -1,9 +1,10 @@
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
-from flask_cors import CORS
-from dotenv import load_dotenv
 import os
+
+from dotenv import load_dotenv
+from flask import Flask
+from flask_cors import CORS
+from flask_migrate import Migrate
+from flask_sqlalchemy import SQLAlchemy
 
 load_dotenv()
 
@@ -18,22 +19,35 @@ app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 
 # Enable CORS for development (allow frontend origin for Docker)
 frontend_origin = os.getenv("FRONTEND_ORIGIN", "http://localhost:3001")
-CORS(app, resources={r"/*": {"origins": [frontend_origin, "http://localhost:3000", "http://localhost:3001"]}})
+
+CORS(
+    app,
+    resources={
+        r"/*": {
+            "origins": [
+                frontend_origin,
+                "http://localhost:3000",
+                "http://localhost:3001",
+                "http://localhost:5173",
+            ]
+        }
+    },
+)
 
 from models import (
-    db,
-    User,
+    Alert,
+    APIKey,
     Business,
     Category,
-    Transaction,
-    OCRDocument,
+    Forecast,
     Model,
     ModelRun,
-    Forecast,
+    OCRDocument,
     RiskScore,
-    Alert,
     Scenario,
-    APIKey,
+    Transaction,
+    User,
+    db,
 )
 from routes import register_routes
 

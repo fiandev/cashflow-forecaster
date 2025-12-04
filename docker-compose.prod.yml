@@ -27,7 +27,7 @@ services:
       dockerfile: Dockerfile.frontend.prod
     container_name: ai_cashflow_frontend
     ports:
-      - "80:80"
+      - "8888:8888"
     depends_on:
       - backend
     restart: unless-stopped
