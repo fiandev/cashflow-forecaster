@@ -36,21 +36,21 @@ export const API_ENDPOINTS = {
   changePassword: buildEndpoint("/api/profile/change-password"),
 
   // Forecast endpoints
-  forecasts: buildEndpoint("/api/forecasts/"),
+  forecasts: buildEndpoint("/api/forecasts"),
   createForecast: buildEndpoint("/api/forecasts"),
   getForecast: (id: number) => buildEndpoint(`/api/forecasts/${id}`),
   updateForecast: (id: number) => buildEndpoint(`/api/forecasts/${id}`),
   deleteForecast: (id: number) => buildEndpoint(`/api/forecasts/${id}`),
 
-  // Alert endpoints
-  alerts: buildEndpoint("/api/alerts/"),
+// Alert endpoints
+  alerts: buildEndpoint("/api/alerts"),
   getAlert: (id: number) => buildEndpoint(`/api/alerts/${id}`),
   updateAlert: (id: number) => buildEndpoint(`/api/alerts/${id}`),
   resolveAlert: (id: number) => buildEndpoint(`/api/alerts/${id}/resolve`),
   deleteAlert: (id: number) => buildEndpoint(`/api/alerts/${id}`),
 
   // Transaction endpoints
-  transactions: buildEndpoint("/api/transactions/"),
+  transactions: buildEndpoint("/api/transactions"),
   getTransaction: (id: number) => buildEndpoint(`/api/transactions/${id}`),
   updateTransaction: (id: number) => buildEndpoint(`/api/transactions/${id}`),
   deleteTransaction: (id: number) => buildEndpoint(`/api/transactions/${id}`),
