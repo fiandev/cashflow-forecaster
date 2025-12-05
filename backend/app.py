@@ -3,6 +3,7 @@ import os
 from dotenv import load_dotenv
 from flask import Flask, make_response, request
 from flask_migrate import Migrate
+from flask_cors import CORS
 
 load_dotenv()
 
@@ -15,14 +16,14 @@ app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv(
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 
+# Configure CORS to allow all origins
+CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
+
 
 from models import db
 
 db.init_app(app)
 migrate = Migrate(app, db)
-
-# Import controllers and middleware
-import os
 
 from controllers.alert_controller import AlertController
 from controllers.business_controller import BusinessController
@@ -324,36 +325,6 @@ def delete_category(category_id):
 @authenticate_request
 def get_dashboard_metrics():
     return DashboardController.get_metrics()
-
-
-# Custom CORS middleware - allow all origins
-@app.after_request
-def after_request(response):
-    response.headers.add("Access-Control-Allow-Origin", "*")
-    response.headers.add(
-        "Access-Control-Allow-Headers",
-        "Content-Type,Authorization,X-Requested-With,Accept,Origin",
-    )
-    response.headers.add(
-        "Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS,HEAD"
-    )
-    return response
-
-
-# Handle preflight OPTIONS requests for all routes
-@app.before_request
-def handle_preflight():
-    if request.method == "OPTIONS":
-        response = make_response()
-        response.headers.add("Access-Control-Allow-Origin", "*")
-        response.headers.add(
-            "Access-Control-Allow-Headers",
-            "Content-Type,Authorization,X-Requested-With,Accept,Origin",
-        )
-        response.headers.add(
-            "Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS,HEAD"
-        )
-        return response
 
 
 @app.route("/")

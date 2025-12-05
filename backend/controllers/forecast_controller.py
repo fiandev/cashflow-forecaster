@@ -1,5 +1,5 @@
 from flask import request, jsonify
-from models import db, Forecast, Business, Model, ModelRun
+from models import db, Forecast, Business, Model, ModelRun, Transaction
 from datetime import datetime, date
 from decimal import Decimal
 from services.ai_service import AIService
@@ -43,24 +43,45 @@ class ForecastController:
         # Initialize metadata if not present
         metadata = data.get("forecast_metadata") or {}
 
+        # Get transactions within the forecast period
+        transactions = Transaction.query.filter(
+            Transaction.business_id == data["business_id"],
+            Transaction.date >= period_start,
+            Transaction.date <= period_end,
+        ).all()
+
         # Generate AI Insight
         try:
             ai_service = AIService()
             # Prepare data for AI analysis
             analysis_input = {
-                'period_start': period_start,
-                'period_end': period_end,
-                'granularity': data["granularity"],
-                'predicted_value': data.get("predicted_value"),
-                'lower_bound': data.get("lower_bound"),
-                'upper_bound': data.get("upper_bound")
+                "period_start": period_start,
+                "period_end": period_end,
+                "granularity": data["granularity"],
+                "predicted_value": data.get("predicted_value"),
+                "lower_bound": data.get("lower_bound"),
+                "upper_bound": data.get("upper_bound"),
+                "transactions": [
+                    {
+                        "date": transaction.date.isoformat(),
+                        "amount": float(transaction.amount),
+                        "direction": transaction.direction,
+                        "description": transaction.description,
+                        "category": transaction.category.name
+                        if transaction.category
+                        else None,
+                    }
+                    for transaction in transactions
+                ],
             }
-            
+
             insight = ai_service.generate_forecast_insight(analysis_input)
-            metadata['ai_analysis'] = insight
+            metadata["ai_analysis"] = insight
+            metadata["transaction_count"] = len(transactions)
         except Exception as e:
             print(f"AI Integration Error: {e}")
-            metadata['ai_error'] = str(e)
+            metadata["ai_error"] = str(e)
+            metadata["transaction_count"] = len(transactions)
 
         forecast = Forecast(
             business_id=data["business_id"],
