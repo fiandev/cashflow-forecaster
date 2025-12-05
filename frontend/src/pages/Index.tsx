@@ -44,7 +44,7 @@ const Index = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await authenticatedRequest(`${API_ENDPOINTS.dashboardMetrics}?business_id=${currentBusiness.id}`);
+      const response = await authenticatedRequest(API_ENDPOINTS.dashboardMetrics(currentBusiness.id));
       if (!response.ok) {
         throw new Error(`Status: ${response.status}`);
       }

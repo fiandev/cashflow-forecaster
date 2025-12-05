@@ -324,6 +324,7 @@ def delete_category(category_id):
 @app.route("/api/dashboard/metrics", methods=["GET"])
 @authenticate_request
 def get_dashboard_metrics():
+    print(f"DEBUG: Dashboard route hit! Method: {request.method}, URL: {request.url}")
     return DashboardController.get_metrics()
 
 

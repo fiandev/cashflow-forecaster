@@ -22,7 +22,7 @@ const MultiStepRegistration: React.FC = () => {
 
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 1;
-  
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -148,7 +148,7 @@ const MultiStepRegistration: React.FC = () => {
           </CardHeader>
 
           <CardContent>
-            <Steps currentStep={currentStep} totalSteps={totalSteps} className="mb-6" />
+            {/* <Steps currentStep={currentStep} totalSteps={totalSteps} className="mb-6" /> */}
 
             {(error || Object.keys(errors).length > 0) && (
               <Alert variant="destructive" className="mb-4">

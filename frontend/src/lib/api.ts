@@ -62,7 +62,7 @@ export const API_ENDPOINTS = {
   deleteCategory: (id: number) => buildEndpoint(`/api/categories/${id}`),
 
   // Dashboard endpoints
-  dashboardMetrics: buildEndpoint("/api/dashboard/metrics"),
+  dashboardMetrics: (businessId?: number) => buildEndpoint(`/api/dashboard/metrics${businessId ? `?business_id=${businessId}` : ''}`),
 
   // Risk score endpoints
   riskScores: buildEndpoint("/api/risk-scores/"),
