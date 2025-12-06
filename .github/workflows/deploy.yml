@@ -46,10 +46,8 @@ jobs:
             rm deploy.tar.gz
             cd $TARGET_PATH
             
-            KOLOSAL_MODEL="${{ secrets.KOLOSAL_MODEL }}" \
-            JWT_SECRET_KEY="${{ secrets.JWT_SECRET_KEY }}" \
-            KOLOSAL_API_KEY="${{ secrets.KOLOSAL_API_KEY }}" \
-            KOLOSAL_BASE_URL="${{ secrets.KOLOSAL_BASE_URL }}" \
-
-            docker-compose down -v
+            export KOLOSAL_MODEL="${{ secrets.KOLOSAL_MODEL }}" \
+            export JWT_SECRET_KEY="${{ secrets.JWT_SECRET_KEY }}" \
+            export KOLOSAL_API_KEY="${{ secrets.KOLOSAL_API_KEY }}" \
+            export KOLOSAL_BASE_URL="${{ secrets.KOLOSAL_BASE_URL }}" \
             ./docker.sh prod-restart
