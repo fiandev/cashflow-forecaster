@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { RotateCcw } from "lucide-react";
-import { API_ENDPOINTS, apiRequest } from "@/lib/api";
+import { API_ENDPOINTS, authenticatedRequest } from "@/lib/api";
 import {
   LineChart,
   Line,
@@ -98,7 +98,7 @@ const ForecastResults = () => {
       // Assuming the forecast ID is stored in forecastData
       // If not, we may need to reconstruct the request with the original inputs
       const endpoint = API_ENDPOINTS.regenerateForecastAnalysis(forecastData.id);
-      const response = await apiRequest(endpoint, {
+      const response = await authenticatedRequest(endpoint, {
         method: 'POST',
         credentials: 'include', // Include cookies for authentication if needed
       });
