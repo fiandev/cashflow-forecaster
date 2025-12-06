@@ -30,7 +30,7 @@ export interface BusinessState {
 
 export interface BusinessActions {
   fetchBusinesses: () => Promise<void>;
-  createBusiness: (businessData: Omit<Business, 'id' | 'created_at'>) => Promise<void>;
+  createBusiness: (businessData: Omit<Business, 'id' | 'owner_id' | 'created_at'>) => Promise<void>;
   updateBusiness: (id: number, businessData: Partial<Business>) => Promise<void>;
   deleteBusiness: (id: number) => Promise<void>;
   setCurrentBusiness: (business: Business | null) => void;

@@ -29,7 +29,8 @@ import {
   ArrowLeft,
   BrainCircuit,
 } from "lucide-react";
-import { mdToSafeHtml } from "@/lib/utils";
+import { formatCurrency, mdToSafeHtml } from "@/lib/utils";
+import { useBusinessStore } from "@/stores/business-store";
 
 // Function to generate chart data from the single backend forecast point
 const generateChartData = (forecastData: any, periodDays: number) => {
@@ -76,6 +77,7 @@ const ForecastResults = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { forecastData, forecastPeriod } = location.state || {};
+  const { currentBusiness } = useBusinessStore();
   const [activeView, setActiveView] = useState<"cashflow" | "scenarios">("cashflow");
   const [aiAnalysis, setAiAnalysis] = useState(forecastData?.forecast_metadata?.ai_analysis);
   const [isRegenerating, setIsRegenerating] = useState(false);
@@ -149,7 +151,7 @@ const ForecastResults = () => {
               Projected Net Flow
             </div>
             <div className="text-xl sm:text-2xl font-bold text-foreground">
-              ${forecastData.predicted_value?.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+              {formatCurrency(forecastData.predicted_value || 0, currentBusiness?.currency || 'USD')}
             </div>
             <div className="flex items-center gap-1 mt-2 text-success text-xs sm:text-sm">
               <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -162,7 +164,7 @@ const ForecastResults = () => {
               Confidence Range
             </div>
             <div className="text-xs sm:text-sm font-bold text-foreground mt-1">
-              ${forecastData.lower_bound?.toLocaleString(undefined, { maximumFractionDigits: 0 })} - ${forecastData.upper_bound?.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+              {formatCurrency(forecastData.lower_bound || 0, currentBusiness?.currency || 'USD')} - {formatCurrency(forecastData.upper_bound || 0, currentBusiness?.currency || 'USD')}
             </div>
             <Progress value={85} className="mt-3 h-2" />
           </Card>
@@ -228,7 +230,7 @@ const ForecastResults = () => {
                     border: "1px solid hsl(var(--border))",
                     borderRadius: "8px",
                   }}
-                  formatter={(value: number) => [`$${value.toLocaleString(undefined, { maximumFractionDigits: 0 })}`, ""]}
+                  formatter={(value: number) => [formatCurrency(value, currentBusiness?.currency || 'USD'), ""]}
                 />
                 <Legend />
                 <Area

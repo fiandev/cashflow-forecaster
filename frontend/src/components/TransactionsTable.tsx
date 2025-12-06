@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { authenticatedRequest, API_ENDPOINTS } from "@/lib/api";
 import { Loader2, Info } from "lucide-react";
 import { useBusinessStore } from "@/stores/business-store";
+import { formatCurrency } from "@/lib/utils";
 
 interface Transaction {
   id: number;
@@ -122,10 +123,10 @@ export const TransactionsTable = () => {
                     {transaction.description}
                   </TableCell>
                   <TableCell className="text-right text-success font-medium whitespace-nowrap">
-                    {transaction.direction === "inflow" ? `$${transaction.amount.toLocaleString()}` : "-"}
+                    {transaction.direction === "inflow" ? formatCurrency(transaction.amount, currentBusiness?.currency || 'USD') : "-"}
                   </TableCell>
                   <TableCell className="text-right text-destructive font-medium whitespace-nowrap">
-                    {transaction.direction === "outflow" ? `$${transaction.amount.toLocaleString()}` : "-"}
+                    {transaction.direction === "outflow" ? formatCurrency(transaction.amount, currentBusiness?.currency || 'USD') : "-"}
                   </TableCell>
                   <TableCell className="hidden md:table-cell whitespace-nowrap">{categories[transaction.category_id] || "Unknown"}</TableCell>
                   <TableCell className="hidden md:table-cell whitespace-nowrap">

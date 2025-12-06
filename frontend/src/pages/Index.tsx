@@ -10,6 +10,7 @@ import { authenticatedRequest, API_ENDPOINTS } from "@/lib/api";
 import { Loader2, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useBusinessStore } from "@/stores/business-store";
+import { formatCurrency } from "@/lib/utils";
 
 interface DashboardMetrics {
   net_cashflow: number;
@@ -115,7 +116,7 @@ const Index = () => {
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         <MetricCard
           title="Net Cashflow"
-          value={`$${metrics.net_cashflow.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
+          value={formatCurrency(metrics.net_cashflow, currentBusiness?.currency || 'USD')}
           trend={metrics.net_cashflow_trend}
           trendValue={`${metrics.net_cashflow_percentage_change.toFixed(1)}%`}
           risk={

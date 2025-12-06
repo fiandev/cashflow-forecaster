@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Card } from "@/components/ui/card";
@@ -9,9 +9,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
-import { authenticatedRequest, API_ENDPOINTS } from "@/lib/api";
 import { Loader2 } from "lucide-react";
 import { useBusinessStore } from "@/stores/business-store";
+import { SearchableSelect, type SearchableSelectItem } from "@/components/ui/searchable-select";
 
 const businessSchema = z.object({
   businessName: z
@@ -68,15 +68,143 @@ const businessSchema = z.object({
 
 type BusinessForm = z.infer<typeof businessSchema>;
 
+// Industry options for the searchable select
+const industryOptions: SearchableSelectItem[] = [
+  { value: "Technology", label: "Technology" },
+  { value: "Healthcare", label: "Healthcare" },
+  { value: "Finance", label: "Finance" },
+  { value: "Retail", label: "Retail" },
+  { value: "Manufacturing", label: "Manufacturing" },
+  { value: "Consulting", label: "Consulting" },
+  { value: "Real Estate", label: "Real Estate" },
+  { value: "Education", label: "Education" },
+  { value: "Hospitality", label: "Hospitality" },
+  { value: "Transportation", label: "Transportation" },
+  { value: "Agriculture", label: "Agriculture" },
+  { value: "Construction", label: "Construction" },
+  { value: "Energy", label: "Energy" },
+  { value: "Entertainment", label: "Entertainment" },
+  { value: "Insurance", label: "Insurance" },
+  { value: "Media", label: "Media" },
+  { value: "Telecommunications", label: "Telecommunications" },
+  { value: "Automotive", label: "Automotive" },
+  { value: "Food & Beverage", label: "Food & Beverage" },
+  { value: "Pharmaceuticals", label: "Pharmaceuticals" },
+  { value: "E-commerce", label: "E-commerce" },
+  { value: "SaaS", label: "SaaS" },
+  { value: "Non-profit", label: "Non-profit" },
+  { value: "Other", label: "Other" },
+];
+
+
+const currencyOptions: SearchableSelectItem[] = [
+  { value: "USD", label: "USD - US Dollar" },
+  { value: "EUR", label: "EUR - Euro" },
+  { value: "GBP", label: "GBP - British Pound" },
+  { value: "JPY", label: "JPY - Japanese Yen" },
+  { value: "CAD", label: "CAD - Canadian Dollar" },
+  { value: "AUD", label: "AUD - Australian Dollar" },
+  { value: "CHF", label: "CHF - Swiss Franc" },
+  { value: "CNY", label: "CNY - Chinese Yuan" },
+  { value: "INR", label: "INR - Indian Rupee" },
+  { value: "MXN", label: "MXN - Mexican Peso" },
+  { value: "SGD", label: "SGD - Singapore Dollar" },
+  { value: "NZD", label: "NZD - New Zealand Dollar" },
+  { value: "HKD", label: "HKD - Hong Kong Dollar" },
+  { value: "NOK", label: "NOK - Norwegian Krone" },
+  { value: "SEK", label: "SEK - Swedish Krona" },
+  { value: "DKK", label: "DKK - Danish Krone" },
+  { value: "PLN", label: "PLN - Polish Zloty" },
+  { value: "CZK", label: "CZK - Czech Koruna" },
+  { value: "HUF", label: "HUF - Hungarian Forint" },
+  { value: "TRY", label: "TRY - Turkish Lira" },
+  { value: "RUB", label: "RUB - Russian Ruble" },
+  { value: "BRL", label: "BRL - Brazilian Real" },
+  { value: "KRW", label: "KRW - South Korean Won" },
+  { value: "ZAR", label: "ZAR - South African Rand" },
+  { value: "IDR", label: "IDR - Indonesian Rupiah" },
+  { value: "MYR", label: "MYR - Malaysian Ringgit" },
+  { value: "THB", label: "THB - Thai Baht" },
+  { value: "VND", label: "VND - Vietnamese Dong" },
+  { value: "PHP", label: "PHP - Philippine Peso" },
+  { value: "AED", label: "AED - UAE Dirham" },
+  { value: "SAR", label: "SAR - Saudi Riyal" },
+  { value: "CLP", label: "CLP - Chilean Peso" },
+  { value: "EGP", label: "EGP - Egyptian Pound" },
+  { value: "ISK", label: "ISK - Icelandic Króna" },
+];
+
+const countryOptions: SearchableSelectItem[] = [
+  { value: "USA", label: "United States" },
+  { value: "GBR", label: "United Kingdom" },
+  { value: "CAN", label: "Canada" },
+  { value: "AUS", label: "Australia" },
+  { value: "DEU", label: "Germany" },
+  { value: "FRA", label: "France" },
+  { value: "JPN", label: "Japan" },
+  { value: "CHN", label: "China" },
+  { value: "IND", label: "India" },
+  { value: "BRA", label: "Brazil" },
+  { value: "MEX", label: "Mexico" },
+  { value: "ITA", label: "Italy" },
+  { value: "ESP", label: "Spain" },
+  { value: "NLD", label: "Netherlands" },
+  { value: "CHE", label: "Switzerland" },
+  { value: "SWE", label: "Sweden" },
+  { value: "NOR", label: "Norway" },
+  { value: "DNK", label: "Denmark" },
+  { value: "SGP", label: "Singapore" },
+  { value: "KOR", label: "South Korea" },
+  { value: "ZAF", label: "South Africa" },
+  { value: "NZL", label: "New Zealand" },
+  { value: "RUS", label: "Russia" },
+  { value: "TUR", label: "Turkey" },
+  { value: "POL", label: "Poland" },
+  { value: "CZE", label: "Czech Republic" },
+  { value: "HUN", label: "Hungary" },
+  { value: "ARG", label: "Argentina" },
+  { value: "COL", label: "Colombia" },
+  { value: "PER", label: "Peru" },
+  { value: "CHL", label: "Chile" },
+  { value: "VEN", label: "Venezuela" },
+  { value: "EGY", label: "Egypt" },
+  { value: "NGA", label: "Nigeria" },
+  { value: "KEN", label: "Kenya" },
+  { value: "GHA", label: "Ghana" },
+  { value: "ETH", label: "Ethiopia" },
+  { value: "MAR", label: "Morocco" },
+  { value: "SAU", label: "Saudi Arabia" },
+  { value: "ARE", label: "United Arab Emirates" },
+  { value: "ISR", label: "Israel" },
+  { value: "KAZ", label: "Kazakhstan" },
+  { value: "AZE", label: "Azerbaijan" },
+  { value: "PHL", label: "Philippines" },
+  { value: "THA", label: "Thailand" },
+  { value: "VNM", label: "Vietnam" },
+  { value: "IDN", label: "Indonesia" },
+  { value: "MYS", label: "Malaysia" },
+  { value: "BRN", label: "Brunei" },
+  { value: "KHM", label: "Cambodia" },
+  { value: "LAO", label: "Laos" },
+  { value: "MMR", label: "Myanmar" },
+  { value: "TLS", label: "Timor-Leste" },
+  { value: "IRL", label: "Ireland" },
+  { value: "AUT", label: "Austria" },
+  { value: "BEL", label: "Belgium" },
+  { value: "PRT", label: "Portugal" },
+  { value: "GRC", label: "Greece" },
+];
+
 const CreateBusiness = () => {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   const { createBusiness, fetchBusinesses } = useBusinessStore();
 
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
     reset,
   } = useForm<BusinessForm>({
@@ -90,6 +218,7 @@ const CreateBusiness = () => {
         name: data.businessName,
         currency: data.currency,
         country: data.country,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone, // Use user's local timezone
         settings: {
           industry: data.industry,
           monthly_revenue: Number(data.monthlyRevenue),
@@ -102,10 +231,10 @@ const CreateBusiness = () => {
       };
 
       await createBusiness(payload);
-      
+
       // Fetch updated list of businesses
       await fetchBusinesses();
-      
+
       toast.success("Business created successfully!", {
         description: "Your new business has been added to your account.",
       });
@@ -149,10 +278,17 @@ const CreateBusiness = () => {
 
               <div className="space-y-2">
                 <Label htmlFor="industry">Industry</Label>
-                <Input
-                  id="industry"
-                  placeholder="e.g., Retail, SaaS, Consulting"
-                  {...register("industry")}
+                <Controller
+                  name="industry"
+                  control={control}
+                  render={({ field }) => (
+                    <SearchableSelect
+                      items={industryOptions}
+                      value={field.value}
+                      onValueChange={field.onChange}
+                      placeholder="Select industry..."
+                    />
+                  )}
                 />
                 {errors.industry && (
                   <p className="text-xs sm:text-sm text-destructive">{errors.industry.message}</p>
@@ -163,10 +299,17 @@ const CreateBusiness = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               <div className="space-y-2">
                 <Label htmlFor="currency">Currency</Label>
-                <Input
-                  id="currency"
-                  placeholder="e.g., USD, EUR, GBP"
-                  {...register("currency")}
+                <Controller
+                  name="currency"
+                  control={control}
+                  render={({ field }) => (
+                    <SearchableSelect
+                      items={currencyOptions}
+                      value={field.value}
+                      onValueChange={field.onChange}
+                      placeholder="Select currency..."
+                    />
+                  )}
                 />
                 {errors.currency && (
                   <p className="text-xs sm:text-sm text-destructive">{errors.currency.message}</p>
@@ -175,10 +318,17 @@ const CreateBusiness = () => {
 
               <div className="space-y-2">
                 <Label htmlFor="country">Country</Label>
-                <Input
-                  id="country"
-                  placeholder="e.g., USA, UK, Canada"
-                  {...register("country")}
+                <Controller
+                  name="country"
+                  control={control}
+                  render={({ field }) => (
+                    <SearchableSelect
+                      items={countryOptions}
+                      value={field.value}
+                      onValueChange={field.onChange}
+                      placeholder="Select country..."
+                    />
+                  )}
                 />
                 {errors.country && (
                   <p className="text-xs sm:text-sm text-destructive">{errors.country.message}</p>

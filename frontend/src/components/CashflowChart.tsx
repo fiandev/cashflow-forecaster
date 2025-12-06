@@ -5,6 +5,7 @@ import { authenticatedRequest, API_ENDPOINTS } from "@/lib/api";
 import { Loader2 } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { useBusinessStore } from "@/stores/business-store";
+import { formatCurrency } from "@/lib/utils";
 
 interface Transaction {
   date: string;
@@ -126,7 +127,7 @@ export const CashflowChart = () => {
                 border: "1px solid hsl(var(--border))",
                 borderRadius: "var(--radius)",
               }}
-              formatter={(value: number) => [`$${value.toLocaleString()}`, ""]}
+              formatter={(value: number) => [formatCurrency(value, currentBusiness?.currency || 'USD'), ""]}
               wrapperStyle={{ zIndex: 100 }}
             />
             <Legend />

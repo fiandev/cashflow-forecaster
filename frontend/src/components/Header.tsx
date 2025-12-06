@@ -12,11 +12,11 @@ export const Header = () => {
         <div className="flex-1 min-w-0">
           <h1 className="text-xl font-bold truncate">
             <Link to="/" rel="noopener noreferrer">
-              AI Cashflow & Risk Analyst
+              Cashflow Forecaster
             </Link>
           </h1>
           <p className="text-xs text-muted-foreground hidden sm:block">
-            MVP Dashboard
+            AI Powered Cashflow Forecaster
           </p>
         </div>
 

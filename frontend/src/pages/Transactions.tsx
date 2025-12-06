@@ -14,6 +14,7 @@ import { CalendarIcon, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { authenticatedRequest, API_ENDPOINTS } from "@/lib/api";
 import { useBusinessStore } from "@/stores/business-store";
+import { formatCurrency } from "@/lib/utils";
 
 const transactionSchema = z.object({
   date: z.date({ required_error: "Date is required" }),
@@ -111,7 +112,7 @@ const Transactions = () => {
       });
 
       toast.success("Transaction added successfully!", {
-        description: `${data.type === "inflow" ? "Income" : "Expense"} of $${Number(data.amount).toLocaleString()} recorded.`,
+        description: `${data.type === "inflow" ? "Income" : "Expense"} of ${formatCurrency(Number(data.amount), currentBusiness?.currency || 'USD')} recorded.`,
       });
 
       reset();

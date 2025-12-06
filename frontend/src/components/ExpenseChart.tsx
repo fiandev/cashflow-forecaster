@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { authenticatedRequest, API_ENDPOINTS } from "@/lib/api";
 import { Loader2 } from "lucide-react";
 import { useBusinessStore } from "@/stores/business-store";
+import { formatCurrency } from "@/lib/utils";
 
 interface Transaction {
   amount: number;
@@ -127,7 +128,7 @@ export const ExpenseChart = () => {
                   border: "1px solid hsl(var(--border))",
                   borderRadius: "var(--radius)",
                 }}
-                formatter={(value: number) => [`$${value.toLocaleString()}`, ""]}
+                formatter={(value: number) => [formatCurrency(value, currentBusiness?.currency || 'USD'), ""]}
               />
               <Legend layout="vertical" verticalAlign="middle" align="right" className="hidden sm:block" />
               <Legend layout="horizontal" verticalAlign="bottom" align="center" className="sm:hidden" />

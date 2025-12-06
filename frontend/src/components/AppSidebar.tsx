@@ -56,10 +56,10 @@ export const AppSidebar = () => {
       <SidebarHeader>
         <div className="px-2 py-1">
           <h2 className="text-lg font-semibold text-sidebar-foreground">
-            AI Cashflow
+            Cashflow Forecaster
           </h2>
           <p className="text-xs text-muted-foreground">
-            Risk Analyst
+            AI Powered Cashflow Forecaster
           </p>
         </div>
       </SidebarHeader>

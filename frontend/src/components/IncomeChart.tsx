@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { authenticatedRequest, API_ENDPOINTS } from "@/lib/api";
 import { Loader2 } from "lucide-react";
 import { useBusinessStore } from "@/stores/business-store";
+import { formatCurrency } from "@/lib/utils";
 
 interface Transaction {
   amount: number;
@@ -108,7 +109,7 @@ export const IncomeChart = () => {
                   border: "1px solid hsl(var(--border))",
                   borderRadius: "var(--radius)",
                 }}
-                formatter={(value: number) => [`$${value.toLocaleString()}`, ""]}
+                formatter={(value: number) => [formatCurrency(value, currentBusiness?.currency || 'USD'), ""]}
               />
               <Bar dataKey="amount" fill="hsl(var(--chart-2))" radius={[4, 4, 0, 0]} />
             </BarChart>
