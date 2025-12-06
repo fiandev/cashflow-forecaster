@@ -32,7 +32,7 @@ services:
       dockerfile: Dockerfile.frontend.prod
     container_name: ai_cashflow_frontend
     ports:
-      - "8443:8443"
+      - "8080:8080"
     depends_on:
       backend:
         condition: service_started
