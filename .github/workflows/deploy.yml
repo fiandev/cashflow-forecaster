@@ -45,9 +45,6 @@ jobs:
             tar -xzf deploy.tar.gz -C $TARGET_PATH
             rm deploy.tar.gz
             cd $TARGET_PATH
-
-            systemctl enable docker --now
-            chmod +x docker.sh
             
             KOLOSAL_MODEL="${{ secrets.KOLOSAL_MODEL }}" \
             JWT_SECRET_KEY="${{ secrets.JWT_SECRET_KEY }}" \
