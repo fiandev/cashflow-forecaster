@@ -2,8 +2,11 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import UserProfileCard from "@/components/UserProfileCard";
 import BusinessSelector from "@/components/BusinessSelector";
 import { Link } from "react-router-dom";
+import { useAuthStore } from "@/stores/auth-store";
 
 export const Header = () => {
+  const { isAuthenticated } = useAuthStore();
+
   return (
     <header className="fixed lg:sticky top-0 z-50 w-full border-b border-border bg-card">
       <div className="flex items-center gap-4 px-4 py-4">
@@ -20,12 +23,14 @@ export const Header = () => {
           </p>
         </div>
 
-        <div className="flex items-center gap-2 md:gap-3">
-          <div className="w-40 sm:w-48 md:w-52">
-            <BusinessSelector />
+        {isAuthenticated && (
+          <div className="flex items-center gap-2 md:gap-3">
+            <div className="w-40 sm:w-48 md:w-52">
+              <BusinessSelector />
+            </div>
+            <UserProfileCard />
           </div>
-          <UserProfileCard />
-        </div>
+        )}
       </div>
     </header>
   );

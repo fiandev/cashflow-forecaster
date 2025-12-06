@@ -280,7 +280,7 @@ const MultiStepRegistration: React.FC = () => {
                       Terms of Service
                     </Link>{' '}
                     and{' '}
-                    <Link to="/privacy" className="text-primary hover:underline">
+                    <Link to="/privacy-policy" className="text-primary hover:underline">
                       Privacy Policy
                     </Link>
                   </Label>

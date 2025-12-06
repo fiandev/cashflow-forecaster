@@ -17,7 +17,7 @@ const Login: React.FC = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-  
+
   const { login, isLoading, error, isAuthenticated } = useAuthStore();
 
   React.useEffect(() => {
@@ -128,12 +128,12 @@ const Login: React.FC = () => {
                   </Label>
                 </div>
 
-                <Link
+                {/* <Link
                   to="/reset-password"
                   className="text-sm text-primary hover:underline"
                 >
                   Forgot your password?
-                </Link>
+                </Link> */}
               </div>
             </CardContent>
 
@@ -152,6 +152,12 @@ const Login: React.FC = () => {
                   'Sign in'
                 )}
               </Button>
+              <p className="text-xs text-gray-500">
+                By signing in, you agree to our{' '}
+                <Link to="/terms" className="ml-1 text-primary hover:underline">Terms</Link>
+                {' '}and{' '}
+                <Link to="/privacy-policy" className="ml-1 text-primary hover:underline">Privacy Policy</Link>
+              </p>
             </CardFooter>
           </form>
         </Card>

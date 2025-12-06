@@ -19,6 +19,8 @@ import Register from "./pages/Register";
 import RegisterBusiness from "./pages/RegisterBusiness";
 import CreateBusiness from "./pages/CreateBusiness";
 import ResetPassword from "./pages/ResetPassword";
+import Terms from "./pages/Terms";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -42,6 +44,10 @@ const App = () => (
                 <Route path="/register" element={<Register />} />
                 <Route path="/register-business" element={<RegisterBusiness />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
+
+                {/* Public Routes */}
+                <Route path="/terms" element={<Terms />} />
+                <Route path="/privacy-policy" element={<PrivacyPolicy />} />
 
                 {/* Protected Routes */}
                 <Route path="/" element={
