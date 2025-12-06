@@ -1,7 +1,7 @@
 import os
 
 from dotenv import load_dotenv
-from flask import Flask, make_response, request
+from flask import Flask, request
 from flask_migrate import Migrate
 from flask_cors import CORS
 
@@ -97,8 +97,9 @@ def get_users_by_role(role):
 # Business routes
 business_controller = BusinessController()
 
-
 @app.route("/api/businesses", methods=["GET"])
+@authenticate_request
+@self_or_admin_required
 def get_businesses():
     return business_controller.get_businesses()
 
@@ -108,13 +109,11 @@ def get_businesses():
 def create_business():
     return business_controller.create_business()
 
-
 @app.route("/api/businesses/<int:business_id>", methods=["GET"])
 @authenticate_request
 @self_or_admin_required
 def get_business(business_id):
     return business_controller.get_business(business_id)
-
 
 @app.route("/api/businesses/<int:business_id>", methods=["PUT"])
 @authenticate_request
@@ -122,8 +121,9 @@ def get_business(business_id):
 def update_business(business_id):
     return business_controller.update_business(business_id)
 
-
 @app.route("/api/businesses/<int:business_id>", methods=["DELETE"])
+@authenticate_request
+@self_or_admin_required
 def delete_business(business_id):
     return business_controller.delete_business(business_id)
 
@@ -166,31 +166,37 @@ def delete_transaction(transaction_id):
 
 # Forecast routes
 @app.route("/api/forecasts", methods=["POST"])
+@authenticate_request
 def create_forecast():
     return ForecastController.create_forecast()
 
 
 @app.route("/api/forecasts", methods=["GET"])
+@authenticate_request
 def get_forecasts():
     return ForecastController.get_forecasts()
 
 
 @app.route("/api/forecasts/<int:forecast_id>", methods=["GET"])
+@authenticate_request
 def get_forecast(forecast_id):
     return ForecastController.get_forecast(forecast_id)
 
 
 @app.route("/api/forecasts/<int:forecast_id>", methods=["PUT"])
+@authenticate_request
 def update_forecast(forecast_id):
     return ForecastController.update_forecast(forecast_id)
 
 
 @app.route("/api/forecasts/<int:forecast_id>", methods=["DELETE"])
+@authenticate_request
 def delete_forecast(forecast_id):
     return ForecastController.delete_forecast(forecast_id)
 
 
 @app.route("/api/forecasts/<int:forecast_id>/regenerate-analysis", methods=["POST"])
+@authenticate_request
 def regenerate_forecast_analysis(forecast_id):
     return ForecastController.regenerate_analysis(forecast_id)
 
