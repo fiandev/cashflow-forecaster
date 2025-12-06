@@ -4,6 +4,8 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { RotateCcw } from "lucide-react";
+import { API_ENDPOINTS, apiRequest } from "@/lib/api";
 import {
   LineChart,
   Line,
@@ -75,6 +77,8 @@ const ForecastResults = () => {
   const location = useLocation();
   const { forecastData, forecastPeriod } = location.state || {};
   const [activeView, setActiveView] = useState<"cashflow" | "scenarios">("cashflow");
+  const [aiAnalysis, setAiAnalysis] = useState(forecastData?.forecast_metadata?.ai_analysis);
+  const [isRegenerating, setIsRegenerating] = useState(false);
 
   useEffect(() => {
     if (!forecastData) {
@@ -85,7 +89,27 @@ const ForecastResults = () => {
   if (!forecastData) return null;
 
   const chartData = generateChartData(forecastData, Number(forecastPeriod || 30));
-  const aiAnalysis = forecastData.forecast_metadata?.ai_analysis;
+
+  const regenerateAnalysis = async () => {
+    setIsRegenerating(true);
+    try {
+      // Assuming the forecast ID is stored in forecastData
+      // If not, we may need to reconstruct the request with the original inputs
+      const endpoint = API_ENDPOINTS.regenerateForecastAnalysis(forecastData.id);
+      const response = await apiRequest(endpoint, {
+        method: 'POST',
+        credentials: 'include', // Include cookies for authentication if needed
+      });
+
+      const result = await response.json();
+      setAiAnalysis(result.ai_analysis);
+    } catch (error) {
+      console.error('Error regenerating analysis:', error);
+      // Optionally show error to user
+    } finally {
+      setIsRegenerating(false);
+    }
+  };
 
   const getRiskColor = (level: number) => {
     if (level < 40) return "hsl(var(--success))";
@@ -293,9 +317,21 @@ const ForecastResults = () => {
 
           {/* AI Insights - DYNAMIC */}
           <Card className="p-4 sm:p-6 border-primary/20 bg-primary/5">
-            <div className="flex items-center gap-2 mb-4">
-              <BrainCircuit className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
-              <h3 className="text-base sm:text-lg font-semibold">AI Strategic Analysis</h3>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <BrainCircuit className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+                <h3 className="text-base sm:text-lg font-semibold">AI Strategic Analysis</h3>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={regenerateAnalysis}
+                disabled={isRegenerating}
+                className="h-8"
+              >
+                <RotateCcw className={`w-4 h-4 mr-2 ${isRegenerating ? 'animate-spin' : ''}`} />
+                {isRegenerating ? 'Regenerating...' : 'Regenerate'}
+              </Button>
             </div>
 
             {aiAnalysis ? (

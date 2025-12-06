@@ -25,7 +25,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           source: "deploy.tar.gz"
-          target: "/root"
+          target: "/home/${{ secrets.VPS_USER }}"
 
       - name: Execute remote commands via SSH
         uses: appleboy/ssh-action@v1.0.3
@@ -35,9 +35,9 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
-            TARGET_PATH="/root/ai-cashflow-forecaster"
+            TARGET_PATH="/home/${{ secrets.VPS_USER }}/ai-cashflow-forecaster"
 
-            cd /root
+            cd /home/${{ secrets.VPS_USER }}
 
             rm -rf $TARGET_PATH
             mkdir -p $TARGET_PATH

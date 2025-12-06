@@ -102,13 +102,23 @@ business_controller = BusinessController()
 def get_businesses():
     return business_controller.get_businesses()
 
+@app.route("/api/businesses", methods=["POST"])
+@authenticate_request
+@self_or_admin_required
+def create_business():
+    return business_controller.create_business()
+
 
 @app.route("/api/businesses/<int:business_id>", methods=["GET"])
+@authenticate_request
+@self_or_admin_required
 def get_business(business_id):
     return business_controller.get_business(business_id)
 
 
 @app.route("/api/businesses/<int:business_id>", methods=["PUT"])
+@authenticate_request
+@self_or_admin_required
 def update_business(business_id):
     return business_controller.update_business(business_id)
 
@@ -178,6 +188,11 @@ def update_forecast(forecast_id):
 @app.route("/api/forecasts/<int:forecast_id>", methods=["DELETE"])
 def delete_forecast(forecast_id):
     return ForecastController.delete_forecast(forecast_id)
+
+
+@app.route("/api/forecasts/<int:forecast_id>/regenerate-analysis", methods=["POST"])
+def regenerate_forecast_analysis(forecast_id):
+    return ForecastController.regenerate_analysis(forecast_id)
 
 
 # Alert routes

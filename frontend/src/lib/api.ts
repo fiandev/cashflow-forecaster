@@ -41,6 +41,7 @@ export const API_ENDPOINTS = {
   getForecast: (id: number) => buildEndpoint(`/api/forecasts/${id}`),
   updateForecast: (id: number) => buildEndpoint(`/api/forecasts/${id}`),
   deleteForecast: (id: number) => buildEndpoint(`/api/forecasts/${id}`),
+  regenerateForecastAnalysis: (id: number) => buildEndpoint(`/api/forecasts/${id}/regenerate-analysis`),
 
   // Alert endpoints
   alerts: buildEndpoint("/api/alerts"),

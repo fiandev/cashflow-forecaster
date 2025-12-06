@@ -6,7 +6,8 @@ class AIService:
     def __init__(self):
         self.api_key = os.getenv("KOLOSAL_API_KEY")
         self.base_url = os.getenv("KOLOSAL_BASE_URL", "https://api.kolosal.ai/v1")
-        
+        self.model = os.getenv("KOLOSAL_MODEL", "Llama 4 Maverick")
+
         if self.api_key:
             self.client = OpenAI(
                 api_key=self.api_key,
@@ -103,7 +104,7 @@ class AIService:
 
             # First API Call: Ask the model
             response = self.client.chat.completions.create(
-                model="Llama 4 Maverick",
+                model=self.model,
                 messages=messages,
                 tools=tools,
                 tool_choice="auto", # Let the model decide whether to call a tool
@@ -153,6 +154,10 @@ class AIService:
 
         except Exception as e:
             print(f"Error generating AI insight: {e}")
+            print(f"""
+            Model: {self.model}
+            Base URL: {self.base_url}
+            """)
             return f"AI analysis failed: {str(e)}"
 
     def analyze_transaction_anomaly(self, transaction_data):

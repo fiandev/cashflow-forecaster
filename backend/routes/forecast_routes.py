@@ -27,3 +27,8 @@ def update_forecast(forecast_id):
 @forecast_bp.route("/<int:forecast_id>", methods=["DELETE"])
 def delete_forecast(forecast_id):
     return ForecastController.delete_forecast(forecast_id)
+
+
+@forecast_bp.route("/<int:forecast_id>/regenerate-analysis", methods=["POST"])
+def regenerate_forecast_analysis(forecast_id):
+    return ForecastController.regenerate_analysis(forecast_id)

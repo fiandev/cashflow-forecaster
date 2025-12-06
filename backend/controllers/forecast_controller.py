@@ -310,6 +310,62 @@ class ForecastController:
         return jsonify({"message": "Forecast deleted successfully"})
 
     @staticmethod
+    def regenerate_analysis(forecast_id):
+        forecast = Forecast.query.get(forecast_id)
+        if not forecast:
+            return jsonify({"error": "Forecast not found"}), 404
+
+        # Get transactions within the forecast period
+        transactions = Transaction.query.filter(
+            Transaction.business_id == forecast.business_id,
+            Transaction.date >= forecast.period_start,
+            Transaction.date <= forecast.period_end,
+        ).all()
+
+        # Generate new AI Insight
+        try:
+            ai_service = AIService()
+            # Prepare data for AI analysis
+            analysis_input = {
+                "period_start": forecast.period_start,
+                "period_end": forecast.period_end,
+                "granularity": forecast.granularity,
+                "predicted_value": forecast.predicted_value,
+                "lower_bound": forecast.lower_bound,
+                "upper_bound": forecast.upper_bound,
+                "transactions": [
+                    {
+                        "date": transaction.date.isoformat(),
+                        "amount": float(transaction.amount),
+                        "direction": transaction.direction,
+                        "description": transaction.description,
+                        "category": transaction.category.name
+                        if transaction.category
+                        else None,
+                    }
+                    for transaction in transactions
+                ],
+            }
+
+            insight = ai_service.generate_forecast_insight(analysis_input)
+
+            # Update forecast metadata with new analysis
+            forecast.forecast_metadata = forecast.forecast_metadata or {}
+            forecast.forecast_metadata["ai_analysis"] = insight
+            forecast.forecast_metadata["transaction_count"] = len(transactions)
+
+            db.session.commit()
+
+            return jsonify({
+                "id": forecast.id,
+                "forecast_metadata": forecast.forecast_metadata,
+                "ai_analysis": insight
+            }), 200
+        except Exception as e:
+            print(f"AI Integration Error during regeneration: {e}")
+            return jsonify({"error": "Failed to regenerate AI analysis"}), 500
+
+    @staticmethod
     def get_forecasts_by_business(business_id):
         business = Business.query.get(business_id)
         if not business:
