@@ -534,6 +534,4 @@ This project is licensed under the [MIT License](LICENSE) - see the LICENSE file
 *Built with ❤️ by [Fiandev](https://fiandev.com) and [ErRickow](https://github.com/ErRickow)*
 
 [![GitHub](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/fiandev/cashflow-forecaster)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://linkedin.com/company/fiandev)
-
 </div>
